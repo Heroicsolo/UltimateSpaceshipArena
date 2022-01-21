@@ -969,8 +969,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (m_isWon) return;
         m_isWon = true;
-        PlayerUI.Instance.OnWin();
+        
+        int oldRating = Launcher.instance.CurrentRating;
         Launcher.instance.OnFightWon();
+        int newRating = Launcher.instance.CurrentRating;
+        
+        PlayerUI.Instance.OnWin(oldRating, newRating - oldRating);
+
         Invoke("ExitFromRoom", 5f);
     }
 

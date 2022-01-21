@@ -36,6 +36,8 @@ public class PlayerUI : MonoBehaviour
     [SerializeField]
     private GameObject winScreen;
     [SerializeField]
+    private TextMeshProUGUI winScreenRatingLabel;
+    [SerializeField]
     private GameObject lossScreen;
     [SerializeField]
     private TextMeshProUGUI lobbyScreenTitle;
@@ -157,9 +159,33 @@ public class PlayerUI : MonoBehaviour
         lossScreen.SetActive(true);
     }
 
-    public void OnWin()
+    public void OnWin(int currRating, int ratingChange)
     {
         winScreen.SetActive(true);
+        winScreenRatingLabel.text = currRating.ToString();
+
+        StartCoroutine(WinScreenAnim(currRating, ratingChange));
+    }
+
+    private IEnumerator WinScreenAnim(int currRating, int ratingChange)
+    {
+        float t = 0f;
+
+        int startValue = currRating;
+        int endValue = currRating + ratingChange;
+
+        do
+        {
+            t += Time.deltaTime * 2f;
+
+            int ratingToShow = Mathf.FloorToInt(Mathf.Lerp(startValue, endValue, t));
+            winScreenRatingLabel.text = ratingToShow.ToString();
+
+            yield return null;
+        }
+        while( t < 1f );
+
+        winScreenRatingLabel.text = endValue.ToString();
     }
 
     public void LeaveArena()
