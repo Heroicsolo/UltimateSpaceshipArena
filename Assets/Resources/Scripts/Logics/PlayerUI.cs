@@ -39,6 +39,16 @@ public class PlayerUI : MonoBehaviour
     private GameObject lossScreen;
     [SerializeField]
     private TextMeshProUGUI lobbyScreenTitle;
+    [SerializeField]
+    private GameObject killAnnounceObject;
+    [SerializeField]
+    private TextMeshProUGUI killAnnounceKillerLabel;
+    [SerializeField]
+    private TextMeshProUGUI killAnnounceVictimLabel;
+    [SerializeField]
+    private GameObject captureAnnounceObject;
+    [SerializeField]
+    private TextMeshProUGUI capturerLabel;
 
     private PlayerController target;
     private List<PlayerController> enemies = new List<PlayerController>();
@@ -51,6 +61,26 @@ public class PlayerUI : MonoBehaviour
     public void DoAnnounce(string msg)
     {
         announcementsLabel.text = msg;
+    }
+
+    public void DoKillAnnounce(string killerName, string victimName)
+    {
+        killAnnounceObject.SetActive(false);
+        killAnnounceObject.SetActive(true);
+        killAnnounceKillerLabel.text = killerName;
+        killAnnounceVictimLabel.text = victimName;
+    }
+
+    public void DoCaptureAnnounce(string capturerName)
+    {
+        captureAnnounceObject.SetActive(false);
+        captureAnnounceObject.SetActive(true);
+        capturerLabel.text = capturerName + "<color=\"white\"> is capturing Nexus!</color>";
+    }
+
+    public void HideKillAnnounce()
+    {
+        killAnnounceObject.SetActive(false);
     }
 
     public void AddEnemyToMiniMap(PlayerController _enemy, string nickname, bool isAI)

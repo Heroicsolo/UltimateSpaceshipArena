@@ -130,6 +130,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private bool m_nexusUsed = false;
     private bool m_initialized = false;
     private Transform m_lastEnemy;
+    private string m_lastEnemyName = "";
     private List<float> m_AI_skillsCD = new List<float>();
     private float m_currAITargetChangeDelay = 0f;
     private float m_globalCD = 0f;
@@ -422,6 +423,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             ArenaController.instance.UnregisterPlayer(this);
             PhotonNetwork.Destroy(gameObject);
         }
+
+        PlayerUI.Instance.DoKillAnnounce(m_lastEnemyName, Name);
     }
 
     void ExitFromRoom()
@@ -582,7 +585,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         {
             m_durability -= actualDamage;
 
-            m_lastEnemy = ArenaController.instance.RoomPlayers.Find(x => x.Name == owner).transform;
+            PlayerController enemy = ArenaController.instance.RoomPlayers.Find(x => x.Name == owner);
+
+            if (enemy)
+            {
+                m_lastEnemy = enemy.transform;
+
+                m_lastEnemyName = enemy.Name;
+            }
         }
         else
         {

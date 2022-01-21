@@ -94,6 +94,7 @@ public class Pickup : MonoBehaviourPunCallbacks
             capturersCount++;
             currCapturerNames.Add(capturerName);
             currCapturingTime = 0f;
+            PlayerUI.Instance.DoCaptureAnnounce(capturerName);
         }
     }
 
