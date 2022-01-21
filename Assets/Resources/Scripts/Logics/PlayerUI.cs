@@ -38,6 +38,8 @@ public class PlayerUI : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI winScreenRatingLabel;
     [SerializeField]
+    private TextMeshProUGUI loseScreenRatingLabel;
+    [SerializeField]
     private GameObject lossScreen;
     [SerializeField]
     private TextMeshProUGUI lobbyScreenTitle;
@@ -154,9 +156,13 @@ public class PlayerUI : MonoBehaviour
         lobbyScreenTitle.text = string.Format("Players ready to fight: {0}/{1}", m_lobbyPlayers.Count, PhotonNetwork.CurrentRoom.MaxPlayers);
     }
 
-    public void OnLoss()
+    public void OnLoss(int currRating, int ratingChange)
     {
         lossScreen.SetActive(true);
+
+        loseScreenRatingLabel.text = currRating.ToString();
+
+        StartCoroutine(LoseScreenAnim(currRating, ratingChange));
     }
 
     public void OnWin(int currRating, int ratingChange)
@@ -188,9 +194,31 @@ public class PlayerUI : MonoBehaviour
         winScreenRatingLabel.text = endValue.ToString();
     }
 
+    private IEnumerator LoseScreenAnim(int currRating, int ratingChange)
+    {
+        float t = 0f;
+
+        int startValue = currRating;
+        int endValue = currRating + ratingChange;
+
+        do
+        {
+            t += Time.deltaTime * 2f;
+
+            int ratingToShow = Mathf.FloorToInt(Mathf.Lerp(startValue, endValue, t));
+            loseScreenRatingLabel.text = ratingToShow.ToString();
+
+            yield return null;
+        }
+        while( t < 1f );
+
+        loseScreenRatingLabel.text = endValue.ToString();
+    }
+
     public void LeaveArena()
     {
         ArenaController.instance.LeaveRoom();
+        Launcher.instance.OnFightLoss();
     }
 
     public void Shoot()

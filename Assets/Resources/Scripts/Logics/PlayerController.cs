@@ -961,7 +961,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     void OnLoss()
     {
-        PlayerUI.Instance.OnLoss();
+        int oldRating = Launcher.instance.CurrentRating;
+        Launcher.instance.OnFightLoss();
+        int newRating = Launcher.instance.CurrentRating;
+
+        PlayerUI.Instance.OnLoss(oldRating, newRating - oldRating);
+
         Invoke("ExitFromRoom", 5f);
     }
 
