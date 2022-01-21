@@ -65,6 +65,7 @@ public class PlayerUI : MonoBehaviour
 
     public void DoKillAnnounce(string killerName, string victimName)
     {
+        HideCaptureAnnounce();
         killAnnounceObject.SetActive(false);
         killAnnounceObject.SetActive(true);
         killAnnounceKillerLabel.text = killerName;
@@ -73,6 +74,7 @@ public class PlayerUI : MonoBehaviour
 
     public void DoCaptureAnnounce(string capturerName)
     {
+        HideKillAnnounce();
         captureAnnounceObject.SetActive(false);
         captureAnnounceObject.SetActive(true);
         capturerLabel.text = capturerName + "<color=\"white\"> is capturing Nexus!</color>";
@@ -81,6 +83,11 @@ public class PlayerUI : MonoBehaviour
     public void HideKillAnnounce()
     {
         killAnnounceObject.SetActive(false);
+    }
+
+    public void HideCaptureAnnounce()
+    {
+        captureAnnounceObject.SetActive(false);
     }
 
     public void AddEnemyToMiniMap(PlayerController _enemy, string nickname, bool isAI)
