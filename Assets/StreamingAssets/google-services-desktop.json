@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "230129856572",
+    "firebase_url": "https://ultimate-spaceship-arena-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "ultimate-spaceship-arena",
+    "storage_bucket": "ultimate-spaceship-arena.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:230129856572:android:8a907edce2db54da3dd339",
+        "android_client_info": {
+          "package_name": "com.marktsemma.ultimatespaceshiparena"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "230129856572-1utcs54rg4ecogs1touv116nqetovidh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhMGCCDO1HfapLYeO9lS-OY8iUwORzGcQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "230129856572-1utcs54rg4ecogs1touv116nqetovidh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
