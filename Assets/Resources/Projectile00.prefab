@@ -119,8 +119,14 @@ MonoBehaviour:
   speed: 160
   lifeTime: 3
   ignoreField: 0
+  isGuiding: 1
+  isDynamicGuiding: 0
+  dynamicGuidingInterval: 0
+  guidingForce: 0.4
+  guidingMaxDist: 200
   ownerID: 
   ownerName: 
+  target: {fileID: 0}
   explodeEffect: {fileID: 1708519681166870291}
 --- !u!54 &5722110091043512634
 Rigidbody:

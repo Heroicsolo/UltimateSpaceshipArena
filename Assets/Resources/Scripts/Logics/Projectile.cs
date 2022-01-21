@@ -24,6 +24,7 @@ public class Projectile : MonoBehaviourPunCallbacks
     [HideInInspector]
     public Transform target;
 
+    private bool targetSelected = false;
     private float timeToDeath = 3f;
     private float timeToChangeTarget = 0f;
 
@@ -55,6 +56,8 @@ public class Projectile : MonoBehaviourPunCallbacks
             target = selectedPlayers[0].transform;
 
             timeToChangeTarget = dynamicGuidingInterval;
+
+            targetSelected = true;
         }
     }
 
@@ -73,9 +76,12 @@ public class Projectile : MonoBehaviourPunCallbacks
                 Explode();
             }
 
-            if (isGuiding && isDynamicGuiding && guidingForce > 0f && (timeToChangeTarget <= 0f || target == null))
+            if (isGuiding && guidingForce > 0f && (timeToChangeTarget <= 0f || target == null))
             {
-                FindNewGuidingTarget();
+                if (isDynamicGuiding)
+                    FindNewGuidingTarget();
+                else if (!isDynamicGuiding && target == null && !targetSelected)
+                    FindNewGuidingTarget();
             }
 
             if (isGuiding && guidingForce > 0f && target != null && target.Distance(transform) < guidingMaxDist)
