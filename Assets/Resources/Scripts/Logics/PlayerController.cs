@@ -595,10 +595,24 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             EndStealth();
     }
 
+    void CheckVictory()
+    {
+        if (!m_isWon && PlayerUI.Instance != null && 
+            !PlayerUI.Instance.IsLobbyState && 
+            ArenaController.instance.RoomPlayers.Count == 1 && 
+            ArenaController.instance.RoomPlayers[0] == this && 
+            DurabilityPercent > 0f)
+        {
+            OnWin();
+        }
+    }
+
     // Update is called once per frame
     void Update()
     {
         ReconstructUI();
+
+        CheckVictory();
 
         HPBar.fillAmount = DurabilityPercent;
         ShieldBar.fillAmount = FieldPercent;
