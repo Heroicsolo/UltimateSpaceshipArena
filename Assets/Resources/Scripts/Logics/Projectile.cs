@@ -87,14 +87,25 @@ public class Projectile : MonoBehaviourPunCallbacks
             if (isGuiding && guidingForce > 0f && target != null && target.Distance(transform) < guidingMaxDist)
             {
                 Vector3 dir = (target.position - transform.position).normalized;
-                Vector3 guidedDir = dir * guidingForce + transform.forward * (1f - guidingForce);
-                transform.Translate(guidedDir * speed * Time.deltaTime, Space.World);
+
+                Vector3 localDir = transform.InverseTransformDirection(dir);
+
+                if (localDir.z > 0f)
+                {
+                    Vector3 guidedDir = dir * guidingForce + transform.forward * (1f - guidingForce);
+                    transform.LookAt(transform.position + guidedDir);
+                }
+                else
+                {
+                    target = null;
+                }
             }
             else
             {
-                transform.Translate(transform.forward * speed * Time.deltaTime, Space.World);
                 target = null;
             }
+
+            transform.Translate(transform.forward * speed * Time.deltaTime, Space.World);
         }
     }
 
