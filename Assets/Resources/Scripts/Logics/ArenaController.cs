@@ -193,6 +193,5 @@ public class ArenaController : MonoBehaviourPunCallbacks
     public void LeaveRoom()
     {
         PhotonNetwork.LeaveRoom();
-        Launcher.instance.OnFightLoss();
     }
 }
