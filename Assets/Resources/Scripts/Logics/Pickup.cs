@@ -113,7 +113,7 @@ public class Pickup : MonoBehaviourPunCallbacks
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && isNexus)
         {
             PlayerController pc = other.GetComponent<PlayerController>();
 
@@ -123,7 +123,7 @@ public class Pickup : MonoBehaviourPunCallbacks
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && isNexus)
         {
             PlayerController pc = other.GetComponent<PlayerController>();
 
