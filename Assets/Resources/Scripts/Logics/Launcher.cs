@@ -266,11 +266,6 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
         chatClient.ChatRegion = "EU";
         chatClient.Connect(PhotonNetwork.PhotonServerSettings.AppSettings.AppIdChat, PhotonNetwork.PhotonServerSettings.AppSettings.AppVersion, new Photon.Chat.AuthenticationValues(UserName));
-
-        yield return new WaitUntil(() => chatClient.State == ChatState.Authenticated);
-
-        chatClient.Subscribe("General");
-        chatClient.SetOnlineStatus(ChatUserStatus.Online);
     }
 
     #endregion
@@ -718,7 +713,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     {
         if (chatClient.CanChat)
         {
-            chatClient.PublishMessage("General", chatMessageField.text);
+            chatClient.PublishMessage("General", "<color=\"green\">" + UserName + ": </color>" + chatMessageField.text);
             chatMessageField.text = "";
         }
     }
@@ -727,6 +722,12 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     {
 
     }
+
+    public void OnConnected()
+    {
+		chatClient.Subscribe("General");
+        chatClient.SetOnlineStatus(ChatUserStatus.Online);
+	}
 
     public void OnDisconnected()
     {
