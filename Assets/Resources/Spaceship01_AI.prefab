@@ -920,8 +920,8 @@ MonoBehaviour:
   m_radarRadius: 40
   m_durabilityRegen: 0.02
   m_fieldRegen: 0.03
-  m_maxDurability: 80
-  m_maxField: 80
+  m_maxDurability: 75
+  m_maxField: 60
   m_shieldRegenDelay: 1
   m_maxSpeed: 65
   shootSound: {fileID: 8300000, guid: c1e99d871f2580347ad67130bbb1902a, type: 3}
