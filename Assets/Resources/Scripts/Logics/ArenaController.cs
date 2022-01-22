@@ -124,7 +124,10 @@ public class ArenaController : MonoBehaviourPunCallbacks
                 m_botsSpawnPoints.Remove(point);
             }
 
-            PhotonNetwork.Instantiate(Launcher.instance.SelectedShipPrefab.name, point.position, Quaternion.identity, 0);
+            if (Launcher.instance.SelectedShipPrefab == null)
+                PhotonNetwork.Instantiate("Spaceship00", point.position, Quaternion.identity, 0);
+            else
+                PhotonNetwork.Instantiate(Launcher.instance.SelectedShipPrefab.name, point.position, Quaternion.identity, 0);
 
             SpawnPickups();
             SpawnBots();

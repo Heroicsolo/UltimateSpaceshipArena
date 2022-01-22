@@ -9,7 +9,7 @@ using TMPro;
 using System.Collections.Generic;
 using System;
 
-public class Launcher : MonoBehaviourPunCallbacks
+public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 {
     public static Launcher instance;
 
@@ -91,12 +91,16 @@ public class Launcher : MonoBehaviourPunCallbacks
     public int CurrentRating => m_arenaRating;
     public GameObject SelectedShipPrefab { get { return m_selectedShip; } set { m_selectedShip = value; } }
 
+    public const string ELO_PROP_KEY = "C0";
+    private TypedLobby sqlLobby = new TypedLobby("customSqlLobby", LobbyType.SqlLobby);
+    private LoadBalancingClient loadBalancingClient;
+
     /// <summary>
     /// MonoBehaviour method called on GameObject by Unity during early initialization phase.
     /// </summary>
     void Awake()
     {
-        if (!instance) 
+        if (!instance)
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
@@ -117,19 +121,19 @@ public class Launcher : MonoBehaviourPunCallbacks
             var dependencyStatus = task.Result;
             if (dependencyStatus == Firebase.DependencyStatus.Available)
             {
-                    // Create and hold a reference to your FirebaseApp,
-                    // where app is a Firebase.FirebaseApp property of your application class.
-                    app = Firebase.FirebaseApp.DefaultInstance;
+                // Create and hold a reference to your FirebaseApp,
+                // where app is a Firebase.FirebaseApp property of your application class.
+                app = Firebase.FirebaseApp.DefaultInstance;
 
                 InitFirebase();
-                    // Set a flag here to indicate whether Firebase is ready to use by your app.
-                }
+                // Set a flag here to indicate whether Firebase is ready to use by your app.
+            }
             else
             {
                 UnityEngine.Debug.LogError(System.String.Format(
                     "Could not resolve all Firebase dependencies: {0}", dependencyStatus));
-                    // Firebase Unity SDK is not safe to use here.
-                }
+                // Firebase Unity SDK is not safe to use here.
+            }
         });
 
         isConnectedToMaster = false;
@@ -246,6 +250,7 @@ public class Launcher : MonoBehaviourPunCallbacks
     public void OnShipSelectorOpened()
     {
         defaultShipToggle.SetIsOnWithoutNotify(true);
+        defaultShipToggle.Select();
     }
 
     public void GetProfileData()
@@ -505,7 +510,12 @@ public class Launcher : MonoBehaviourPunCallbacks
             m_loadingScreen.SetActive(true);
             m_loadingText.text = "FINDING A GAME...";
             // #Critical we need at this point to attempt joining a Random Room. If it fails, we'll get notified in OnJoinRandomFailed() and we'll create one.
-            PhotonNetwork.JoinRandomRoom();
+            string sqlLobbyFilter = string.Format("C0 BETWEEN {0} AND {1}", Mathf.Max(0, m_arenaRating - 200), m_arenaRating + 200);
+            OpJoinRandomRoomParams opJoinRandomRoomParams = new OpJoinRandomRoomParams();
+            opJoinRandomRoomParams.SqlLobbyFilter = sqlLobbyFilter;
+            if (loadBalancingClient == null)
+                loadBalancingClient = PhotonNetwork.NetworkingClient;
+            loadBalancingClient.OpJoinRandomRoom(opJoinRandomRoomParams);
         }
     }
 
@@ -568,7 +578,12 @@ public class Launcher : MonoBehaviourPunCallbacks
         RoomOptions roomOptions = new RoomOptions();
         roomOptions.MaxPlayers = maxPlayersPerRoom;
         roomOptions.EmptyRoomTtl = 1000;
-        PhotonNetwork.CreateRoom(null, roomOptions);
+        roomOptions.CustomRoomProperties = new ExitGames.Client.Photon.Hashtable { { ELO_PROP_KEY, m_arenaRating } };
+        roomOptions.CustomRoomPropertiesForLobby = new string[] { ELO_PROP_KEY };
+        EnterRoomParams enterRoomParams = new EnterRoomParams();
+        enterRoomParams.RoomOptions = roomOptions;
+        enterRoomParams.Lobby = sqlLobby;
+        loadBalancingClient.OpCreateRoom(enterRoomParams);
     }
 
     public override void OnJoinedRoom()
@@ -645,8 +660,8 @@ public class Launcher : MonoBehaviourPunCallbacks
                 return;
             }
 
-                // Firebase user has been created.
-                FirebaseUser newUser = task.Result;
+            // Firebase user has been created.
+            FirebaseUser newUser = task.Result;
             Debug.LogFormat("Firebase user created successfully: {0} ({1})", newUser.DisplayName, newUser.UserId);
 
             m_email = email;
