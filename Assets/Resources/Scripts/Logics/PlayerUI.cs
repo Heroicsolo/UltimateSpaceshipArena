@@ -426,6 +426,11 @@ public class PlayerUI : MonoBehaviour
                 IsLobbyState = false;
                 lobbyScreen.SetActive(false);
                 PlaySound(SoundType.LobbyTimerEnd);
+
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    ArenaController.instance.RemoveRoomFromList();
+                }
             }
             else
             {
