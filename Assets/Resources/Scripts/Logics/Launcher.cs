@@ -252,7 +252,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
     public void OnShipSelectorOpened()
     {
-        defaultShipToggle.SetIsOnWithoutNotify(true);
+        defaultShipToggle.isOn = true;
         defaultShipToggle.Select();
     }
 
