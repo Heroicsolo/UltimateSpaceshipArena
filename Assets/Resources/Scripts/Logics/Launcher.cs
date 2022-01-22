@@ -265,10 +265,12 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         chatClient = new ChatClient(this);
 
         chatClient.ChatRegion = "EU";
-        chatClient.Connect(chatAppId, gameVersion, new Photon.Chat.AuthenticationValues(UserName));
+        chatClient.Connect(PhotonNetwork.PhotonServerSettings.AppSettings.AppIdChat, PhotonNetwork.PhotonServerSettings.AppSettings.AppVersion, new Photon.Chat.AuthenticationValues(UserName));
+
         yield return new WaitUntil(() => chatClient.State == ChatState.Authenticated);
 
         chatClient.Subscribe("General");
+        chatClient.SetOnlineStatus(ChatUserStatus.Online);
     }
 
     #endregion
@@ -378,6 +380,11 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
             mDatabaseRef.Child(m_userId).Child("online").SetValueAsync(false);
 
         SignOut();
+
+        if (chatClient != null)
+        {
+            chatClient.Disconnect();
+        }
     }
 
     private void LoadNicknamesFromSnapshot(DataSnapshot snapshot)
@@ -715,17 +722,17 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
     public void DebugReturn(DebugLevel level, string message)
     {
-        
+
     }
 
     public void OnDisconnected()
     {
-        
+
     }
 
     public void OnChatStateChange(ChatState state)
     {
-        
+
     }
 
     public void OnGetMessages(string channelName, string[] senders, object[] messages)
@@ -748,31 +755,31 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
     public void OnPrivateMessage(string sender, object message, string channelName)
     {
-        
+
     }
 
     public void OnSubscribed(string[] channels, bool[] results)
     {
-        
+
     }
 
     public void OnUnsubscribed(string[] channels)
     {
-        
+
     }
 
     public void OnStatusUpdate(string user, int status, bool gotMessage, object message)
     {
-        
+
     }
 
     public void OnUserSubscribed(string channel, string user)
     {
-        
+
     }
 
     public void OnUserUnsubscribed(string channel, string user)
     {
-        
+
     }
 }
