@@ -8,8 +8,10 @@ using Firebase.Database;
 using TMPro;
 using System.Collections.Generic;
 using System;
+using Photon.Chat;
+using ExitGames.Client.Photon;
 
-public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
+public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatClientListener
 {
     public static Launcher instance;
 
@@ -26,8 +28,10 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     /// This client's version number. Users are separated from each other by gameVersion (which allows you to make breaking changes).
     /// </summary>
     string gameVersion = "3";
+    string chatAppId = "5daa70f5-f9e6-4d8f-a4cb-bfd821e0a048";
     [SerializeField] private byte maxPlayersPerRoom = 8;
     [SerializeField] private int initArenaRating = 1000;
+    [SerializeField] private int maxChatMessagesCount = 20;
     [SerializeField] private GameObject m_loginScreen;
     [SerializeField] private GameObject m_signupScreen;
     [SerializeField] private GameObject m_loadingScreen;
@@ -44,6 +48,9 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     [SerializeField] private GameObject m_homeScreen;
     [SerializeField] AudioClip buttonSound;
     [SerializeField] private TextMeshProUGUI userIdLabel;
+    [SerializeField] private Transform chatContent;
+    [SerializeField] private GameObject chatMessagePrefab;
+    [SerializeField] private TMP_InputField chatMessageField;
 
     private Firebase.FirebaseApp app = null;
     private FirebaseAuth auth;
@@ -81,6 +88,9 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
     private AudioSource audioSource;
 
+    private ChatClient chatClient;
+    private List<GameObject> chatMessages = new List<GameObject>();
+
     private List<string> m_usedNicknamesList = new List<string>();
 
     #endregion
@@ -94,7 +104,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     public int CurrentRating => m_arenaRating;
     public GameObject SelectedShipPrefab { get { return m_selectedShip; } set { m_selectedShip = value; } }
 
-    public bool IsSoundOn{ get{ return isSoundOn; } set{ isSoundOn = value; PlayerPrefs.SetInt("soundOn", isSoundOn ? 1 : 0); } }
+    public bool IsSoundOn { get { return isSoundOn; } set { isSoundOn = value; PlayerPrefs.SetInt("soundOn", isSoundOn ? 1 : 0); } }
 
     public const string ELO_PROP_KEY = "C0";
     private TypedLobby sqlLobby = new TypedLobby("customSqlLobby", LobbyType.SqlLobby);
@@ -123,7 +133,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
         isSoundOn = PlayerPrefs.GetInt("soundOn", 1) == 1;
 
-        AudioListener.volume = Launcher.instance.IsSoundOn ? 1f : 0f;
+        AudioListener.volume = IsSoundOn ? 1f : 0f;
 
         Firebase.FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
         {
@@ -251,6 +261,15 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         GetProfileData();
 
         userIdLabel.text = "User ID: " + UserID;
+
+        chatClient = new ChatClient(this);
+
+        chatClient.ChatRegion = "EU";
+        chatClient.Connect(chatAppId, gameVersion, new Photon.Chat.AuthenticationValues(UserName));
+
+        yield return new WaitUntil(() => chatClient.State == ChatState.Authenticated);
+
+        chatClient.Subscribe(new string[] { "General" });
     }
 
     #endregion
@@ -559,8 +578,10 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
     private void Update()
     {
-        if (isConnectedToMaster && m_playersCountText)
+        if (isConnectedToMaster && m_playersCountText && chatClient != null && chatClient.CanChat)
         {
+            chatClient.Service();
+
             m_playersCountText.text = "Players online: " + PhotonNetwork.CountOfPlayers + "\nPlayers on arena: " + PhotonNetwork.CountOfPlayersInRooms;
         }
     }
@@ -684,5 +705,74 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
             m_signedIn = true;
             m_signingIn = false;
         });
+    }
+
+    public void SendChatMessage()
+    {
+        if (chatClient.CanChat)
+            chatClient.PublishMessage("General", chatMessageField.text);
+    }
+
+    public void DebugReturn(DebugLevel level, string message)
+    {
+        
+    }
+
+    public void OnDisconnected()
+    {
+        
+    }
+
+    public void OnChatStateChange(ChatState state)
+    {
+        
+    }
+
+    public void OnGetMessages(string channelName, string[] senders, object[] messages)
+    {
+        for (int i = 0; i < senders.Length; i++)
+        {
+            GameObject chatMsgGO = Instantiate(chatMessagePrefab, chatContent);
+            chatMsgGO.GetComponent<TextMeshProUGUI>().text = messages[i].ToString();
+
+            chatMessages.Add(chatMsgGO);
+
+            if (chatMessages.Count > maxChatMessagesCount)
+            {
+                GameObject firstChatMsg = chatMessages[0];
+                chatMessages.RemoveAt(0);
+                Destroy(firstChatMsg);
+            }
+        }
+    }
+
+    public void OnPrivateMessage(string sender, object message, string channelName)
+    {
+        
+    }
+
+    public void OnSubscribed(string[] channels, bool[] results)
+    {
+        
+    }
+
+    public void OnUnsubscribed(string[] channels)
+    {
+        
+    }
+
+    public void OnStatusUpdate(string user, int status, bool gotMessage, object message)
+    {
+        
+    }
+
+    public void OnUserSubscribed(string channel, string user)
+    {
+        
+    }
+
+    public void OnUserUnsubscribed(string channel, string user)
+    {
+        
     }
 }
