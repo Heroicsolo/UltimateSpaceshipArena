@@ -600,6 +600,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             m_currShieldRegenDelay = m_shieldRegenDelay;
 
             SpawnDamageText(actualDamage, isCrit);
+
+            if (DurabilityPercent < 0.25f && photonView.IsMine && !IsAI)
+            {
+                PlayerUI.Instance.PlaySound(PlayerUI.SoundType.LowDurability, 10f);
+            }
         }
         else
         {

@@ -794,6 +794,7 @@ MonoBehaviour:
   m_fieldRegen: 0.03
   m_maxDurability: 80
   m_maxField: 80
+  m_shieldRegenDelay: 1
   m_maxSpeed: 65
 --- !u!54 &6972756198996731786
 Rigidbody:

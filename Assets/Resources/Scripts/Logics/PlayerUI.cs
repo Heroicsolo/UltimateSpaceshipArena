@@ -9,6 +9,7 @@ public class PlayerUI : MonoBehaviour
 {
     public static PlayerUI Instance;
 
+    [Header("Battle UI")]
     [SerializeField]
     private Image playerHealthBar;
     [SerializeField]
@@ -25,6 +26,7 @@ public class PlayerUI : MonoBehaviour
     private List<SkillButton> m_skillsButtons;
     [SerializeField]
     private TextMeshProUGUI announcementsLabel;
+    [Header("Lobby")]
     [SerializeField]
     private GameObject lobbyScreen;
     [SerializeField]
@@ -33,6 +35,7 @@ public class PlayerUI : MonoBehaviour
     private TextMeshProUGUI lobbyTimer;
     [SerializeField]
     private Transform lobbyPlayersHolder;
+    [Header("Win/Loss Screens")]
     [SerializeField]
     private GameObject winScreen;
     [SerializeField]
@@ -43,6 +46,7 @@ public class PlayerUI : MonoBehaviour
     private GameObject lossScreen;
     [SerializeField]
     private TextMeshProUGUI lobbyScreenTitle;
+    [Header("UI Announcements")]
     [SerializeField]
     private GameObject killAnnounceObject;
     [SerializeField]
@@ -53,6 +57,35 @@ public class PlayerUI : MonoBehaviour
     private GameObject captureAnnounceObject;
     [SerializeField]
     private TextMeshProUGUI capturerLabel;
+    [Header("Audio")]
+    [SerializeField]
+    private AudioSource audioSource;
+    [SerializeField]
+    private AudioClip getReadySound;
+    [SerializeField]
+    private AudioClip lobbyTimerStartSound;
+    [SerializeField]
+    private AudioClip lobbyTimerThreeSound;
+    [SerializeField]
+    private AudioClip lobbyTimerTwoSound;
+    [SerializeField]
+    private AudioClip lobbyTimerOneSound;
+    [SerializeField]
+    private List<AudioClip> lobbyTimerZeroSounds;
+    [SerializeField]
+    private List<AudioClip> killSounds;
+    [SerializeField]
+    private AudioClip capturingSound;
+    [SerializeField]
+    private AudioClip capturingFriendlySound;
+    [SerializeField]
+    private AudioClip finishHimSound;
+    [SerializeField]
+    private AudioClip victorySound;
+    [SerializeField]
+    private AudioClip lossSound;
+    [SerializeField]
+    private List<AudioClip> lowDurabilitySounds;
 
     private PlayerController target;
     private List<PlayerController> enemies = new List<PlayerController>();
@@ -61,6 +94,122 @@ public class PlayerUI : MonoBehaviour
 
     public bool IsLobbyState = true;
     private bool IsInitialized = false;
+    private Dictionary<SoundType, float> soundsCDs = new Dictionary<SoundType, float>();
+
+    public enum SoundType
+    {
+        GetReady,
+        LobbyTimerStart,
+        LobbyTimerOne,
+        LobbyTimerTwo,
+        LobbyTimerThree,
+        LobbyTimerEnd,
+        Kill,
+        Capturing,
+        CapturingFriendly,
+        FinishHim,
+        Victory,
+        Loss,
+        LowDurability
+    }
+
+    public void PlaySound(SoundType soundType, float cooldown = 0f)
+    {
+        switch (soundType)
+        {
+            case SoundType.GetReady:
+                if (getReadySound && (!soundsCDs.ContainsKey(SoundType.GetReady) || soundsCDs[SoundType.GetReady] <= 0f))
+                {
+                    audioSource.PlayOneShot(getReadySound);
+                    soundsCDs[SoundType.GetReady] = cooldown;
+                }
+                break;
+            case SoundType.Kill:
+                if (killSounds.Count > 0 && (!soundsCDs.ContainsKey(SoundType.Kill) || soundsCDs[SoundType.Kill] <= 0f))
+                {
+                    audioSource.PlayOneShot(killSounds.GetRandomElement());
+                    soundsCDs[SoundType.Kill] = cooldown;
+                }
+                break;
+            case SoundType.FinishHim:
+                if (finishHimSound && (!soundsCDs.ContainsKey(SoundType.FinishHim) || soundsCDs[SoundType.FinishHim] <= 0f))
+                {
+                    audioSource.PlayOneShot(finishHimSound);
+                    soundsCDs[SoundType.FinishHim] = cooldown;
+                }
+                break;
+            case SoundType.Victory:
+                if (victorySound && (!soundsCDs.ContainsKey(SoundType.Victory) || soundsCDs[SoundType.Victory] <= 0f))
+                {
+                    audioSource.PlayOneShot(victorySound);
+                    soundsCDs[SoundType.Victory] = cooldown;
+                }
+                break;
+            case SoundType.Loss:
+                if (lossSound && (!soundsCDs.ContainsKey(SoundType.Loss) || soundsCDs[SoundType.Loss] <= 0f))
+                {
+                    audioSource.PlayOneShot(lossSound);
+                    soundsCDs[SoundType.Loss] = cooldown;
+                }
+                break;
+            case SoundType.LowDurability:
+                if (lowDurabilitySounds.Count > 0 && (!soundsCDs.ContainsKey(SoundType.LowDurability) || soundsCDs[SoundType.LowDurability] <= 0f))
+                {
+                    audioSource.PlayOneShot(lowDurabilitySounds.GetRandomElement());
+                    soundsCDs[SoundType.LowDurability] = cooldown;
+                }
+                break;
+            case SoundType.Capturing:
+                if (capturingSound && (!soundsCDs.ContainsKey(SoundType.Capturing) || soundsCDs[SoundType.Capturing] <= 0f))
+                {
+                    audioSource.PlayOneShot(capturingSound);
+                    soundsCDs[SoundType.Capturing] = cooldown;
+                }
+                break;
+            case SoundType.CapturingFriendly:
+                if (capturingFriendlySound && (!soundsCDs.ContainsKey(SoundType.CapturingFriendly) || soundsCDs[SoundType.CapturingFriendly] <= 0f))
+                {
+                    audioSource.PlayOneShot(capturingFriendlySound);
+                    soundsCDs[SoundType.CapturingFriendly] = cooldown;
+                }
+                break;
+            case SoundType.LobbyTimerStart:
+                if (lobbyTimerStartSound && (!soundsCDs.ContainsKey(SoundType.LobbyTimerStart) || soundsCDs[SoundType.LobbyTimerStart] <= 0f))
+                {
+                    audioSource.PlayOneShot(lobbyTimerStartSound);
+                    soundsCDs[SoundType.LobbyTimerStart] = cooldown;
+                }
+                break;
+            case SoundType.LobbyTimerThree:
+                if (lobbyTimerThreeSound && (!soundsCDs.ContainsKey(SoundType.LobbyTimerThree) || soundsCDs[SoundType.LobbyTimerThree] <= 0f))
+                {
+                    audioSource.PlayOneShot(lobbyTimerThreeSound);
+                    soundsCDs[SoundType.LobbyTimerThree] = cooldown;
+                }
+                break;
+            case SoundType.LobbyTimerTwo:
+                if (lobbyTimerTwoSound && (!soundsCDs.ContainsKey(SoundType.LobbyTimerTwo) || soundsCDs[SoundType.LobbyTimerTwo] <= 0f))
+                {
+                    audioSource.PlayOneShot(lobbyTimerTwoSound);
+                    soundsCDs[SoundType.LobbyTimerTwo] = cooldown;
+                }
+                break;
+            case SoundType.LobbyTimerOne:
+                if (lobbyTimerOneSound && (!soundsCDs.ContainsKey(SoundType.LobbyTimerOne) || soundsCDs[SoundType.LobbyTimerOne] <= 0f))
+                {
+                    audioSource.PlayOneShot(lobbyTimerOneSound);
+                    soundsCDs[SoundType.LobbyTimerOne] = cooldown;
+                }
+                break;
+            case SoundType.LobbyTimerEnd:
+                if (lobbyTimerZeroSounds.Count > 0 && (!soundsCDs.ContainsKey(SoundType.LobbyTimerEnd) || soundsCDs[SoundType.LobbyTimerEnd] <= 0f))
+                {
+                    audioSource.PlayOneShot(lobbyTimerZeroSounds.GetRandomElement());
+                    soundsCDs[SoundType.LobbyTimerEnd] = cooldown;
+                }
+                break;
+        }
+    }
 
     public void DoAnnounce(string msg)
     {
@@ -74,6 +223,11 @@ public class PlayerUI : MonoBehaviour
         killAnnounceObject.SetActive(true);
         killAnnounceKillerLabel.text = killerName;
         killAnnounceVictimLabel.text = victimName;
+
+        if (killerName == target.Name)
+        {
+            PlaySound(SoundType.Kill, 4f);
+        }
     }
 
     public void DoCaptureAnnounce(string capturerName)
@@ -132,6 +286,8 @@ public class PlayerUI : MonoBehaviour
         IsLobbyState = target.LobbyTimer > 0f;
         lobbyScreen.SetActive(IsLobbyState);
 
+        if (IsLobbyState) PlaySound(SoundType.GetReady, 20f);
+
         OnLobbyPlayerAdded(PhotonNetwork.NickName, target.ShipIcon, false);
 
         IsInitialized = true;
@@ -162,6 +318,8 @@ public class PlayerUI : MonoBehaviour
 
         loseScreenRatingLabel.text = currRating.ToString();
 
+        PlaySound(SoundType.Loss, 5f);
+
         StartCoroutine(LoseScreenAnim(currRating, ratingChange));
     }
 
@@ -169,6 +327,8 @@ public class PlayerUI : MonoBehaviour
     {
         winScreen.SetActive(true);
         winScreenRatingLabel.text = currRating.ToString();
+
+        PlaySound(SoundType.Victory, 5f);
 
         StartCoroutine(WinScreenAnim(currRating, ratingChange));
     }
@@ -252,12 +412,20 @@ public class PlayerUI : MonoBehaviour
             return;
         }
 
+        List<SoundType> soundTypes = new List<SoundType>(soundsCDs.Keys);
+        foreach (var soundType in soundTypes)
+        {
+            if (soundsCDs[soundType] > 0f)
+                soundsCDs[soundType] -= Time.deltaTime;
+        }
+
         if (IsLobbyState)
         {
             if (target.LobbyTimer <= 0f)
             {
                 IsLobbyState = false;
                 lobbyScreen.SetActive(false);
+                PlaySound(SoundType.LobbyTimerEnd);
             }
             else
             {
@@ -265,6 +433,22 @@ public class PlayerUI : MonoBehaviour
                 int minutes = Mathf.FloorToInt(deltaSeconds / 60);
                 int seconds = deltaSeconds % 60;
                 lobbyTimer.text = minutes.ToString("00") + ":" + seconds.ToString("00");
+                if (deltaSeconds == 3)
+                {
+                    PlaySound(SoundType.LobbyTimerThree, 2f);
+                }
+                else if (deltaSeconds == 2)
+                {
+                    PlaySound(SoundType.LobbyTimerTwo, 2f);
+                }
+                else if (deltaSeconds == 1)
+                {
+                    PlaySound(SoundType.LobbyTimerOne, 2f);
+                }
+                else if (deltaSeconds == 6)
+                {
+                    PlaySound(SoundType.LobbyTimerStart, 2f);
+                }
             }
         }
 

@@ -841,6 +841,7 @@ MonoBehaviour:
   m_fieldRegen: 0.04
   m_maxDurability: 100
   m_maxField: 100
+  m_shieldRegenDelay: 1
   m_maxSpeed: 50
 --- !u!1 &7482507792824328463
 GameObject:
