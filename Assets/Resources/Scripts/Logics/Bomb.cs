@@ -5,7 +5,8 @@ using Photon.Pun;
 
 public class Bomb : MonoBehaviourPunCallbacks
 {
-    public int damage = 20;
+    public int damageMin = 20;
+    public int damageMax = 22;
     public int damageToShield = 30;
     public float critChance = 0.05f;
     public float critDamageModifier = 2f;
@@ -108,7 +109,7 @@ public class Bomb : MonoBehaviourPunCallbacks
             {
                 bool isCrit = Random.value <= critChance;
 
-                p.GetDamage(damage, damageToShield, ignoreField, isCrit, critDamageModifier, ownerName);
+                p.GetDamage(Random.Range(damageMin, damageMax + 1), damageToShield, ignoreField, isCrit, critDamageModifier, ownerName);
             }
         }
 

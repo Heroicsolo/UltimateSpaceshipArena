@@ -5,7 +5,8 @@ using Photon.Pun;
 
 public class Projectile : MonoBehaviourPunCallbacks
 {
-    public int damage = 2;
+    public int damageMin = 2;
+    public int damageMax = 3;
     public float critChance = 0.05f;
     public float critDamageModifier = 2f;
     public float speed = 10f;

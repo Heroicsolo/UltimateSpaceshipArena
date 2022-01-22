@@ -1077,7 +1077,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
             if (proj.ownerName != m_name)
             {
-                int actualDamage = proj.damage;
+                int actualDamage = Random.Range(proj.damageMin, proj.damageMax + 1);
 
                 bool isCrit = Random.value <= proj.critChance;
 
@@ -1092,7 +1092,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
             if (bomb.IsActive)
             {
-                int actualDamage = bomb.damage;
+                int actualDamage = Random.Range(bomb.damageMin, bomb.damageMax + 1);
 
                 bool isCrit = Random.value <= bomb.critChance;
 
