@@ -20,3 +20,4 @@ MonoBehaviour:
   durabilityBonus: 0
   shieldBonus: 0
   projectilePrefab: {fileID: 6987788691464400540, guid: ae5ccf6e67bb55a438dfc29b932609ba, type: 3}
+  sound: {fileID: 8300000, guid: 281e15cc92254794eaf05caf4d044b76, type: 3}

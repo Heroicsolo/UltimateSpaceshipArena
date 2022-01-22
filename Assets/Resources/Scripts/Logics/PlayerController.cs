@@ -551,7 +551,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         proj.GetComponent<Projectile>().SetOwner(m_name, photonView.Owner.UserId);
 
         if (audioSource && shootSound)
-            audioSource.PlayOneShot(shootSound);
+            audioSource.PlayOneShot(shootSound, 0.6f);
     }
 
     public void LaunchProjectileCustom(GameObject projectilePrefab)

@@ -42,6 +42,7 @@ public class Launcher : MonoBehaviourPunCallbacks
     [SerializeField] private Toggle defaultShipToggle;
     [SerializeField] private GameObject m_canvas;
     [SerializeField] private GameObject m_homeScreen;
+    [SerializeField] AudioClip buttonSound;
 
     private Firebase.FirebaseApp app = null;
     private FirebaseAuth auth;
@@ -75,6 +76,8 @@ public class Launcher : MonoBehaviourPunCallbacks
     private DatabaseReference mDatabaseRef;
     private DatabaseReference mNicknamesDB;
 
+    private AudioSource audioSource;
+
     private List<string> m_usedNicknamesList = new List<string>();
 
     #endregion
@@ -100,6 +103,8 @@ public class Launcher : MonoBehaviourPunCallbacks
         }
 
         m_deviceId = SystemInfo.deviceUniqueIdentifier;
+
+        audioSource = GetComponentInChildren<AudioSource>();
 
         Input.multiTouchEnabled = true;
 
@@ -128,6 +133,11 @@ public class Launcher : MonoBehaviourPunCallbacks
         });
 
         isConnectedToMaster = false;
+    }
+
+    public void PlayButtonSound()
+    {
+        audioSource.PlayOneShot(buttonSound);
     }
 
     private void InitFirebase()
