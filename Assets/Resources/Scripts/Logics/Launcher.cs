@@ -25,7 +25,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     /// <summary>
     /// This client's version number. Users are separated from each other by gameVersion (which allows you to make breaking changes).
     /// </summary>
-    string gameVersion = "2";
+    string gameVersion = "3";
     [SerializeField] private byte maxPlayersPerRoom = 8;
     [SerializeField] private int initArenaRating = 1000;
     [SerializeField] private GameObject m_loginScreen;
@@ -43,6 +43,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     [SerializeField] private GameObject m_canvas;
     [SerializeField] private GameObject m_homeScreen;
     [SerializeField] AudioClip buttonSound;
+    [SerializeField] private TextMeshProUGUI userIdLabel;
 
     private Firebase.FirebaseApp app = null;
     private FirebaseAuth auth;
@@ -240,6 +241,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         yield return new WaitUntil(() => isConnectedToMaster);
 
         GetProfileData();
+
+        userIdLabel.text = "User ID: " + UserID;
     }
 
     #endregion
