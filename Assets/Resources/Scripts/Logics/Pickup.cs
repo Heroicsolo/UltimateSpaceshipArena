@@ -21,10 +21,12 @@ public class Pickup : MonoBehaviourPunCallbacks
     private List<string> currCapturerNames = new List<string>();
     private int botsTargetedCount = 0;
     private int capturersCount = 0;
+    private bool capturingAnnounceDone = false;
 
     public bool IsActive => m_collider.enabled;
 
     public int BotsTargetedCount => botsTargetedCount;
+    public int CapturersCount => capturersCount;
 
     private Collider m_collider;
 
@@ -94,7 +96,11 @@ public class Pickup : MonoBehaviourPunCallbacks
             capturersCount++;
             currCapturerNames.Add(capturerName);
             currCapturingTime = 0f;
-            PlayerUI.Instance.DoCaptureAnnounce(capturerName);
+            if (capturersCount == 1)
+            {
+                PlayerUI.Instance.DoCaptureAnnounce(capturerName);
+                capturingAnnounceDone = true;
+            }
         }
     }
 
@@ -165,11 +171,22 @@ public class Pickup : MonoBehaviourPunCallbacks
                 if (capturersCount == 1)
                 {
                     currCapturingTime += Time.deltaTime;
+
+                    if (!capturingAnnounceDone)
+                    {
+                        PlayerUI.Instance.DoCaptureAnnounce(currCapturerNames[0]);
+                        capturingAnnounceDone = true;
+                    }
                 }
-                else if (currCapturingTime > 0f)
+                else
                 {
-                    currCapturingTime -= 3f * Time.deltaTime;
-                    currCapturingTime = Mathf.Max(0f, currCapturingTime);
+                    capturingAnnounceDone = false;
+
+                    if (currCapturingTime > 0f)
+                    {
+                        currCapturingTime -= 3f * Time.deltaTime;
+                        currCapturingTime = Mathf.Max(0f, currCapturingTime);
+                    }
                 }
 
                 if (currCapturingTime >= captureTime && capturersCount == 1)

@@ -83,8 +83,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private int m_maxDurability = 100;
     [SerializeField]
     private int m_maxField = 100;
+    [SerializeField]
+    private float m_shieldRegenDelay = 1f;
 
     private float m_speed = 0f;
+    private float m_currShieldRegenDelay = 0f;
 
     [SerializeField]
     private float m_maxSpeed = 50f;
@@ -593,13 +596,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
                 m_lastEnemyName = enemy.Name;
             }
+
+            m_currShieldRegenDelay = m_shieldRegenDelay;
+
+            SpawnDamageText(actualDamage, isCrit);
         }
         else
         {
             SpawnInfoText("Absorbed");
         }
-
-        SpawnDamageText(actualDamage, isCrit);
 
         if (m_stealthTime > 0f)
             EndStealth();
@@ -607,10 +612,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     void CheckVictory()
     {
-        if (!m_isWon && PlayerUI.Instance != null && 
-            !PlayerUI.Instance.IsLobbyState && 
-            ArenaController.instance.RoomPlayers.Count == 1 && 
-            ArenaController.instance.RoomPlayers[0] == this && 
+        if (!m_isWon && PlayerUI.Instance != null &&
+            !PlayerUI.Instance.IsLobbyState &&
+            ArenaController.instance.RoomPlayers.Count == 1 &&
+            ArenaController.instance.RoomPlayers[0] == this &&
             DurabilityPercent > 0f)
         {
             OnWin();
@@ -646,6 +651,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
                     EndStealth();
                 }
             }
+
+            if (m_currShieldRegenDelay > 0f)
+            {
+                m_currShieldRegenDelay -= Time.deltaTime;
+
+                if (m_currShieldRegenDelay <= 0f)
+                {
+                    m_currShieldRegenDelay = 0f;
+                }
+            }
         }
 
         if (isNitroActive && m_stealthTime <= 0f && !NitroEffect.isPlaying)
@@ -670,7 +685,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             m_durability = Mathf.Min(m_maxDurability, m_durability + m_maxDurability * m_durabilityRegen * Time.deltaTime);
         }
 
-        if (m_forceField < m_maxField && m_fieldRegen > 0f)
+        if (m_forceField < m_maxField && m_fieldRegen > 0f && m_currShieldRegenDelay <= 0f)
         {
             m_forceField = Mathf.Min(m_maxField, m_forceField + m_maxField * m_fieldRegen * Time.deltaTime);
         }
@@ -860,13 +875,18 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             {
                 Pickup nexus = selectedPickups.Find(x => x.isNexus == true);
 
-                if (nexus != null && DurabilityPercent > 0.5f && nexus.transform.Distance(transform) < AINexusFindingRadius && nexus.BotsTargetedCount < 2)
+                if (nexus != null)
                 {
-                    m_currentAITarget = nexus.transform;
-                    m_currentAIEnemy = null;
-                    m_targetIsPlayer = false;
-                    nexus.OnTargetedByBot();
-                    m_targetIsNexus = true;
+                    bool nexusInPrio = (DurabilityPercent > 0.5f && nexus.transform.Distance(transform) < AINexusFindingRadius && nexus.BotsTargetedCount < 2) || (nexus.CapturersCount == 1 && DurabilityPercent > 0.35f);
+
+                    if (nexusInPrio)
+                    {
+                        m_currentAITarget = nexus.transform;
+                        m_currentAIEnemy = null;
+                        m_targetIsPlayer = false;
+                        nexus.OnTargetedByBot();
+                        m_targetIsNexus = true;
+                    }
                 }
             }
 
@@ -974,11 +994,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (m_isWon) return;
         m_isWon = true;
-        
+
         int oldRating = Launcher.instance.CurrentRating;
         Launcher.instance.OnFightWon();
         int newRating = Launcher.instance.CurrentRating;
-        
+
         PlayerUI.Instance.OnWin(oldRating, newRating - oldRating);
 
         Invoke("ExitFromRoom", 5f);
