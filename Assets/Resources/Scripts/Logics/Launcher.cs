@@ -72,6 +72,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     private bool isRoomCreating = false;
     private bool isRoomLoading = false;
 
+    private bool isSoundOn = true;
+
     private GameObject m_selectedShip;
 
     private DatabaseReference mDatabaseRef;
@@ -91,6 +93,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
     public int CurrentRating => m_arenaRating;
     public GameObject SelectedShipPrefab { get { return m_selectedShip; } set { m_selectedShip = value; } }
+
+    public bool IsSoundOn{ get{ return isSoundOn; } set{ isSoundOn = value; PlayerPrefs.SetInt("soundOn", isSoundOn ? 1 : 0); } }
 
     public const string ELO_PROP_KEY = "C0";
     private TypedLobby sqlLobby = new TypedLobby("customSqlLobby", LobbyType.SqlLobby);
@@ -116,6 +120,10 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         // #Critical
         // this makes sure we can use PhotonNetwork.LoadLevel() on the master client and all clients in the same room sync their level automatically
         PhotonNetwork.AutomaticallySyncScene = true;
+
+        isSoundOn = PlayerPrefs.GetInt("soundOn", 1) == 1;
+
+        AudioListener.volume = Launcher.instance.IsSoundOn ? 1f : 0f;
 
         Firebase.FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
         {
