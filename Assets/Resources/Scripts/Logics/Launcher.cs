@@ -28,7 +28,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     /// This client's version number. Users are separated from each other by gameVersion (which allows you to make breaking changes).
     /// </summary>
     string gameVersion = "3";
-    string chatAppId = "5daa70f5-f9e6-4d8f-a4cb-bfd821e0a048";
+    string chatAppId = "e1f0448d-06a1-40c0-8653-93ffc1b0bee7";
     [SerializeField] private byte maxPlayersPerRoom = 8;
     [SerializeField] private int initArenaRating = 1000;
     [SerializeField] private int maxChatMessagesCount = 20;
@@ -266,10 +266,9 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
         chatClient.ChatRegion = "EU";
         chatClient.Connect(chatAppId, gameVersion, new Photon.Chat.AuthenticationValues(UserName));
-
         yield return new WaitUntil(() => chatClient.State == ChatState.Authenticated);
 
-        chatClient.Subscribe(new string[] { "General" });
+        chatClient.Subscribe("General");
     }
 
     #endregion
@@ -578,9 +577,10 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
     private void Update()
     {
-        if (isConnectedToMaster && m_playersCountText && chatClient != null && chatClient.CanChat)
+        if (isConnectedToMaster && m_playersCountText)
         {
-            chatClient.Service();
+            if (chatClient != null)
+                chatClient.Service();
 
             m_playersCountText.text = "Players online: " + PhotonNetwork.CountOfPlayers + "\nPlayers on arena: " + PhotonNetwork.CountOfPlayersInRooms;
         }
