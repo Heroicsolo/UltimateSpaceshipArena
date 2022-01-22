@@ -13,4 +13,5 @@ public class SkillData : ScriptableObject
     [SerializeField] public float durabilityBonus = 0f;
     [SerializeField] public float shieldBonus = 0f;
     [SerializeField] public GameObject projectilePrefab;
+    [SerializeField] public AudioClip sound;
 }

@@ -92,6 +92,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField]
     private float m_maxSpeed = 50f;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip shootSound;
+    [SerializeField] private AudioClip deathSound;
+
     private float m_acceleration = 6f;
     private float m_rollForce = 20f;
     private float m_speedBonus = 0f;
@@ -137,6 +141,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private List<float> m_AI_skillsCD = new List<float>();
     private float m_currAITargetChangeDelay = 0f;
     private float m_globalCD = 0f;
+
+    private AudioSource audioSource;
 
     public float DurabilityPercent => (float)m_durability / (float)m_maxDurability;
     public float FieldPercent => (float)m_forceField / (float)m_maxField;
@@ -303,7 +309,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     void Awake()
     {
-
+        audioSource = GetComponentInChildren<AudioSource>();
     }
 
     void LateUpdate()
@@ -349,6 +355,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             m_speedBonus = skill.speedBonus;
             m_speedBonusLength = skill.speedBonusLength;
             isNitroActive = true;
+        }
+
+        if (skill.sound && audioSource)
+        {
+            audioSource.PlayOneShot(skill.sound);
         }
     }
 
@@ -410,6 +421,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         EndShooting();
         meshRenderer.gameObject.SetActive(false);
         GetComponent<Collider>().enabled = false;
+
+        if (audioSource && deathSound)
+            audioSource.PlayOneShot(deathSound);
 
         if (DeathEffect)
         {
@@ -535,6 +549,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     {
         GameObject proj = PhotonNetwork.Instantiate(ProjectilePrefab.name, ShootPosition.position, transform.rotation);
         proj.GetComponent<Projectile>().SetOwner(m_name, photonView.Owner.UserId);
+
+        if (audioSource && shootSound)
+            audioSource.PlayOneShot(shootSound);
     }
 
     public void LaunchProjectileCustom(GameObject projectilePrefab)
