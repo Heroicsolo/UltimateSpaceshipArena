@@ -717,7 +717,10 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     public void SendChatMessage()
     {
         if (chatClient.CanChat)
+        {
             chatClient.PublishMessage("General", chatMessageField.text);
+            chatMessageField.text = "";
+        }
     }
 
     public void DebugReturn(DebugLevel level, string message)
