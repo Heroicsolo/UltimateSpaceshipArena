@@ -60,7 +60,7 @@ public class ArenaController : MonoBehaviourPunCallbacks
         PlayerController killer = GetPlayerByName(killerName);
         PlayerController victim = GetPlayerByName(victimName);
 
-        if (killer.photonView.IsMine)
+        if (killer.photonView.IsMine && killerName != victimName)
             killer.KillsCount++;
 
         if (victim.photonView.IsMine)
