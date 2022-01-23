@@ -98,7 +98,8 @@ public class Pickup : MonoBehaviourPunCallbacks
             currCapturingTime = 0f;
             if (capturersCount == 1)
             {
-                PlayerUI.Instance.DoCaptureAnnounce(capturerName);
+                if (!PlayerController.LocalPlayer.IsDied)
+                    PlayerUI.Instance.DoCaptureAnnounce(capturerName);
                 capturingAnnounceDone = true;
             }
         }
@@ -174,7 +175,8 @@ public class Pickup : MonoBehaviourPunCallbacks
 
                     if (!capturingAnnounceDone)
                     {
-                        PlayerUI.Instance.DoCaptureAnnounce(currCapturerNames[0]);
+                        if (!PlayerController.LocalPlayer.IsDied)
+                            PlayerUI.Instance.DoCaptureAnnounce(currCapturerNames[0]);
                         capturingAnnounceDone = true;
                     }
                 }

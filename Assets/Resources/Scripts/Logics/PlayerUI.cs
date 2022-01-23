@@ -56,6 +56,10 @@ public class PlayerUI : MonoBehaviour
     [SerializeField]
     private GameObject captureAnnounceObject;
     [SerializeField]
+    private GameObject respawnAnnounceObject;
+    [SerializeField]
+    private TextMeshProUGUI respawnAnnounceLabel;
+    [SerializeField]
     private TextMeshProUGUI capturerLabel;
     [Header("Audio")]
     [SerializeField]
@@ -238,6 +242,15 @@ public class PlayerUI : MonoBehaviour
         capturerLabel.text = capturerName + "<color=\"white\"> is capturing Nexus!</color>";
     }
 
+    public void DoRespawnAnnounce(int seconds)
+    {
+        HideCaptureAnnounce();
+        HideKillAnnounce();
+        respawnAnnounceObject.SetActive(false);
+        respawnAnnounceObject.SetActive(true);
+        respawnAnnounceLabel.text = "Respawn in: " + seconds.ToString();
+    }
+
     public void HideKillAnnounce()
     {
         killAnnounceObject.SetActive(false);
@@ -389,6 +402,26 @@ public class PlayerUI : MonoBehaviour
     public void ShootEnd()
     {
         target.EndShooting();
+    }
+
+    public void OnDeath()
+    {
+        foreach (var s in m_skillsButtons)
+        {
+            s.GetComponent<Button>().interactable = false;
+        }
+
+        joystick.Disable();
+    }
+
+    public void OnSpawn()
+    {
+        foreach (var s in m_skillsButtons)
+        {
+            s.GetComponent<Button>().interactable = true;
+        }
+
+        joystick.Enable();
     }
 
     private void Awake()

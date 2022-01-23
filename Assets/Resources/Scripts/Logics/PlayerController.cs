@@ -141,6 +141,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private List<float> m_AI_skillsCD = new List<float>();
     private float m_currAITargetChangeDelay = 0f;
     private float m_globalCD = 0f;
+    private Vector3 m_spawnPoint;
+    private float m_currRespawnTime = 0f;
 
     private AudioSource audioSource;
 
@@ -155,6 +157,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     public float MaxSpeed => m_maxSpeed;
 
     public bool IsAI => isAI;
+
+    public bool IsDied => m_durability <= 0 || m_isDied;
 
     public bool InStealth => m_stealthTime > 0f;
     public List<SkillData> Skills => m_skills;
@@ -186,18 +190,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         barsHolder = HPBar.transform.parent.parent;
 
-        if (!photonView.IsMine)
-        {
-            charController.enabled = false;
-        }
-        else
-            DontDestroyOnLoad(this.gameObject);
+        m_spawnPoint = transform.position;
+
+        DontDestroyOnLoad(this.gameObject);
 
         m_immuneTime = 5f;
         m_spectacleTime = 3f;
         m_isDied = false;
 
         m_durability = m_maxDurability;
+        m_forceField = 0;
         m_speed = 0f;
 
         ImmortalityOrb.SetActive(true);
@@ -318,6 +320,50 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         //transform.position = new Vector3(transform.position.x, initPos.y, transform.position.z);
     }
 
+    public void Spawn()
+    {
+        m_immuneTime = 3f;
+        m_isDied = false;
+        m_durability = m_maxDurability;
+        m_forceField = 0;
+        m_speed = 0f;
+
+        GetComponent<Collider>().enabled = true;
+        charController.enabled = true;
+
+        if (m_stealthTime > 0f)
+            EndStealth();
+
+        m_stealthTime = 0f;
+
+        ImmortalityOrb.SetActive(true);
+
+        if (IsAI)
+        {
+            m_AI_skillsCD.Clear();
+
+            foreach (var skill in m_skills)
+            {
+                m_AI_skillsCD.Add(0f);
+            }
+        }
+
+        StartCoroutine(ShootingCoroutine());
+
+        if (IsAI || LocalPlayer != this)
+        {
+            HPBar.transform.parent.gameObject.SetActive(true);
+            ShieldBar.transform.parent.gameObject.SetActive(true);
+        }
+        else
+        {
+            HPBar.transform.parent.gameObject.SetActive(false);
+            ShieldBar.transform.parent.gameObject.SetActive(false);
+        }
+
+        PlayerUI.Instance.OnSpawn();
+    }
+
     public void StartShooting()
     {
         if (isFiring || m_isDied) return;
@@ -418,12 +464,20 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         m_isDied = true;
 
+        StopAllCoroutines();
+
         EndShooting();
         meshRenderer.gameObject.SetActive(false);
         GetComponent<Collider>().enabled = false;
+        charController.enabled = false;
+
+        HPBar.transform.parent.gameObject.SetActive(false);
+        ShieldBar.transform.parent.gameObject.SetActive(false);
 
         if (audioSource && deathSound)
             audioSource.PlayOneShot(deathSound);
+
+        m_currRespawnTime = ArenaController.instance.RespawnTime;
 
         if (DeathEffect)
         {
@@ -433,15 +487,40 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         if (this == LocalPlayer)
         {
-            Invoke("OnLoss", m_spectacleTime);
-        }
-        else
-        {
-            ArenaController.instance.UnregisterPlayer(this);
-            PhotonNetwork.Destroy(gameObject);
+            PlayerUI.Instance.OnDeath();
         }
 
-        PlayerUI.Instance.DoKillAnnounce(m_lastEnemyName, Name);
+        Invoke("StartSpawning", m_spectacleTime);
+
+        if (!LocalPlayer.m_isDied)
+            PlayerUI.Instance.DoKillAnnounce(m_lastEnemyName, Name);
+    }
+
+    public void StartSpawning()
+    {
+        Invoke("Spawn", m_currRespawnTime);
+
+        transform.position = m_spawnPoint;
+
+        meshRenderer.gameObject.SetActive(true);
+
+        if (this == LocalPlayer)
+            StartCoroutine(SpawnAnnouncements());
+    }
+
+    private IEnumerator SpawnAnnouncements()
+    {
+        int t = Mathf.CeilToInt(m_currRespawnTime);
+
+        do
+        {
+            PlayerUI.Instance.DoRespawnAnnounce(t);
+
+            t--;
+
+            yield return new WaitForSeconds(1f);
+        }
+        while (t > 0);
     }
 
     void ExitFromRoom()
@@ -702,7 +781,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             return;
         }
 
-        if (m_durability < m_maxDurability && m_durabilityRegen > 0f)
+        if (m_durability < m_maxDurability && m_durabilityRegen > 0f && m_durability > 0)
         {
             m_durability = Mathf.Min(m_maxDurability, m_durability + m_maxDurability * m_durabilityRegen * Time.deltaTime);
         }
@@ -736,8 +815,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
                 else
                     cameraTransform.position = Vector3.Lerp(cameraTransform.position, transform.position + Vector3.up * 90f, Time.deltaTime * 8f);
             }
-            else if (m_lastEnemy != null)
+            else if (m_lastEnemy != null && !meshRenderer.gameObject.activeSelf)
                 cameraTransform.position = Vector3.Lerp(cameraTransform.position, m_lastEnemy.position + Vector3.up * 90f, Time.deltaTime * 8f);
+            else if (m_isDied && meshRenderer.gameObject.activeSelf)
+                cameraTransform.position = Vector3.Lerp(cameraTransform.position, transform.position + Vector3.up * 90f, Time.deltaTime * 8f);
         }
 
 #if UNITY_STANDALONE || UNITY_EDITOR

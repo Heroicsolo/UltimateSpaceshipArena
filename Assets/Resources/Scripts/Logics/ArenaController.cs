@@ -14,9 +14,11 @@ public class ArenaController : MonoBehaviourPunCallbacks
     [SerializeField] private List<GameObject> botsPrefabs;
     [SerializeField] private List<string> botsPossibleNames;
     [SerializeField] Transform nexusPosition;
+    [SerializeField] private float respawnTime = 5f;
 
     public Vector3 RandomSpawnPoint => spawnPoints.GetRandomElement().position;
     public string RandomBotName => botsPossibleNames.GetRandomElement();
+    public float RespawnTime => respawnTime;
 
     private List<PlayerController> m_roomPlayers = new List<PlayerController>();
     private List<Pickup> m_roomPickups = new List<Pickup>();
