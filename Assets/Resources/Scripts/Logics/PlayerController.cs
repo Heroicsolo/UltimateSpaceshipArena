@@ -166,7 +166,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     public int KillsCount{ get{ return m_killsCount; } set {m_killsCount = value; } }
     public int DeathsCount{ get{ return m_deathsCount; } set {m_deathsCount = value; } }
 
-    public int Score => KillsCount - DeathsCount;
+    public int Score => KillsCount > 0 ? KillsCount - DeathsCount + 1 : KillsCount - DeathsCount;
 
     public bool InStealth => m_stealthTime > 0f;
     public List<SkillData> Skills => m_skills;
@@ -362,6 +362,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         GetComponent<Collider>().enabled = true;
         charController.enabled = true;
 
+        foreach (var flame in EngineFlames)
+        {
+            flame.Play();
+        }
+
         if (m_stealthTime > 0f)
             EndStealth();
 
@@ -501,6 +506,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         meshRenderer.gameObject.SetActive(false);
         GetComponent<Collider>().enabled = false;
         charController.enabled = false;
+        foreach (var flame in EngineFlames)
+        {
+            flame.Stop();
+        }
 
         HPBar.transform.parent.gameObject.SetActive(false);
         ShieldBar.transform.parent.gameObject.SetActive(false);
@@ -519,11 +528,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         if (this == LocalPlayer)
         {
             PlayerUI.Instance.OnDeath();
-        }
-
-        if (photonView.IsMine)
-        {
-            DeathsCount++;
         }
 
         Invoke("StartSpawning", m_spectacleTime);
@@ -772,12 +776,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         List<PlayerController> sortedPlayers = new List<PlayerController>(ArenaController.instance.RoomPlayers);
 
         if (sortedPlayers.Count > 1)
-            sortedPlayers.Sort((a, b) => a.Score.CompareTo(b.Score));
+            sortedPlayers.Sort((a, b) => b.Score.CompareTo(a.Score));
         
-        if (this == sortedPlayers[0])
-            OnWin();
+        int place = sortedPlayers.FindIndex(x => x == this);
+
+        if (place < 3)
+            OnWin(place);
         else
-            OnLoss();
+            OnLoss(place);
     }
 
     // Update is called once per frame
@@ -1142,10 +1148,22 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         targetCameraPos = pos;
         m_nexusUsed = true;
 
-        if (byPlayer != PhotonNetwork.NickName)
-            OnLoss();
+        List<PlayerController> sortedPlayers = new List<PlayerController>(ArenaController.instance.RoomPlayers);
+
+        if (sortedPlayers.Count > 1)
+            sortedPlayers.Sort((a, b) => b.Score.CompareTo(a.Score));
+        
+        int place = sortedPlayers.FindIndex(x => x == this);
+
+        if (Name == byPlayer)
+            place = 1;
         else
-            OnWin();
+            place++;
+
+        if (place < 3)
+            OnWin(place);
+        else
+            OnLoss(place);
     }
 
     public void OnPlayerKilled(string killerName, string victimName)
@@ -1156,26 +1174,30 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     [PunRPC]
     public void OnPlayerKilled_RPC(string killerName, string victimName)
     {
-        if (killerName == Name && photonView.IsMine)
+        if (killerName == Name && photonView.IsMine && killerName != victimName)
         {
             KillsCount++;
+        }
+        else if (victimName == Name && photonView.IsMine)
+        {
+            DeathsCount++;
         }
 
         PlayerUI.Instance.SortPlayerStatsSlots();
     }
 
-    void OnLoss()
+    void OnLoss(int place)
     {
         int oldRating = Launcher.instance.CurrentRating;
         Launcher.instance.OnFightLoss();
         int newRating = Launcher.instance.CurrentRating;
 
-        PlayerUI.Instance.OnLoss(oldRating, newRating - oldRating);
+        PlayerUI.Instance.OnLoss(oldRating, newRating - oldRating, place);
 
         Invoke("ExitFromRoom", 5f);
     }
 
-    void OnWin()
+    void OnWin(int place = 1)
     {
         if (m_isWon) return;
         m_isWon = true;
@@ -1184,7 +1206,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         Launcher.instance.OnFightWon();
         int newRating = Launcher.instance.CurrentRating;
 
-        PlayerUI.Instance.OnWin(oldRating, newRating - oldRating);
+        PlayerUI.Instance.OnWin(oldRating, newRating - oldRating, place);
 
         Invoke("ExitFromRoom", 5f);
     }

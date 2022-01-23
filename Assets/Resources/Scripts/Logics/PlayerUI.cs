@@ -50,7 +50,11 @@ public class PlayerUI : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI winScreenRatingLabel;
     [SerializeField]
+    private TextMeshProUGUI winScreenPlaceLabel;
+    [SerializeField]
     private TextMeshProUGUI loseScreenRatingLabel;
+    [SerializeField]
+    private TextMeshProUGUI loseScreenPlaceLabel;
     [SerializeField]
     private GameObject lossScreen;
     [SerializeField]
@@ -376,21 +380,31 @@ public class PlayerUI : MonoBehaviour
         lobbyScreenTitle.text = string.Format("Players ready to fight: {0}/{1}", m_lobbyPlayers.Count, PhotonNetwork.CurrentRoom.MaxPlayers);
     }
 
-    public void OnLoss(int currRating, int ratingChange)
+    public void OnLoss(int currRating, int ratingChange, int place)
     {
         lossScreen.SetActive(true);
 
         loseScreenRatingLabel.text = currRating.ToString();
+        string suffix = "th";
+        if (place == 1) suffix = "st";
+        if (place == 2) suffix = "nd";
+        if (place == 3) suffix = "rd";
+        loseScreenPlaceLabel.text = place.ToString() + suffix + " Place!";
 
         PlaySound(SoundType.Loss, 5f);
 
         StartCoroutine(LoseScreenAnim(currRating, ratingChange));
     }
 
-    public void OnWin(int currRating, int ratingChange)
+    public void OnWin(int currRating, int ratingChange, int place)
     {
         winScreen.SetActive(true);
         winScreenRatingLabel.text = currRating.ToString();
+        string suffix = "th";
+        if (place == 1) suffix = "st";
+        if (place == 2) suffix = "nd";
+        if (place == 3) suffix = "rd";
+        winScreenPlaceLabel.text = place.ToString() + suffix + " Place!";
 
         PlaySound(SoundType.Victory, 5f);
 
