@@ -558,7 +558,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Kills
+  m_text: K
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9c39d2c7265172746b0baa69475cc5e8, type: 2}
   m_sharedMaterial: {fileID: 594424095830867057, guid: 9c39d2c7265172746b0baa69475cc5e8, type: 2}
@@ -585,8 +585,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20
-  m_fontSizeBase: 20
+  m_fontSize: 32
+  m_fontSizeBase: 32
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1145,7 +1145,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Deaths
+  m_text: D
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9c39d2c7265172746b0baa69475cc5e8, type: 2}
   m_sharedMaterial: {fileID: 594424095830867057, guid: 9c39d2c7265172746b0baa69475cc5e8, type: 2}
@@ -1172,8 +1172,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20
-  m_fontSizeBase: 20
+  m_fontSize: 32
+  m_fontSizeBase: 32
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1747,7 +1747,9 @@ MonoBehaviour:
   lobbyPlayersHolder: {fileID: 3477540453455127237}
   winScreen: {fileID: 6822050532163226370}
   winScreenRatingLabel: {fileID: 870215653610344757}
+  winScreenPlaceLabel: {fileID: 0}
   loseScreenRatingLabel: {fileID: 1278748932094955220}
+  loseScreenPlaceLabel: {fileID: 0}
   lossScreen: {fileID: 2110724608828625682}
   lobbyScreenTitle: {fileID: 4526596109104641382}
   killAnnounceObject: {fileID: 1449964224729398429}
@@ -5177,8 +5179,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20
-  m_fontSizeBase: 20
+  m_fontSize: 28
+  m_fontSizeBase: 28
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -6355,8 +6357,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20
-  m_fontSizeBase: 20
+  m_fontSize: 28
+  m_fontSizeBase: 28
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
