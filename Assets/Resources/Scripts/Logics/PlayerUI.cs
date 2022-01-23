@@ -1,6 +1,7 @@
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -152,9 +153,7 @@ public class PlayerUI : MonoBehaviour
 
     public void SortPlayerStatsSlots()
     {
-        List<PlayerStatsSlot> sortedSlots = new List<PlayerStatsSlot>(m_battleStatsSlots);
-
-        sortedSlots.Sort((a, b) => b.Score.CompareTo(a.Score));
+        List<PlayerStatsSlot> sortedSlots = m_battleStatsSlots.OrderByDescending(x => x.Score).ToList();
 
         m_battleStatsItemsHolder.GetComponent<VerticalLayoutGroup>().enabled = false;
 

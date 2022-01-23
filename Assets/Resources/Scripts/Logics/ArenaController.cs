@@ -48,11 +48,11 @@ public class ArenaController : MonoBehaviourPunCallbacks
 
     public void OnPlayerKilled(string killerName, string victimName)
     {
-        photonView.RPC("OnPlayerKilled_RPC", RpcTarget.All, killerName, victimName);
+        this.photonView.RPC("OnPlayerKilled_RPC", RpcTarget.All, killerName, victimName);
     }
 
     [PunRPC]
-    public void OnPlayerKilled_RPC(string killerName, string victimName)
+    void OnPlayerKilled_RPC(string killerName, string victimName)
     {
         PlayerController killer = GetPlayerByName(killerName);
         PlayerController victim = GetPlayerByName(victimName);
@@ -171,6 +171,8 @@ public class ArenaController : MonoBehaviourPunCallbacks
     void Start()
     {
         instance = this;
+
+        photonView.ViewID = 1;
 
         if (PlayerController.LocalPlayerInstance == null)
         {

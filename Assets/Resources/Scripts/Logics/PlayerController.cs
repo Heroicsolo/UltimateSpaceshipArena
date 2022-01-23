@@ -4,7 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 using UnityEngine.UI;
 using TMPro;
-
+using System.Linq;
 
 public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 {
@@ -506,6 +506,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         meshRenderer.gameObject.SetActive(false);
         GetComponent<Collider>().enabled = false;
         charController.enabled = false;
+        NameLabel.gameObject.SetActive(false);
         foreach (var flame in EngineFlames)
         {
             flame.Stop();
@@ -545,6 +546,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         transform.position = m_spawnPoint;
 
         meshRenderer.gameObject.SetActive(true);
+        NameLabel.gameObject.SetActive(true);
 
         if (this == LocalPlayer)
             StartCoroutine(SpawnAnnouncements());
@@ -601,8 +603,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     void EndStealth_RPC()
     {
         m_stealthTime = 0f;
-        if (!photonView.IsMine)
-            NameLabel.gameObject.SetActive(false);
+        NameLabel.gameObject.SetActive(true);
         StartCoroutine(StealthEndAnim());
     }
 
@@ -773,11 +774,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     [PunRPC]
     void EndMatch_RPC()
     {
-        List<PlayerController> sortedPlayers = new List<PlayerController>(ArenaController.instance.RoomPlayers);
+        List<PlayerController> sortedPlayers = ArenaController.instance.RoomPlayers.OrderByDescending(x => x.Score).ToList();
 
-        if (sortedPlayers.Count > 1)
-            sortedPlayers.Sort((a, b) => b.Score.CompareTo(a.Score));
-        
         int place = sortedPlayers.FindIndex(x => x == this);
 
         if (place < 3)
@@ -1148,11 +1146,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         targetCameraPos = pos;
         m_nexusUsed = true;
 
-        List<PlayerController> sortedPlayers = new List<PlayerController>(ArenaController.instance.RoomPlayers);
+        List<PlayerController> sortedPlayers = ArenaController.instance.RoomPlayers.OrderByDescending(x => x.Score).ToList();
 
-        if (sortedPlayers.Count > 1)
-            sortedPlayers.Sort((a, b) => b.Score.CompareTo(a.Score));
-        
         int place = sortedPlayers.FindIndex(x => x == this);
 
         if (Name == byPlayer)
