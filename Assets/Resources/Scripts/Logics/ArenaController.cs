@@ -15,6 +15,7 @@ public class ArenaController : MonoBehaviourPunCallbacks
     [SerializeField] private List<string> botsPossibleNames;
     [SerializeField] Transform nexusPosition;
     [SerializeField] private float respawnTime = 5f;
+    [SerializeField] private float joiningTime = 60f;
 
     public Vector3 RandomSpawnPoint => spawnPoints.GetRandomElement().position;
     public string RandomBotName => botsPossibleNames.GetRandomElement();
@@ -24,6 +25,8 @@ public class ArenaController : MonoBehaviourPunCallbacks
     private List<Pickup> m_roomPickups = new List<Pickup>();
     private List<Transform> m_botsSpawnPoints = new List<Transform>();
     private Dictionary<string, int> m_playersRatings = new Dictionary<string, int>();
+
+    private float m_timeToJoin = 0f;
 
     public List<PlayerController> RoomPlayers => m_roomPlayers;
     public List<Pickup> RoomPickups => m_roomPickups;
@@ -182,6 +185,8 @@ public class ArenaController : MonoBehaviourPunCallbacks
             {
                 m_botsSpawnPoints.AddRange(spawnPoints);
                 m_botsSpawnPoints.Remove(point);
+
+                m_timeToJoin = joiningTime;
             }
 
             if (Launcher.instance.SelectedShipPrefab == null)
@@ -201,7 +206,18 @@ public class ArenaController : MonoBehaviourPunCallbacks
     // Update is called once per frame
     void Update()
     {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            if (m_timeToJoin > 0f)
+            {
+                m_timeToJoin -= Time.deltaTime;
 
+                if (m_timeToJoin <= 0f)
+                {
+                    RemoveRoomFromList();
+                }
+            }
+        }
     }
 
     public override void OnPlayerEnteredRoom(Player other)
