@@ -789,7 +789,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     {
         ReconstructUI();
 
-        CheckVictory();
+        //CheckVictory();
 
         HPBar.fillAmount = DurabilityPercent;
         ShieldBar.fillAmount = FieldPercent;
@@ -1143,6 +1143,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     [PunRPC]
     void OnNexusUsed_RPC(string byPlayer, Vector3 pos)
     {
+
+
         targetCameraPos = pos;
         m_nexusUsed = true;
 
@@ -1164,6 +1166,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     void OnLoss(int place)
     {
+        if (m_isWon) return;
+
         int oldRating = Launcher.instance.CurrentRating;
         Launcher.instance.OnFightLoss();
         int newRating = Launcher.instance.CurrentRating;
