@@ -135,6 +135,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private float m_spectacleTime = 3f;
     private bool m_isDied = false;
     private bool m_isWon = false;
+    private bool m_isLoss = false;
     private bool m_nexusUsed = false;
     private bool m_initialized = false;
     private Transform m_lastEnemy;
@@ -1166,7 +1167,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     void OnLoss(int place)
     {
-        if (m_isWon) return;
+        if (m_isWon || m_isLoss) return;
+        m_isLoss = true;
 
         int oldRating = Launcher.instance.CurrentRating;
         Launcher.instance.OnFightLoss();
@@ -1179,7 +1181,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     void OnWin(int place = 1)
     {
-        if (m_isWon) return;
+        if (m_isWon || m_isLoss) return;
         m_isWon = true;
 
         int oldRating = Launcher.instance.CurrentRating;
