@@ -514,6 +514,7 @@ public class PlayerUI : MonoBehaviour
                 if (PhotonNetwork.IsMasterClient)
                 {
                     ArenaController.instance.RemoveRoomFromList();
+                    ArenaController.instance.OnBattleStarted();
                 }
             }
             else

@@ -86,6 +86,17 @@ public class ArenaController : MonoBehaviourPunCallbacks
         }
     }
 
+    public void OnBattleStarted()
+    {
+        foreach (var p in m_roomPlayers)
+        {
+            if (p.IsAI)
+            {
+                p.SendRating();
+            }
+        }
+    }
+
     void SpawnPickups()
     {
         if (PhotonNetwork.IsMasterClient)
