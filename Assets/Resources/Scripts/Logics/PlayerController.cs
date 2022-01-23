@@ -335,6 +335,22 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         //transform.position = new Vector3(transform.position.x, initPos.y, transform.position.z);
     }
 
+    public void SendRating()
+    {
+        photonView.RPC("GetRating_RPC", RpcTarget.All, Name, Launcher.instance.CurrentRating);
+    }
+
+    [PunRPC]
+    void GetRating_RPC(string playerName, int rating)
+    {
+        ArenaController.instance.SetPlayerRating(playerName, rating);
+
+        PlayerController pc = ArenaController.instance.GetPlayerByName(playerName);
+
+        if (pc)
+            PlayerUI.Instance.AddPlayerStatsSlot(pc, rating);
+    }
+
     public void Spawn()
     {
         m_immuneTime = 3f;
@@ -1140,6 +1156,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         {
             KillsCount++;
         }
+
+        PlayerUI.Instance.SortPlayerStatsSlots();
     }
 
     void OnLoss()

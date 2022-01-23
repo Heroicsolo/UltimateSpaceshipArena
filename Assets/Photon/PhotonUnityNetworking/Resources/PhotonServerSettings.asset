@@ -56,6 +56,9 @@ MonoBehaviour:
   - OnAbandonedByBot_RPC
   - OnTargetedByBot_RPC
   - SetOwner_RPC
+  - OnPlayerKilled_RPC
+  - EndMatch_RPC
+  - GetRating_RPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

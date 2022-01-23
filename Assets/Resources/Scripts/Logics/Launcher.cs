@@ -733,11 +733,11 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
     public void OnConnected()
     {
-		chatClient.Subscribe("General");
+        chatClient.Subscribe("General");
         chatClient.SetOnlineStatus(ChatUserStatus.Online);
         chatLoadingIndicator.SetActive(false);
         chatMessageField.interactable = true;
-	}
+    }
 
     public void OnDisconnected()
     {

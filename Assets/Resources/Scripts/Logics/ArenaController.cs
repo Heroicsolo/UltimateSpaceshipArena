@@ -23,6 +23,7 @@ public class ArenaController : MonoBehaviourPunCallbacks
     private List<PlayerController> m_roomPlayers = new List<PlayerController>();
     private List<Pickup> m_roomPickups = new List<Pickup>();
     private List<Transform> m_botsSpawnPoints = new List<Transform>();
+    private Dictionary<string, int> m_playersRatings = new Dictionary<string, int>();
 
     public List<PlayerController> RoomPlayers => m_roomPlayers;
     public List<Pickup> RoomPickups => m_roomPickups;
@@ -35,6 +36,22 @@ public class ArenaController : MonoBehaviourPunCallbacks
     public void RemoveRoomFromList()
     {
         PhotonNetwork.CurrentRoom.IsOpen = false;
+    }
+
+    public void SetPlayerRating(string name, int rating)
+    {
+        if (m_playersRatings.ContainsKey(name))
+            m_playersRatings[name] = rating;
+        else
+            m_playersRatings.Add(name, rating);
+    }
+
+    public int GetPlayerRating(string name)
+    {
+        if (m_playersRatings.ContainsKey(name))
+            return m_playersRatings[name];
+        else
+            return -1;
     }
 
     public void RegisterPlayer(PlayerController player)
@@ -54,7 +71,10 @@ public class ArenaController : MonoBehaviourPunCallbacks
             if (player.IsAI)
                 botsPossibleNames.Add(player.Name);
             if (PlayerUI.Instance != null)
+            {
                 PlayerUI.Instance.OnLobbyPlayerDeleted(player.Name);
+                PlayerUI.Instance.RemovePlayerStatsSlot(player.Name);
+            }
         }
     }
 

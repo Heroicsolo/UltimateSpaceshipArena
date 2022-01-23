@@ -28,6 +28,13 @@ public class PlayerUI : MonoBehaviour
     private TextMeshProUGUI announcementsLabel;
     [SerializeField]
     private TextMeshProUGUI matchTimerLabel;
+    [Header("Battle stats screen")]
+    [SerializeField]
+    private GameObject m_battleStatsScreen;
+    [SerializeField]
+    private Transform m_battleStatsItemsHolder;
+    [SerializeField]
+    private GameObject m_battleStatsItemPrefab;
     [Header("Lobby")]
     [SerializeField]
     private GameObject lobbyScreen;
@@ -97,6 +104,7 @@ public class PlayerUI : MonoBehaviour
     private List<PlayerController> enemies = new List<PlayerController>();
     private List<Transform> enemiesIcons = new List<Transform>();
     private List<LobbyPlayerSlot> m_lobbyPlayers = new List<LobbyPlayerSlot>();
+    private List<PlayerStatsSlot> m_battleStatsSlots = new List<PlayerStatsSlot>();
 
     public bool IsLobbyState = true;
     private bool IsInitialized = false;
@@ -117,6 +125,42 @@ public class PlayerUI : MonoBehaviour
         Victory,
         Loss,
         LowDurability
+    }
+
+    public void AddPlayerStatsSlot(PlayerController pc, int rating)
+    {
+        GameObject slot = Instantiate(m_battleStatsItemPrefab, m_battleStatsItemsHolder);
+        PlayerStatsSlot ps = slot.GetComponent<PlayerStatsSlot>();
+        ps.SetData(pc, rating);
+        m_battleStatsSlots.Add(ps);
+    }
+
+    public void RemovePlayerStatsSlot(string playerName)
+    {
+        PlayerStatsSlot ps = m_battleStatsSlots.Find(x => x.PlayerName == playerName);
+
+        if (ps)
+        {
+            m_battleStatsSlots.Remove(ps);
+            Destroy(ps.gameObject);
+        }
+    }
+
+    public void SortPlayerStatsSlots()
+    {
+        List<PlayerStatsSlot> sortedSlots = new List<PlayerStatsSlot>(m_battleStatsSlots);
+
+        sortedSlots.Sort((a, b) => a.Score.CompareTo(b.Score));
+
+        for (int i = 0; i < sortedSlots.Count; i++)
+        {
+            sortedSlots[i].transform.SetSiblingIndex(i);
+        }
+    }
+
+    public void ShowStatsScreen()
+    {
+        m_battleStatsScreen.SetActive(true);
     }
 
     public void PlaySound(SoundType soundType, float cooldown = 0f)
@@ -391,10 +435,11 @@ public class PlayerUI : MonoBehaviour
         loseScreenRatingLabel.text = endValue.ToString();
     }
 
-    public void LeaveArena()
+    public void LeaveArena(bool changeRating = false)
     {
         ArenaController.instance.LeaveRoom();
-        Launcher.instance.OnFightLoss();
+        if (changeRating)
+            Launcher.instance.OnFightLoss();
     }
 
     public void Shoot()
@@ -463,6 +508,8 @@ public class PlayerUI : MonoBehaviour
                 lobbyScreen.SetActive(false);
                 matchTimerLabel.transform.parent.gameObject.SetActive(true);
                 PlaySound(SoundType.LobbyTimerEnd);
+
+                target.SendRating();
 
                 if (PhotonNetwork.IsMasterClient)
                 {
