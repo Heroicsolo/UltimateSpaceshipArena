@@ -51,6 +51,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     [SerializeField] private Transform chatContent;
     [SerializeField] private GameObject chatMessagePrefab;
     [SerializeField] private TMP_InputField chatMessageField;
+    [SerializeField] private GameObject chatLoadingIndicator;
 
     private Firebase.FirebaseApp app = null;
     private FirebaseAuth auth;
@@ -272,6 +273,12 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
 
     #region Public Methods
+
+    public void OnMainScreenLoaded()
+    {
+        if (chatClient.State == ChatState.Disconnected)
+            chatClient.Connect(PhotonNetwork.PhotonServerSettings.AppSettings.AppIdChat, PhotonNetwork.PhotonServerSettings.AppSettings.AppVersion, new Photon.Chat.AuthenticationValues(UserName));
+    }
 
     public void OnShipSelectorOpened()
     {
@@ -575,6 +582,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         isConnectedToMaster = false;
         isRoomLoading = false;
         m_homeScreen.SetActive(true);
+        OnMainScreenLoaded();
     }
 
     private void Update()
@@ -711,9 +719,9 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
     public void SendChatMessage()
     {
-        if (chatClient.CanChat)
+        if (chatClient.CanChat && chatMessageField.text.Length > 0)
         {
-            chatClient.PublishMessage("General", "<color=\"green\">" + UserName + ": </color>" + chatMessageField.text);
+            chatClient.PublishMessage("General", chatMessageField.text);
             chatMessageField.text = "";
         }
     }
@@ -727,11 +735,14 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     {
 		chatClient.Subscribe("General");
         chatClient.SetOnlineStatus(ChatUserStatus.Online);
+        chatLoadingIndicator.SetActive(false);
+        chatMessageField.interactable = true;
 	}
 
     public void OnDisconnected()
     {
-
+        chatLoadingIndicator.SetActive(true);
+        chatMessageField.interactable = false;
     }
 
     public void OnChatStateChange(ChatState state)
@@ -744,7 +755,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         for (int i = 0; i < senders.Length; i++)
         {
             GameObject chatMsgGO = Instantiate(chatMessagePrefab, chatContent);
-            chatMsgGO.GetComponent<TextMeshProUGUI>().text = messages[i].ToString();
+            chatMsgGO.GetComponent<TextMeshProUGUI>().text = "<color=\"green\">" + senders[i] + ": </color>" + messages[i].ToString();
 
             chatMessages.Add(chatMsgGO);
 
