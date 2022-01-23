@@ -535,7 +535,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         if (!LocalPlayer.m_isDied)
             PlayerUI.Instance.DoKillAnnounce(m_lastEnemyName, Name);
 
-        OnPlayerKilled(m_lastEnemyName, Name);
+        ArenaController.instance.OnPlayerKilled(m_lastEnemyName, Name);
     }
 
     public void StartSpawning()
@@ -1166,25 +1166,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             OnLoss(place);
     }
 
-    public void OnPlayerKilled(string killerName, string victimName)
-    {
-        photonView.RPC("OnPlayerKilled_RPC", RpcTarget.All, killerName, victimName);
-    }
-
-    [PunRPC]
-    public void OnPlayerKilled_RPC(string killerName, string victimName)
-    {
-        if (killerName == Name && photonView.IsMine && killerName != victimName)
-        {
-            KillsCount++;
-        }
-        else if (victimName == Name && photonView.IsMine)
-        {
-            DeathsCount++;
-        }
-
-        PlayerUI.Instance.SortPlayerStatsSlots();
-    }
 
     void OnLoss(int place)
     {

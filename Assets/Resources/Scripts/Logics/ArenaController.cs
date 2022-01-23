@@ -46,6 +46,26 @@ public class ArenaController : MonoBehaviourPunCallbacks
             m_playersRatings.Add(name, rating);
     }
 
+    public void OnPlayerKilled(string killerName, string victimName)
+    {
+        photonView.RPC("OnPlayerKilled_RPC", RpcTarget.All, killerName, victimName);
+    }
+
+    [PunRPC]
+    public void OnPlayerKilled_RPC(string killerName, string victimName)
+    {
+        PlayerController killer = GetPlayerByName(killerName);
+        PlayerController victim = GetPlayerByName(victimName);
+
+        if (killer.photonView.IsMine)
+            killer.KillsCount++;
+
+        if (victim.photonView.IsMine)
+            victim.DeathsCount++;
+
+        PlayerUI.Instance.SortPlayerStatsSlots();
+    }
+
     public int GetPlayerRating(string name)
     {
         if (m_playersRatings.ContainsKey(name))
