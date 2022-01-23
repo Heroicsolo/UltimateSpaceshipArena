@@ -937,7 +937,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         m_currRoll -= transform.InverseTransformDirection(movementDir).x * m_rollForce;
 
-        if (m_durability <= 0 && !m_isWon && PhotonNetwork.IsMasterClient)
+        if (m_durability <= 0 && !m_isWon )
         {
             Die();
         }
