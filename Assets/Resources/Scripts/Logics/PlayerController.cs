@@ -791,7 +791,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             timer.Update(Time.deltaTime);
             matchTimer.Update(Time.deltaTime);
 
-            if (MatchTimer <= 0f && PhotonNetwork.IsMasterClient)
+            if (MatchTimer <= 0f && PhotonNetwork.IsMasterClient && !PlayerUI.Instance.IsLobbyState)
             {
                 matchTimer.Stop();
                 EndMatch();
