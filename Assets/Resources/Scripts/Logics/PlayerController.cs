@@ -123,6 +123,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private Transform barsHolder;
 
     private Timer timer;
+    private Timer matchTimer;
 
     private string m_name = "";
 
@@ -165,12 +166,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     public int KillsCount{ get{ return m_killsCount; } set {m_killsCount = value; } }
     public int DeathsCount{ get{ return m_deathsCount; } set {m_deathsCount = value; } }
 
+    public int Score => KillsCount - DeathsCount;
+
     public bool InStealth => m_stealthTime > 0f;
     public List<SkillData> Skills => m_skills;
 
     public string Name => m_name;
 
     public float LobbyTimer => timer.GetTime();
+    public float MatchTimer => matchTimer.GetTime();
 
 #if UNITY_5_4_OR_NEWER
     void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode loadingMode)
@@ -219,10 +223,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         timer = new Timer();
         timer.Initialize("lobbyTimer");
 
+        matchTimer = new Timer();
+        matchTimer.Initialize("matchTimer");
+
         if (photonView.IsMine && !IsAI)
         {
             if (PhotonNetwork.IsMasterClient)
                 timer.Start(15f);
+
+            if (PhotonNetwork.IsMasterClient)
+                matchTimer.Start(195f);
 
             if (PlayerUiPrefab != null)
             {
@@ -731,6 +741,25 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
+    void EndMatch()
+    {
+        photonView.RPC("EndMatch_RPC", RpcTarget.All);
+    }
+
+    [PunRPC]
+    void EndMatch_RPC()
+    {
+        List<PlayerController> sortedPlayers = new List<PlayerController>(ArenaController.instance.RoomPlayers);
+
+        if (sortedPlayers.Count > 1)
+            sortedPlayers.Sort((a, b) => a.Score.CompareTo(b.Score));
+        
+        if (this == sortedPlayers[0])
+            OnWin();
+        else
+            OnLoss();
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -742,7 +771,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         ShieldBar.fillAmount = FieldPercent;
 
         if (photonView.IsMine)
+        {
             timer.Update(Time.deltaTime);
+            matchTimer.Update(Time.deltaTime);
+
+            if (MatchTimer <= 0f && PhotonNetwork.IsMasterClient)
+            {
+                matchTimer.Stop();
+                EndMatch();
+            }
+        }
 
         NameLabel.transform.position = transform.position + Vector3.forward * 20f;
         barsHolder.position = transform.position + Vector3.forward * 17f;

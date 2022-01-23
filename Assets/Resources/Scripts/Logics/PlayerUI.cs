@@ -26,6 +26,8 @@ public class PlayerUI : MonoBehaviour
     private List<SkillButton> m_skillsButtons;
     [SerializeField]
     private TextMeshProUGUI announcementsLabel;
+    [SerializeField]
+    private TextMeshProUGUI matchTimerLabel;
     [Header("Lobby")]
     [SerializeField]
     private GameObject lobbyScreen;
@@ -298,6 +300,7 @@ public class PlayerUI : MonoBehaviour
 
         IsLobbyState = target.LobbyTimer > 0f;
         lobbyScreen.SetActive(IsLobbyState);
+        matchTimerLabel.transform.parent.gameObject.SetActive(!IsLobbyState);
 
         if (IsLobbyState) PlaySound(SoundType.GetReady, 20f);
 
@@ -362,7 +365,7 @@ public class PlayerUI : MonoBehaviour
 
             yield return null;
         }
-        while( t < 1f );
+        while (t < 1f);
 
         winScreenRatingLabel.text = endValue.ToString();
     }
@@ -383,7 +386,7 @@ public class PlayerUI : MonoBehaviour
 
             yield return null;
         }
-        while( t < 1f );
+        while (t < 1f);
 
         loseScreenRatingLabel.text = endValue.ToString();
     }
@@ -458,6 +461,7 @@ public class PlayerUI : MonoBehaviour
             {
                 IsLobbyState = false;
                 lobbyScreen.SetActive(false);
+                matchTimerLabel.transform.parent.gameObject.SetActive(true);
                 PlaySound(SoundType.LobbyTimerEnd);
 
                 if (PhotonNetwork.IsMasterClient)
@@ -488,6 +492,13 @@ public class PlayerUI : MonoBehaviour
                     PlaySound(SoundType.LobbyTimerStart, 2f);
                 }
             }
+        }
+        else
+        {
+            int deltaSeconds = Mathf.CeilToInt(target.MatchTimer);
+            int minutes = Mathf.FloorToInt(deltaSeconds / 60);
+            int seconds = deltaSeconds % 60;
+            matchTimerLabel.text = minutes.ToString("00") + ":" + seconds.ToString("00");
         }
 
         minimapPlayer.localPosition = new Vector3(target.transform.position.x / 5f, target.transform.position.z / 5f, 0f);
