@@ -150,12 +150,16 @@ public class PlayerUI : MonoBehaviour
     {
         List<PlayerStatsSlot> sortedSlots = new List<PlayerStatsSlot>(m_battleStatsSlots);
 
-        sortedSlots.Sort((a, b) => a.Score.CompareTo(b.Score));
+        sortedSlots.Sort((a, b) => b.Score.CompareTo(a.Score));
+
+        m_battleStatsItemsHolder.GetComponent<VerticalLayoutGroup>().enabled = false;
 
         for (int i = 0; i < sortedSlots.Count; i++)
         {
             sortedSlots[i].transform.SetSiblingIndex(i);
         }
+
+        m_battleStatsItemsHolder.GetComponent<VerticalLayoutGroup>().enabled = true;
     }
 
     public void ShowStatsScreen()

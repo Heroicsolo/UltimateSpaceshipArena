@@ -519,6 +519,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         if (this == LocalPlayer)
         {
             PlayerUI.Instance.OnDeath();
+        }
+
+        if (photonView.IsMine)
+        {
             DeathsCount++;
         }
 
@@ -1152,7 +1156,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     [PunRPC]
     public void OnPlayerKilled_RPC(string killerName, string victimName)
     {
-        if (killerName == Name)
+        if (killerName == Name && photonView.IsMine)
         {
             KillsCount++;
         }
