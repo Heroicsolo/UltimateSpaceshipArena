@@ -548,7 +548,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
             m_loadingScreen.SetActive(true);
             m_loadingText.text = "FINDING A GAME...";
             // #Critical we need at this point to attempt joining a Random Room. If it fails, we'll get notified in OnJoinRandomFailed() and we'll create one.
-            string sqlLobbyFilter = string.Format("C0 BETWEEN {0} AND {1}", Mathf.Max(0, m_arenaRating - 200), m_arenaRating + 200);
+            string sqlLobbyFilter = string.Format("C0 BETWEEN {0} AND {1}", Mathf.Max(0, m_arenaRating - 400), m_arenaRating + 400);
             OpJoinRandomRoomParams opJoinRandomRoomParams = new OpJoinRandomRoomParams();
             opJoinRandomRoomParams.SqlLobbyFilter = sqlLobbyFilter;
             if (loadBalancingClient == null)

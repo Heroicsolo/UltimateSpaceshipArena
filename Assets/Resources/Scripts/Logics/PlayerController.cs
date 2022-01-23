@@ -518,7 +518,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         if (audioSource && deathSound)
             audioSource.PlayOneShot(deathSound);
 
-        m_currRespawnTime = ArenaController.instance.RespawnTime;
+        m_currRespawnTime = ArenaController.instance.RespawnTime + Mathf.Min(DeathsCount * DeathsCount, 10f);
 
         if (DeathEffect)
         {
