@@ -143,6 +143,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private float m_globalCD = 0f;
     private Vector3 m_spawnPoint;
     private float m_currRespawnTime = 0f;
+    private int m_killsCount = 0;
+    private int m_deathsCount = 0;
 
     private AudioSource audioSource;
 
@@ -159,6 +161,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     public bool IsAI => isAI;
 
     public bool IsDied => m_durability <= 0 || m_isDied;
+
+    public int KillsCount{ get{ return m_killsCount; } set {m_killsCount = value; } }
+    public int DeathsCount{ get{ return m_deathsCount; } set {m_deathsCount = value; } }
 
     public bool InStealth => m_stealthTime > 0f;
     public List<SkillData> Skills => m_skills;
@@ -488,12 +493,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         if (this == LocalPlayer)
         {
             PlayerUI.Instance.OnDeath();
+            DeathsCount++;
         }
 
         Invoke("StartSpawning", m_spectacleTime);
 
         if (!LocalPlayer.m_isDied)
             PlayerUI.Instance.DoKillAnnounce(m_lastEnemyName, Name);
+
+        OnPlayerKilled(m_lastEnemyName, Name);
     }
 
     public void StartSpawning()
@@ -1082,6 +1090,20 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             OnWin();
     }
 
+    public void OnPlayerKilled(string killerName, string victimName)
+    {
+        photonView.RPC("OnPlayerKilled_RPC", RpcTarget.All, killerName, victimName);
+    }
+
+    [PunRPC]
+    public void OnPlayerKilled_RPC(string killerName, string victimName)
+    {
+        if (killerName == Name)
+        {
+            KillsCount++;
+        }
+    }
+
     void OnLoss()
     {
         int oldRating = Launcher.instance.CurrentRating;
@@ -1125,6 +1147,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             stream.SendNext(m_immuneTime);
             stream.SendNext(m_stealthTime);
             stream.SendNext(isNitroActive);
+            stream.SendNext(m_killsCount);
+            stream.SendNext(m_deathsCount);
         }
         else
         {
@@ -1138,6 +1162,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             this.m_immuneTime = (float)stream.ReceiveNext();
             this.m_stealthTime = (float)stream.ReceiveNext();
             this.isNitroActive = (bool)stream.ReceiveNext();
+            this.m_killsCount = (int)stream.ReceiveNext();
+            this.m_deathsCount = (int)stream.ReceiveNext();
         }
     }
 

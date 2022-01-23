@@ -27,6 +27,11 @@ public class ArenaController : MonoBehaviourPunCallbacks
     public List<PlayerController> RoomPlayers => m_roomPlayers;
     public List<Pickup> RoomPickups => m_roomPickups;
 
+    public PlayerController GetPlayerByName(string name)
+    {
+        return m_roomPlayers.Find(x => x.Name == name);
+    }
+
     public void RemoveRoomFromList()
     {
         PhotonNetwork.CurrentRoom.IsOpen = false;
