@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System;
 using Photon.Chat;
 using ExitGames.Client.Photon;
+using Google;
+using System.Threading.Tasks;
 
 public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatClientListener
 {
@@ -431,7 +433,15 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         m_email = PlayerPrefs.GetString("email", "");
         m_password = PlayerPrefs.GetString("pass", "");
 
-        if (m_email.Length > 2)
+        string googleToken = PlayerPrefs.GetString("googleId", "");
+
+        if (googleToken.Length > 2)
+        {
+            m_signingIn = true;
+            SignInWithGoogleOnFirebase(googleToken);
+            return true;
+        }
+        else if (m_email.Length > 2)
         {
             StartCoroutine(WaitForLoginFail());
             m_signingIn = true;
@@ -486,6 +496,90 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         StartCoroutine(WaitForLoginFail());
 
         SignIn(m_inputEmail.text, m_inputPass.text);
+    }
+
+    public void SignUpWithGoogle()
+    {
+        if (m_signingIn) return;
+
+        if (m_inputName.text.Length < 2)
+        {
+            MessageBox.instance.Show("Your nickname is too short!");
+            return;
+        }
+
+        if (m_inputSignUpEmail.text.Length < 6)
+        {
+            MessageBox.instance.Show("Incorrect email!");
+            return;
+        }
+
+        if (m_inputSignUpPass.text.Length < 4)
+        {
+            MessageBox.instance.Show("Password is too short!");
+            return;
+        }
+
+        if (m_usedNicknamesList.Contains(m_inputName.text))
+        {
+            MessageBox.instance.Show("This nickname is already taken!");
+            return;
+        }
+
+        m_signingIn = true;
+
+        StartCoroutine(WaitForLoginFail());
+
+        SignInWithGoogle();
+    }
+
+    public void SignInWithGoogle()
+    {
+        GoogleSignIn.DefaultInstance?.SignIn().ContinueWith(OnGoogleAuthFinished);
+    }
+
+    void OnGoogleAuthFinished(Task<GoogleSignInUser> task)
+    {
+        if (task.IsCompleted)
+            SignInWithGoogleOnFirebase(task.Result.IdToken);
+    }
+
+    private void SignInWithGoogleOnFirebase(string idToken)
+    {
+        Credential credential = GoogleAuthProvider.GetCredential(idToken, null);
+
+        auth.SignInWithCredentialAsync(credential).ContinueWith(task =>
+        {
+            if (task.IsCanceled)
+            {
+                Debug.LogError("SignInWithGoogleOnFirebase was canceled.");
+                m_loginError = "Logging in was canceled.";
+                m_signInFailed = true;
+                m_signingIn = false;
+                return;
+            }
+            if (task.IsFaulted)
+            {
+                Debug.LogError("SignInWithGoogleOnFirebase encountered an error: " + task.Exception);
+                m_loginError = task.Exception.Message;
+                m_signInFailed = true;
+                m_signingIn = false;
+                return;
+            }
+
+            FirebaseUser newUser = task.Result;
+            Debug.LogFormat("User signed in successfully: {0} ({1})", newUser.DisplayName, newUser.UserId);
+
+            m_email = newUser.Email;
+            m_userId = newUser.UserId;
+            m_password = "";
+
+            m_signInFailed = false;
+            m_signedIn = true;
+            m_signingIn = false;
+
+            PlayerPrefs.SetString("googleId", idToken);
+        });
     }
 
     public void SignIn(string email, string password)
