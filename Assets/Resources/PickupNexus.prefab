@@ -19184,7 +19184,6 @@ MonoBehaviour:
   speedBonusLength: 0
   isNexus: 1
   respawnTime: 30
-  captureTime: 30
   effectsHolder: {fileID: 8213307917496181798}
   capturingBar: {fileID: 2961771747097574249}
 --- !u!114 &33564264532032792

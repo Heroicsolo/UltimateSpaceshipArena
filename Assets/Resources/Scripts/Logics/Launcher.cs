@@ -33,6 +33,7 @@ public class BalanceInfo
     public float spectacleTime;
     public int winnersCount;
     public float shieldRegenDelay;
+    public int initCurrency;
 }
 
 public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatClientListener
@@ -77,6 +78,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     [SerializeField] private GameObject chatMessagePrefab;
     [SerializeField] private TMP_InputField chatMessageField;
     [SerializeField] private GameObject chatLoadingIndicator;
+    [SerializeField] private TextMeshProUGUI currencyLabel;
+    [SerializeField] private TextMeshProUGUI ratingLabel;
 
     private BalanceInfo m_balanceData;
     private Firebase.FirebaseApp app = null;
@@ -89,6 +92,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     private string authCode = "";
     private string m_deviceId = "";
 
+    private int m_currency = 1000;
     private int m_arenaRating = 0;
     private int m_loginQueueLength = 0;
 
@@ -403,6 +407,9 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
         userIdLabel.text = "User ID: " + UserID;
 
+        ratingLabel.text = m_arenaRating.ToString();
+        currencyLabel.text = m_currency.ToString();
+
         chatClient = new ChatClient(this);
 
         chatClient.ChatRegion = "EU";
@@ -437,6 +444,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     {
         m_arenaRating = Mathf.Max(0, m_arenaRating - Mathf.FloorToInt(0.1f * Balance.lossRatingMod * m_arenaRating));
         SaveProfile();
+        ratingLabel.text = m_arenaRating.ToString();
     }
 
     public void OnFightWon(int place = 1)
@@ -444,6 +452,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         int bonusForPlace = (Balance.winnersCount - place) * 100;
         m_arenaRating = Mathf.Max(0, m_arenaRating + Mathf.CeilToInt((bonusForPlace + 200) * Balance.victoryRatingMod * 2000f / Mathf.Max(1000f, m_arenaRating)));
         SaveProfile();
+        ratingLabel.text = m_arenaRating.ToString();
     }
 
     public void SetOnline()
@@ -566,6 +575,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
             m_email = notEmptyProfile ? snapshot.Child("email").Value.ToString() : "";
 
         m_arenaRating = notEmptyProfile && snapshot.HasChild("arenaRating") ? int.Parse(snapshot.Child("arenaRating").Value.ToString()) : Balance.initArenaRating;
+
+        m_currency = notEmptyProfile && snapshot.HasChild("currency") ? int.Parse(snapshot.Child("currency").Value.ToString()) : Balance.initCurrency;
 
         m_loadedProfile = true;
     }

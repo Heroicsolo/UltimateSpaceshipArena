@@ -846,7 +846,6 @@ MonoBehaviour:
   m_fieldRegen: 0.07
   m_maxDurability: 120
   m_maxField: 140
-  m_shieldRegenDelay: 1
   m_maxSpeed: 40
   shootSound: {fileID: 8300000, guid: c1e99d871f2580347ad67130bbb1902a, type: 3}
   deathSound: {fileID: 8300000, guid: dce0fc50c98b24282867ddc791aa869d, type: 3}
