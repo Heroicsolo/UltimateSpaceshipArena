@@ -150,6 +150,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     private AudioSource audioSource;
 
+    private BalanceInfo m_balance;
+
     public float DurabilityPercent => (float)m_durability / (float)m_maxDurability;
     public float FieldPercent => (float)m_forceField / (float)m_maxField;
 
@@ -194,6 +196,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             LocalPlayer = this;
         }
 
+        m_balance = Launcher.instance.Balance;
+
         charController = GetComponent<CharacterController>();
 
         initMaterial = meshRenderer.material;
@@ -205,7 +209,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         DontDestroyOnLoad(this.gameObject);
 
         m_immuneTime = 5f;
-        m_spectacleTime = 3f;
+        m_spectacleTime = m_balance.spectacleTime;
         m_isDied = false;
 
         m_durability = m_maxDurability;
@@ -230,10 +234,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         if (photonView.IsMine && !IsAI)
         {
             if (PhotonNetwork.IsMasterClient)
-                timer.Start(15f);
+                timer.Start(m_balance.lobbyLength);
 
             if (PhotonNetwork.IsMasterClient)
-                matchTimer.Start(195f);
+                matchTimer.Start(m_balance.lobbyLength + m_balance.fightLength);
 
             if (PlayerUiPrefab != null)
             {
@@ -519,7 +523,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         if (audioSource && deathSound)
             audioSource.PlayOneShot(deathSound);
 
-        m_currRespawnTime = ArenaController.instance.RespawnTime + Mathf.Min(DeathsCount * DeathsCount, 10f);
+        m_currRespawnTime = ArenaController.instance.RespawnTime + Mathf.Min(DeathsCount * DeathsCount, m_balance.respawnTimeMax);
 
         if (DeathEffect)
         {
@@ -779,7 +783,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         int place = sortedPlayers.FindIndex(x => x == this);
 
-        if (place < 3)
+        if (place < m_balance.winnersCount + 1)
             OnWin(place);
         else
             OnLoss(place);
@@ -1144,8 +1148,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     [PunRPC]
     void OnNexusUsed_RPC(string byPlayer, Vector3 pos)
     {
-
-
         targetCameraPos = pos;
         m_nexusUsed = true;
 
@@ -1158,7 +1160,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         else
             place++;
 
-        if (place < 3)
+        if (place < m_balance.winnersCount + 1)
             OnWin(place);
         else
             OnLoss(place);

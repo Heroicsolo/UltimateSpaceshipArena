@@ -14,12 +14,10 @@ public class ArenaController : MonoBehaviourPunCallbacks
     [SerializeField] private List<GameObject> botsPrefabs;
     [SerializeField] private List<string> botsPossibleNames;
     [SerializeField] Transform nexusPosition;
-    [SerializeField] private float respawnTime = 5f;
-    [SerializeField] private float joiningTime = 60f;
 
     public Vector3 RandomSpawnPoint => spawnPoints.GetRandomElement().position;
     public string RandomBotName => botsPossibleNames.GetRandomElement();
-    public float RespawnTime => respawnTime;
+    public float RespawnTime => Launcher.instance.Balance.respawnTimeBase;
 
     private List<PlayerController> m_roomPlayers = new List<PlayerController>();
     private List<Pickup> m_roomPickups = new List<Pickup>();
@@ -186,7 +184,7 @@ public class ArenaController : MonoBehaviourPunCallbacks
                 m_botsSpawnPoints.AddRange(spawnPoints);
                 m_botsSpawnPoints.Remove(point);
 
-                m_timeToJoin = joiningTime;
+                m_timeToJoin = Launcher.instance.Balance.joinStageLength;
             }
 
             if (Launcher.instance.SelectedShipPrefab == null)
@@ -226,7 +224,7 @@ public class ArenaController : MonoBehaviourPunCallbacks
 
         PlayerUI.Instance.DoAnnounce(other.NickName + " entered to arena");
 
-        if (m_roomPlayers.Count > 3) RemoveOneBot();
+        if (m_roomPlayers.Count > Launcher.instance.Balance.maxPlayersPerRoom - 1) RemoveOneBot();
 
         if (PhotonNetwork.IsMasterClient)
         {
@@ -246,7 +244,7 @@ public class ArenaController : MonoBehaviourPunCallbacks
 
         PlayerUI.Instance.OnLobbyPlayerDeleted(other.NickName);
 
-        if (m_roomPlayers.Count < 4) AddOneBot();
+        if (m_roomPlayers.Count < Launcher.instance.Balance.maxPlayersPerRoom) AddOneBot();
 
         if (PhotonNetwork.IsMasterClient)
         {

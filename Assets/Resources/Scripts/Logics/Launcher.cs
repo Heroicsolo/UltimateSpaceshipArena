@@ -13,6 +13,27 @@ using ExitGames.Client.Photon;
 using Google;
 using System.Threading.Tasks;
 
+[Serializable]
+public class BalanceInfo
+{
+    public int techWorks;
+    public int techWorksDelay;
+    public int version;
+    public float fightLength;
+    public int initArenaRating;
+    public float joinStageLength;
+    public float lobbyLength;
+    public float lossRatingMod;
+    public int matchmakingGap;
+    public int maxPlayersPerRoom;
+    public float nexusCaptureTime;
+    public float victoryRatingMod;
+    public float respawnTimeBase;
+    public float respawnTimeMax;
+    public float spectacleTime;
+    public int winnersCount;
+}
+
 public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatClientListener
 {
     public static Launcher instance;
@@ -29,9 +50,9 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     /// <summary>
     /// This client's version number. Users are separated from each other by gameVersion (which allows you to make breaking changes).
     /// </summary>
-    string gameVersion = "3";
-    string chatAppId = "e1f0448d-06a1-40c0-8653-93ffc1b0bee7";
-    [SerializeField] private byte maxPlayersPerRoom = 8;
+    const string gameVersion = "3";
+    const int clientVersion = 1;
+    const string chatAppId = "e1f0448d-06a1-40c0-8653-93ffc1b0bee7";
     [SerializeField] private int initArenaRating = 1000;
     [SerializeField] private int maxChatMessagesCount = 20;
     [SerializeField] private GameObject m_loginScreen;
@@ -56,6 +77,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     [SerializeField] private TMP_InputField chatMessageField;
     [SerializeField] private GameObject chatLoadingIndicator;
 
+    private BalanceInfo m_balanceData;
     private Firebase.FirebaseApp app = null;
     private FirebaseAuth auth;
     private string m_userName = "Player";
@@ -78,6 +100,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     private bool m_DB_loaded = false;
     private bool m_credentialsSaved = false;
     private bool m_newProfile = false;
+    private bool m_loadedBalance = false;
 
     private bool isConnecting;
     private bool isConnectedToMaster;
@@ -91,6 +114,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     private DatabaseReference mDatabaseRef;
     private DatabaseReference mNicknamesDB;
     private DatabaseReference mQueueValueRef;
+    private DatabaseReference mBalanceDatabaseRef;
 
     private AudioSource audioSource;
 
@@ -110,6 +134,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     public int CurrentRating => m_arenaRating;
     public GameObject SelectedShipPrefab { get { return m_selectedShip; } set { m_selectedShip = value; } }
 
+    public BalanceInfo Balance{ get{ return m_balanceData; } }
     public bool IsSoundOn { get { return isSoundOn; } set { isSoundOn = value; PlayerPrefs.SetInt("soundOn", isSoundOn ? 1 : 0); } }
 
     public const string ELO_PROP_KEY = "C0";
@@ -176,6 +201,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         mDatabaseRef = FirebaseDatabase.DefaultInstance.RootReference.Child("users");
         mNicknamesDB = FirebaseDatabase.DefaultInstance.RootReference.Child("nicknames");
         mQueueValueRef = FirebaseDatabase.DefaultInstance.RootReference.Child("queueLength");
+        mBalanceDatabaseRef = FirebaseDatabase.DefaultInstance.RootReference.Child("balance");
 
         mNicknamesDB.GetValueAsync().ContinueWith(task =>
         {
@@ -196,7 +222,19 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
                     else if (task.IsCompleted)
                     {
                         GetLoginQueueLengthFromSnapshot(task.Result);
-                        m_DB_loaded = true;
+
+                        mBalanceDatabaseRef.GetValueAsync().ContinueWith(task =>
+                        {
+                            if (task.IsFaulted)
+                            {
+
+                            }
+                            else if (task.IsCompleted)
+                            {
+                                RefreshBalance(task.Result);
+                                m_DB_loaded = true;
+                            }
+                        });
                     }
                 });
             }
@@ -204,6 +242,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
         mNicknamesDB.ValueChanged += CheckUsedNicknames;
         mQueueValueRef.ValueChanged += OnQueueLengthChanged;
+        mBalanceDatabaseRef.ValueChanged += HandleBalanceValueChanged;
     }
 
     private void OnQueueLengthChanged(object sender, ValueChangedEventArgs args)
@@ -244,6 +283,60 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         LoadNicknamesFromSnapshot(args.Snapshot);
     }
 
+    private void RefreshBalance(DataSnapshot snapshot)
+    {
+        string restoredData = snapshot.GetRawJsonValue();
+
+        if( restoredData.Length < 2 )
+        {
+            m_balanceData = new BalanceInfo();
+        }
+        else
+		    m_balanceData = JsonUtility.FromJson<BalanceInfo>(restoredData);
+
+        m_loadedBalance = true;
+    }
+
+    void HandleBalanceValueChanged(object sender, ValueChangedEventArgs args)
+    {
+        if (args.DatabaseError != null)
+        {
+            Debug.LogError(args.DatabaseError.Message);
+            return;
+        }
+
+        RefreshBalance(args.Snapshot);
+
+        if( Balance.version > clientVersion )
+        {
+            MessageBox.instance.Show("Your game client version is old. Please, update it on Google Play.");
+            CloseGameDelayed();
+        }
+        else if( Balance.techWorks != 0 )
+        {
+            if (Balance.techWorksDelay < 1)
+            {
+                MessageBox.instance.Show("The game is currently under maintenance. We are sorry for the inconvenience.");
+            }
+            else
+            {
+                MessageBox.instance.Show(string.Format("The game will be under maintenance in {0} minutes. We are sorry for the inconvenience.", Balance.techWorksDelay));
+                CloseGameDelayed(Balance.techWorksDelay * 60f);
+            }
+        }
+    }
+
+    public void CloseGameDelayed(float delay = 3f)
+    {
+        StartCoroutine(CloseGameAfterDelay(delay));
+    }
+
+    private IEnumerator CloseGameAfterDelay(float delay = 3f)
+    {
+        yield return new WaitForSecondsRealtime(delay);
+
+        Application.Quit();
+    }
 
     /// <summary>
     /// MonoBehaviour method called on GameObject by Unity during initialization phase.
@@ -465,7 +558,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         if (m_email.Length < 2)
             m_email = notEmptyProfile ? snapshot.Child("email").Value.ToString() : "";
 
-        m_arenaRating = notEmptyProfile && snapshot.HasChild("arenaRating") ? int.Parse(snapshot.Child("arenaRating").Value.ToString()) : initArenaRating;
+        m_arenaRating = notEmptyProfile && snapshot.HasChild("arenaRating") ? int.Parse(snapshot.Child("arenaRating").Value.ToString()) : Balance.initArenaRating;
 
         m_loadedProfile = true;
     }
@@ -689,7 +782,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
             m_loadingScreen.SetActive(true);
             m_loadingText.text = "FINDING A GAME...";
             // #Critical we need at this point to attempt joining a Random Room. If it fails, we'll get notified in OnJoinRandomFailed() and we'll create one.
-            string sqlLobbyFilter = string.Format("C0 BETWEEN {0} AND {1}", Mathf.Max(0, m_arenaRating - 400), m_arenaRating + 400);
+            string sqlLobbyFilter = string.Format("C0 BETWEEN {0} AND {1}", Mathf.Max(0, m_arenaRating - Balance.matchmakingGap), m_arenaRating + Balance.matchmakingGap);
             OpJoinRandomRoomParams opJoinRandomRoomParams = new OpJoinRandomRoomParams();
             opJoinRandomRoomParams.SqlLobbyFilter = sqlLobbyFilter;
             if (loadBalancingClient == null)
@@ -763,7 +856,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         isRoomCreating = true;
         // #Critical: we failed to join a random room, maybe none exists or they are all full. No worries, we create a new room.
         RoomOptions roomOptions = new RoomOptions();
-        roomOptions.MaxPlayers = maxPlayersPerRoom;
+        roomOptions.MaxPlayers = (byte)Balance.maxPlayersPerRoom;
         roomOptions.EmptyRoomTtl = 1000;
         roomOptions.CustomRoomProperties = new ExitGames.Client.Photon.Hashtable { { ELO_PROP_KEY, m_arenaRating } };
         roomOptions.CustomRoomPropertiesForLobby = new string[] { ELO_PROP_KEY };
@@ -817,13 +910,6 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
         if (m_closeGameOnError)
             StartCoroutine(CloseGameAfterDelay());
-    }
-
-    private IEnumerator CloseGameAfterDelay()
-    {
-        yield return new WaitForSecondsRealtime(3f);
-
-        Application.Quit();
     }
 
     public void CreateAccount(string email, string password)

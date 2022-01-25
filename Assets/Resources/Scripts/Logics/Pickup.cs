@@ -12,7 +12,6 @@ public class Pickup : MonoBehaviourPunCallbacks
     public float speedBonusLength = 0f;
     public bool isNexus = false;
     public float respawnTime = 30f;
-    public float captureTime = 10f;
     [SerializeField] private GameObject effectsHolder;
     [SerializeField] private Image capturingBar;
 
@@ -29,10 +28,16 @@ public class Pickup : MonoBehaviourPunCallbacks
     public int CapturersCount => capturersCount;
 
     private Collider m_collider;
+    private BalanceInfo m_balance;
 
     private void Awake()
     {
         m_collider = GetComponent<Collider>();
+    }
+
+    private void Start()
+    {
+        m_balance = Launcher.instance.Balance;
     }
 
     void Activate()
@@ -163,7 +168,7 @@ public class Pickup : MonoBehaviourPunCallbacks
     {
         if (capturingBar)
         {
-            capturingBar.fillAmount = currCapturingTime / captureTime;
+            capturingBar.fillAmount = currCapturingTime / m_balance.nexusCaptureTime;
 
             if (PhotonNetwork.IsMasterClient)
             {
@@ -191,7 +196,7 @@ public class Pickup : MonoBehaviourPunCallbacks
                     }
                 }
 
-                if (currCapturingTime >= captureTime && capturersCount == 1)
+                if (currCapturingTime >= m_balance.nexusCaptureTime && capturersCount == 1)
                 {
                     PlayerController.LocalPlayer.OnNexusUsed(currCapturerNames[0], transform.position);
                     Deactivate();
