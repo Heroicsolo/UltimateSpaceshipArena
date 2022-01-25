@@ -43,6 +43,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     [SerializeField] private InputField m_inputSignUpPass;
     [SerializeField] private InputField m_inputName;
     [SerializeField] private TextMeshProUGUI m_loadingText;
+    [SerializeField] private TextMeshProUGUI m_loginQueueText;
     [SerializeField] private TextMeshProUGUI m_playersCountText;
     [SerializeField] private GameObject m_loadingGears;
     [SerializeField] private Toggle defaultShipToggle;
@@ -66,6 +67,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     private string m_deviceId = "";
 
     private int m_arenaRating = 0;
+    private int m_loginQueueLength = 0;
 
     private bool m_signingIn = false;
     private bool m_signedIn = false;
@@ -88,6 +90,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
     private DatabaseReference mDatabaseRef;
     private DatabaseReference mNicknamesDB;
+    private DatabaseReference mQueueValueRef;
 
     private AudioSource audioSource;
 
@@ -172,6 +175,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
         mDatabaseRef = FirebaseDatabase.DefaultInstance.RootReference.Child("users");
         mNicknamesDB = FirebaseDatabase.DefaultInstance.RootReference.Child("nicknames");
+        mQueueValueRef = FirebaseDatabase.DefaultInstance.RootReference.Child("queueLength");
 
         mNicknamesDB.GetValueAsync().ContinueWith(task =>
         {
@@ -182,11 +186,46 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
             else if (task.IsCompleted)
             {
                 LoadNicknamesFromSnapshot(task.Result);
-                m_DB_loaded = true;
+
+                mQueueValueRef.GetValueAsync().ContinueWith(task =>
+                {
+                    if (task.IsFaulted)
+                    {
+
+                    }
+                    else if (task.IsCompleted)
+                    {
+                        GetLoginQueueLengthFromSnapshot(task.Result);
+                        m_DB_loaded = true;
+                    }
+                });
             }
         });
 
         mNicknamesDB.ValueChanged += CheckUsedNicknames;
+        mQueueValueRef.ValueChanged += OnQueueLengthChanged;
+    }
+
+    private void OnQueueLengthChanged(object sender, ValueChangedEventArgs args)
+    {
+        if (args.DatabaseError != null)
+        {
+            Debug.LogError(args.DatabaseError.Message);
+            return;
+        }
+
+        if (args == null || args.Snapshot == null || args.Snapshot.Value == null)
+        {
+            return;
+        }
+
+        m_loginQueueLength = int.Parse(args.Snapshot.Value.ToString());
+        m_loginQueueText.text = "Your position in queue: " + m_loginQueueLength.ToString();
+    }
+
+    private void GetLoginQueueLengthFromSnapshot(DataSnapshot snapshot)
+    {
+        m_loginQueueLength = int.Parse(snapshot.Value.ToString());
     }
 
     private void CheckUsedNicknames(object sender, ValueChangedEventArgs args)
@@ -382,6 +421,9 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     {
         if (!m_closeGameOnError && m_signedIn)
             mDatabaseRef.Child(m_userId).Child("online").SetValueAsync(false);
+
+        m_loginQueueLength--;
+        mQueueValueRef.SetValueAsync(m_loginQueueLength);
 
         SignOut();
 
@@ -633,6 +675,11 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         isConnecting = PhotonNetwork.ConnectUsingSettings();
         PhotonNetwork.ConnectUsingSettings();
         PhotonNetwork.GameVersion = gameVersion;
+        m_loginQueueLength++;
+        if (m_loginQueueLength > 1)
+            m_loginQueueText.gameObject.SetActive(true);
+        m_loginQueueText.text = "Your position in queue: " + m_loginQueueLength.ToString();
+        mQueueValueRef.SetValueAsync(m_loginQueueLength);
     }
 
     public void FindRoom()
@@ -665,6 +712,10 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         {
             isConnecting = false;
         }
+
+        m_loginQueueText.gameObject.SetActive(false);
+        m_loginQueueLength--;
+        mQueueValueRef.SetValueAsync(m_loginQueueLength);
 
         isConnectedToMaster = true;
     }
