@@ -1154,12 +1154,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         int place = sortedPlayers.FindIndex(x => x == this);
 
         if (Name == byPlayer)
-            place = 1;
-        else
-            place++;
-
-        if (place < m_balance.winnersCount + 1)
-            OnWin(place);
+            OnWin();
         else
             OnLoss(place);
     }
