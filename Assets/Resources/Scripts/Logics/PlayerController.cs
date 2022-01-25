@@ -1185,7 +1185,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         m_isWon = true;
 
         int oldRating = Launcher.instance.CurrentRating;
-        Launcher.instance.OnFightWon();
+        Launcher.instance.OnFightWon(place);
         int newRating = Launcher.instance.CurrentRating;
 
         PlayerUI.Instance.OnWin(oldRating, newRating - oldRating, place);

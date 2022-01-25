@@ -435,13 +435,14 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
     public void OnFightLoss()
     {
-        m_arenaRating = Mathf.Max(0, m_arenaRating - Mathf.FloorToInt(0.1f * m_arenaRating));
+        m_arenaRating = Mathf.Max(0, m_arenaRating - Mathf.FloorToInt(0.1f * Balance.lossRatingMod * m_arenaRating));
         SaveProfile();
     }
 
-    public void OnFightWon()
+    public void OnFightWon(int place = 1)
     {
-        m_arenaRating = Mathf.Max(0, m_arenaRating + Mathf.CeilToInt(200 * 2000f / Mathf.Max(1000f, m_arenaRating)));
+        int bonusForPlace = (Balance.winnersCount - place) * 100;
+        m_arenaRating = Mathf.Max(0, m_arenaRating + Mathf.CeilToInt((bonusForPlace + 200) * Balance.victoryRatingMod * 2000f / Mathf.Max(1000f, m_arenaRating)));
         SaveProfile();
     }
 
