@@ -2,13 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New UpgradeData", menuName = "Upgrade Data", order = 52)]
-public class UpgradeData : MonoBehaviour
+[CreateAssetMenu(fileName = "New UpgradeData", menuName = "Upgrade Data", order = 51)]
+public class UpgradeData : ScriptableObject
 {
     [SerializeField] public string title;
     [SerializeField] public string desc;
     [SerializeField] public Sprite icon;
-    [SerializeField] public int maxUpgradeLevels;
+    [SerializeField] public int cost = 0;
+    [SerializeField] public int tier = 0;
+    [SerializeField] public int maxUpgradeLevels = 1;
+    [SerializeField] public int damageBonus = 0;
     [SerializeField] public float speedBonus = 0f;
     [SerializeField] public float durabilityBonus = 0f;
     [SerializeField] public float shieldBonus = 0f;

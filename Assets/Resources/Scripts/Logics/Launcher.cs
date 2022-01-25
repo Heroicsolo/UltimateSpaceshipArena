@@ -39,6 +39,18 @@ public class BalanceInfo
     public int currencyPlaceBonus;
 }
 
+[Serializable]
+public class ShipUpgradesInfo
+{
+    public List<int> upgradeLevels;
+}
+
+[Serializable]
+public class UpgradesInfo
+{
+    public List<ShipUpgradesInfo> shipUpgradeLevels;
+}
+
 public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatClientListener
 {
     public static Launcher instance;
@@ -84,6 +96,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     [SerializeField] private TextMeshProUGUI currencyLabel;
     [SerializeField] private TextMeshProUGUI ratingLabel;
 
+    private UpgradesInfo m_upgradesInfo;
     private BalanceInfo m_balanceData;
     private Firebase.FirebaseApp app = null;
     private FirebaseAuth auth;
@@ -448,6 +461,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         m_currency += Balance.currencyPerFightMin;
         m_arenaRating = Mathf.Max(0, m_arenaRating - Mathf.FloorToInt(0.1f * Balance.lossRatingMod * m_arenaRating));
         SaveProfile();
+        currencyLabel.text = m_currency.ToString();
         ratingLabel.text = m_arenaRating.ToString();
         return Balance.currencyPerFightMin;
     }
@@ -459,6 +473,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         m_currency += moneyGained;
         m_arenaRating = Mathf.Max(0, m_arenaRating + Mathf.CeilToInt((bonusForPlace + 200) * Balance.victoryRatingMod * 2000f / Mathf.Max(1000f, m_arenaRating)));
         SaveProfile();
+        currencyLabel.text = m_currency.ToString();
         ratingLabel.text = m_arenaRating.ToString();
         return moneyGained;
     }
@@ -503,6 +518,10 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         userTable.Child("email").SetValueAsync(m_email);
         userTable.Child("arenaRating").SetValueAsync(m_arenaRating);
         userTable.Child("currency").SetValueAsync(m_currency);
+
+        string saveData = JsonUtility.ToJson(m_upgradesInfo);
+
+        userTable.Child("UpgradesInfo").SetRawJsonValueAsync(saveData);
     }
 
     public void LoadProfile(bool defaultProfile = false)
@@ -586,6 +605,16 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         m_arenaRating = notEmptyProfile && snapshot.HasChild("arenaRating") ? int.Parse(snapshot.Child("arenaRating").Value.ToString()) : Balance.initArenaRating;
 
         m_currency = notEmptyProfile && snapshot.HasChild("currency") ? int.Parse(snapshot.Child("currency").Value.ToString()) : Balance.initCurrency;
+
+        string restoredData = "";
+
+        if( notEmptyProfile )
+            restoredData = snapshot.Child("UpgradesInfo").GetRawJsonValue();
+
+        if( restoredData == null || restoredData.Length < 2 )
+            m_upgradesInfo = new UpgradesInfo();
+        else
+		    m_upgradesInfo = JsonUtility.FromJson<UpgradesInfo>(restoredData);
 
         m_loadedProfile = true;
     }

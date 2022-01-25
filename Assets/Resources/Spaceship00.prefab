@@ -881,6 +881,11 @@ MonoBehaviour:
   AIPickupsFindingRadius: 600
   AINexusFindingRadius: 600
   AIDurabilityPercentToRetreat: 0.4
+  m_upgrades:
+  - {fileID: 11400000, guid: a31b6f2dd194c97478231b613fdd4457, type: 2}
+  - {fileID: 11400000, guid: cdc5e8ca7fc9aa3438f7f504d64bb8f9, type: 2}
+  - {fileID: 11400000, guid: 6a4df038582327e4997f4be306167c20, type: 2}
+  - {fileID: 11400000, guid: ce31d9d85c496ab4eaa9b4ede44b1965, type: 2}
   m_skills:
   - {fileID: 11400000, guid: 4a7c2be73870cb747a877de63d3cda01, type: 2}
   - {fileID: 11400000, guid: ab833239f36936b43905ddf8fc0597d6, type: 2}

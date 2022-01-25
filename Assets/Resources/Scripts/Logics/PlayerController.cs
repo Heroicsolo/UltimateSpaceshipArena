@@ -55,6 +55,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private float AINexusFindingRadius = 600f;
     [SerializeField]
     private float AIDurabilityPercentToRetreat = 0.4f;
+    [SerializeField] private List<UpgradeData> m_upgrades;
 
     [SerializeField] private List<SkillData> m_skills;
 
