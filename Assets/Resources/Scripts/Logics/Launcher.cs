@@ -95,6 +95,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     [SerializeField] private GameObject chatLoadingIndicator;
     [SerializeField] private TextMeshProUGUI currencyLabel;
     [SerializeField] private TextMeshProUGUI ratingLabel;
+    [SerializeField] private List<PlayerController> availableShips;
 
     private UpgradesInfo m_upgradesInfo;
     private BalanceInfo m_balanceData;
@@ -518,6 +519,22 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         userTable.Child("email").SetValueAsync(m_email);
         userTable.Child("arenaRating").SetValueAsync(m_arenaRating);
         userTable.Child("currency").SetValueAsync(m_currency);
+
+        if (m_upgradesInfo.shipUpgradeLevels == null || m_upgradesInfo.shipUpgradeLevels.Count == 0)
+        {
+            m_upgradesInfo.shipUpgradeLevels = new List<ShipUpgradesInfo>();
+
+            for (int i = 0; i < availableShips.Count; i++)
+            {
+                ShipUpgradesInfo sui = new ShipUpgradesInfo();
+                sui.upgradeLevels = new List<int>();
+
+                for (int u = 0; u < availableShips[i].Upgrades.Count; u++)
+                {
+                    sui.upgradeLevels.Add(0); 
+                }
+            }
+        }
 
         string saveData = JsonUtility.ToJson(m_upgradesInfo);
 

@@ -173,6 +173,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     public bool InStealth => m_stealthTime > 0f;
     public List<SkillData> Skills => m_skills;
 
+    public List<UpgradeData> Upgrades => m_upgrades;
+
     public string Name => m_name;
 
     public float LobbyTimer => timer.GetTime();
