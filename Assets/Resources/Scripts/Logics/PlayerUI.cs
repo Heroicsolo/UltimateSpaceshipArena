@@ -51,9 +51,13 @@ public class PlayerUI : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI winScreenRatingLabel;
     [SerializeField]
+    private TextMeshProUGUI winScreenCurrencyLabel;
+    [SerializeField]
     private TextMeshProUGUI winScreenPlaceLabel;
     [SerializeField]
     private TextMeshProUGUI loseScreenRatingLabel;
+    [SerializeField]
+    private TextMeshProUGUI loseScreenCurrencyLabel;
     [SerializeField]
     private TextMeshProUGUI loseScreenPlaceLabel;
     [SerializeField]
@@ -379,7 +383,7 @@ public class PlayerUI : MonoBehaviour
         lobbyScreenTitle.text = string.Format("Players ready to fight: {0}/{1}", m_lobbyPlayers.Count, PhotonNetwork.CurrentRoom.MaxPlayers);
     }
 
-    public void OnLoss(int currRating, int ratingChange, int place)
+    public void OnLoss(int currRating, int ratingChange, int place, int moneyGained)
     {
         lossScreen.SetActive(true);
 
@@ -392,13 +396,14 @@ public class PlayerUI : MonoBehaviour
 
         PlaySound(SoundType.Loss, 5f);
 
-        StartCoroutine(LoseScreenAnim(currRating, ratingChange));
+        StartCoroutine(LoseScreenAnim(currRating, ratingChange, moneyGained));
     }
 
-    public void OnWin(int currRating, int ratingChange, int place)
+    public void OnWin(int currRating, int ratingChange, int place, int moneyGained)
     {
         winScreen.SetActive(true);
-        winScreenRatingLabel.text = currRating.ToString();
+        winScreenRatingLabel.text = "+0";
+        winScreenCurrencyLabel.text = "+0";
         string suffix = "th";
         if (place == 1) suffix = "st";
         if (place == 2) suffix = "nd";
@@ -407,49 +412,57 @@ public class PlayerUI : MonoBehaviour
 
         PlaySound(SoundType.Victory, 5f);
 
-        StartCoroutine(WinScreenAnim(currRating, ratingChange));
+        StartCoroutine(WinScreenAnim(currRating, ratingChange, moneyGained));
     }
 
-    private IEnumerator WinScreenAnim(int currRating, int ratingChange)
+    private IEnumerator WinScreenAnim(int currRating, int ratingChange, int moneyGained)
     {
         float t = 0f;
 
-        int startValue = currRating;
-        int endValue = currRating + ratingChange;
+        int startValue = 0;
+        int endValue = ratingChange;
+        int endValue2 = moneyGained;
 
         do
         {
             t += Time.deltaTime * 2f;
 
             int ratingToShow = Mathf.FloorToInt(Mathf.Lerp(startValue, endValue, t));
-            winScreenRatingLabel.text = ratingToShow.ToString();
+            int moneyToShow = Mathf.FloorToInt(Mathf.Lerp(startValue, endValue2, t));
+            winScreenRatingLabel.text = "+" + ratingToShow.ToString();
+            winScreenCurrencyLabel.text = "+" + moneyToShow.ToString();
 
             yield return null;
         }
         while (t < 1f);
 
-        winScreenRatingLabel.text = endValue.ToString();
+        winScreenRatingLabel.text = "+" + endValue.ToString();
+        winScreenCurrencyLabel.text = "+" + endValue2.ToString();
     }
 
-    private IEnumerator LoseScreenAnim(int currRating, int ratingChange)
+    private IEnumerator LoseScreenAnim(int currRating, int ratingChange, int moneyGained)
     {
         float t = 0f;
 
-        int startValue = currRating;
-        int endValue = currRating + ratingChange;
+        int startValue = 0;
+        int endValue = ratingChange;
+        int endValue2 = moneyGained;
 
         do
         {
             t += Time.deltaTime * 2f;
 
             int ratingToShow = Mathf.FloorToInt(Mathf.Lerp(startValue, endValue, t));
-            loseScreenRatingLabel.text = ratingToShow.ToString();
+            int moneyToShow = Mathf.FloorToInt(Mathf.Lerp(startValue, endValue2, t));
+            loseScreenRatingLabel.text = "-" + ratingToShow.ToString();
+            loseScreenCurrencyLabel.text = "+" + moneyToShow.ToString();
 
             yield return null;
         }
         while (t < 1f);
 
-        loseScreenRatingLabel.text = endValue.ToString();
+        loseScreenRatingLabel.text = "-" + endValue.ToString();
+        loseScreenCurrencyLabel.text = "+" + endValue2.ToString();
     }
 
     public void LeaveArena(bool changeRating = false)

@@ -1171,10 +1171,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         m_isLoss = true;
 
         int oldRating = Launcher.instance.CurrentRating;
-        Launcher.instance.OnFightLoss();
+        int moneyGained = Launcher.instance.OnFightLoss();
         int newRating = Launcher.instance.CurrentRating;
 
-        PlayerUI.Instance.OnLoss(oldRating, newRating - oldRating, place);
+        PlayerUI.Instance.OnLoss(oldRating, newRating - oldRating, place, moneyGained);
 
         Invoke("ExitFromRoom", 5f);
     }
@@ -1185,10 +1185,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         m_isWon = true;
 
         int oldRating = Launcher.instance.CurrentRating;
-        Launcher.instance.OnFightWon(place);
+        int moneyGained = Launcher.instance.OnFightWon(place);
         int newRating = Launcher.instance.CurrentRating;
 
-        PlayerUI.Instance.OnWin(oldRating, newRating - oldRating, place);
+        PlayerUI.Instance.OnWin(oldRating, newRating - oldRating, place, moneyGained);
 
         Invoke("ExitFromRoom", 5f);
     }

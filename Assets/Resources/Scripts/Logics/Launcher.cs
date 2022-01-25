@@ -34,6 +34,9 @@ public class BalanceInfo
     public int winnersCount;
     public float shieldRegenDelay;
     public int initCurrency;
+    public int currencyPerFightMin;
+    public int currencyPerWin;
+    public int currencyPlaceBonus;
 }
 
 public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatClientListener
@@ -440,19 +443,24 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         SaveProfile();
     }
 
-    public void OnFightLoss()
+    public int OnFightLoss()
     {
+        m_currency += Balance.currencyPerFightMin;
         m_arenaRating = Mathf.Max(0, m_arenaRating - Mathf.FloorToInt(0.1f * Balance.lossRatingMod * m_arenaRating));
         SaveProfile();
         ratingLabel.text = m_arenaRating.ToString();
+        return Balance.currencyPerFightMin;
     }
 
-    public void OnFightWon(int place = 1)
+    public int OnFightWon(int place = 1)
     {
         int bonusForPlace = (Balance.winnersCount - place) * 100;
+        int moneyGained = Balance.currencyPerFightMin + Balance.currencyPerWin + Balance.currencyPlaceBonus * (Balance.winnersCount - place);
+        m_currency += moneyGained;
         m_arenaRating = Mathf.Max(0, m_arenaRating + Mathf.CeilToInt((bonusForPlace + 200) * Balance.victoryRatingMod * 2000f / Mathf.Max(1000f, m_arenaRating)));
         SaveProfile();
         ratingLabel.text = m_arenaRating.ToString();
+        return moneyGained;
     }
 
     public void SetOnline()
@@ -494,6 +502,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         userTable.Child("username").SetValueAsync(m_userName);
         userTable.Child("email").SetValueAsync(m_email);
         userTable.Child("arenaRating").SetValueAsync(m_arenaRating);
+        userTable.Child("currency").SetValueAsync(m_currency);
     }
 
     public void LoadProfile(bool defaultProfile = false)
