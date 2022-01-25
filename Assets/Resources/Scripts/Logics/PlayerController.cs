@@ -83,8 +83,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private int m_maxDurability = 100;
     [SerializeField]
     private int m_maxField = 100;
-    [SerializeField]
-    private float m_shieldRegenDelay = 1f;
 
     private float m_speed = 0f;
     private float m_currShieldRegenDelay = 0f;
@@ -741,7 +739,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
                 m_lastEnemyName = enemy.Name;
             }
 
-            m_currShieldRegenDelay = m_shieldRegenDelay;
+            m_currShieldRegenDelay = m_balance.shieldRegenDelay;
 
             SpawnDamageText(actualDamage, isCrit);
 

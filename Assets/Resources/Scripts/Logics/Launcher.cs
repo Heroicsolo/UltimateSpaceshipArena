@@ -32,6 +32,7 @@ public class BalanceInfo
     public float respawnTimeMax;
     public float spectacleTime;
     public int winnersCount;
+    public float shieldRegenDelay;
 }
 
 public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatClientListener
