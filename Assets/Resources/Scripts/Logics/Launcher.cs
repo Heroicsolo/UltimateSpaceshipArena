@@ -344,7 +344,12 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     /// </summary>
     void Start()
     {
-        StartCoroutine(AwaitForProfile());
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+        }
+        else
+            StartCoroutine(AwaitForProfile());
     }
 
     private IEnumerator AwaitForProfile(bool skipSignIn = false)
