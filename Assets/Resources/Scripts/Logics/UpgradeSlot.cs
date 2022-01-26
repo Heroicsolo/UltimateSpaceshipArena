@@ -37,6 +37,7 @@ public class UpgradeSlot : MonoBehaviour
     {
         costLabel.text = currentCost.ToString();
         levelLabel.text = "lvl " + currentLevel.ToString();
+        if (currentCost > Launcher.instance.Currency) costLabel.color = Color.red;
     }
 
     public void TryUpgrade()

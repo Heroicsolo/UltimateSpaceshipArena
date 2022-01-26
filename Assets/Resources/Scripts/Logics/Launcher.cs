@@ -158,7 +158,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
     public BalanceInfo Balance{ get{ return m_balanceData; } }
 
-    public int Currency{ get{ return m_currency;} set{ m_currency = value; } }
+    public int Currency{ get{ return m_currency; } set{ m_currency = value; currencyLabel.text = m_currency.ToString(); } }
 
     public bool IsSoundOn { get { return isSoundOn; } set { isSoundOn = value; PlayerPrefs.SetInt("soundOn", isSoundOn ? 1 : 0); } }
 
