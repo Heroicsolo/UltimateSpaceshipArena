@@ -1245,7 +1245,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     void OnLoss(int place)
     {
-        if (m_isWon || m_isLoss || !photonView.IsMine) return;
+        if (m_isWon || m_isLoss || !photonView.IsMine || PlayerUI.Instance.ResultsScreenShown) return;
         m_isLoss = true;
 
         int oldRating = Launcher.instance.CurrentRating;
@@ -1259,7 +1259,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     void OnWin(int place = 1)
     {
-        if (m_isWon || m_isLoss || !photonView.IsMine) return;
+        if (m_isWon || m_isLoss || !photonView.IsMine || PlayerUI.Instance.ResultsScreenShown) return;
         m_isWon = true;
 
         int oldRating = Launcher.instance.CurrentRating;

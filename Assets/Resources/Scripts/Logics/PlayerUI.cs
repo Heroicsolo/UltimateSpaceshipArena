@@ -415,6 +415,8 @@ public class PlayerUI : MonoBehaviour
         StartCoroutine(WinScreenAnim(currRating, ratingChange, moneyGained));
     }
 
+    public bool ResultsScreenShown => winScreen.activeSelf || lossScreen.activeSelf;
+
     private IEnumerator WinScreenAnim(int currRating, int ratingChange, int moneyGained)
     {
         float t = 0f;
