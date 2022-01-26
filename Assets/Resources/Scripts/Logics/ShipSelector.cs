@@ -4,8 +4,16 @@ using UnityEngine;
 
 public class ShipSelector : MonoBehaviour
 {
+    [SerializeField] UpgradesScreen upgradesScreen;
+
     private void OnEnable()
     {
         Launcher.instance.OnShipSelectorOpened();
+    }
+
+    public void OpenUpgradesScreen(ShipToggle toggle)
+    {
+        upgradesScreen.SetData(toggle.ShipData);
+        upgradesScreen.gameObject.SetActive(true);
     }
 }

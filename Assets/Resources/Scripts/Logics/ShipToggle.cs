@@ -15,6 +15,8 @@ public class ShipToggle : MonoBehaviour
     [SerializeField] Image m_shipIcon;
     [SerializeField] Text m_shipTitle;
 
+    public PlayerController ShipData => m_shipData;
+
     public void OnShipSelected(bool selected)
     {
         if( selected )

@@ -582,6 +582,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
                 {
                     sui.upgradeLevels.Add(0); 
                 }
+
+                m_upgradesInfo.shipUpgradeLevels.Add(sui);
             }
         }
     }

@@ -2714,6 +2714,38 @@ PrefabInstance:
       propertyPath: m_shipData
       value: 
       objectReference: {fileID: 6972756198996731789, guid: b37f444a19ce86040b734a5573188997, type: 3}
+    - target: {fileID: 4504088804255990277, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4504088804255990277, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4504088804255990277, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1528247117}
+    - target: {fileID: 4504088804255990277, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4504088804255990277, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OpenUpgradesScreen
+      objectReference: {fileID: 0}
+    - target: {fileID: 4504088804255990277, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: ShipSelector, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 4504088804255990277, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgument
+      value: 
+      objectReference: {fileID: 615367768}
+    - target: {fileID: 4504088804255990277, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: ShipToggle, Assembly-CSharp
+      objectReference: {fileID: 0}
     - target: {fileID: 5751699258368081034, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -2817,6 +2849,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 5751699258368081034, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
   m_PrefabInstance: {fileID: 615367766}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &615367768 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1546590402817540494, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
+  m_PrefabInstance: {fileID: 615367766}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fabb595bc4ac2b44b7122a641a140ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &615718541
 GameObject:
   m_ObjectHideFlags: 0
@@ -4173,6 +4216,38 @@ PrefabInstance:
       propertyPath: m_shipData
       value: 
       objectReference: {fileID: 6972756198996731789, guid: 1afdeb89e6c64cc41ba37e847741c3d6, type: 3}
+    - target: {fileID: 4504088804255990277, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4504088804255990277, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4504088804255990277, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1528247117}
+    - target: {fileID: 4504088804255990277, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4504088804255990277, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OpenUpgradesScreen
+      objectReference: {fileID: 0}
+    - target: {fileID: 4504088804255990277, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: ShipSelector, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 4504088804255990277, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgument
+      value: 
+      objectReference: {fileID: 857687655}
+    - target: {fileID: 4504088804255990277, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: ShipToggle, Assembly-CSharp
+      objectReference: {fileID: 0}
     - target: {fileID: 5751699258368081034, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -4276,6 +4351,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 5751699258368081034, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
   m_PrefabInstance: {fileID: 857687653}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &857687655 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1546590402817540494, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
+  m_PrefabInstance: {fileID: 857687653}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fabb595bc4ac2b44b7122a641a140ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &857763153
 GameObject:
   m_ObjectHideFlags: 0
@@ -7144,6 +7230,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb249c47c8f5a4040acf21a9334aac43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  upgradesScreen: {fileID: 2034940738}
 --- !u!1 &1561375293
 GameObject:
   m_ObjectHideFlags: 0
@@ -9341,7 +9428,10 @@ MonoBehaviour:
   chatLoadingIndicator: {fileID: 639619058}
   currencyLabel: {fileID: 2056832088}
   ratingLabel: {fileID: 436737593}
-  availableShips: []
+  availableShips:
+  - {fileID: 7690417566898504318, guid: c246416bc2681cc4bb0f521549655abc, type: 3}
+  - {fileID: 6972756198996731789, guid: 1afdeb89e6c64cc41ba37e847741c3d6, type: 3}
+  - {fileID: 6972756198996731789, guid: b37f444a19ce86040b734a5573188997, type: 3}
 --- !u!4 &2034605826
 Transform:
   m_ObjectHideFlags: 0
@@ -10248,6 +10338,38 @@ PrefabInstance:
       propertyPath: m_shipData
       value: 
       objectReference: {fileID: 7690417566898504318, guid: c246416bc2681cc4bb0f521549655abc, type: 3}
+    - target: {fileID: 4504088804255990277, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4504088804255990277, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4504088804255990277, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1528247117}
+    - target: {fileID: 4504088804255990277, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4504088804255990277, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OpenUpgradesScreen
+      objectReference: {fileID: 0}
+    - target: {fileID: 4504088804255990277, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: ShipSelector, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 4504088804255990277, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgument
+      value: 
+      objectReference: {fileID: 5751699257916901931}
+    - target: {fileID: 4504088804255990277, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: ShipToggle, Assembly-CSharp
+      objectReference: {fileID: 0}
     - target: {fileID: 5751699258368081034, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -10346,3 +10468,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
+--- !u!114 &5751699257916901931 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1546590402817540494, guid: 7766d47770996344cad8a0463ae16d2f, type: 3}
+  m_PrefabInstance: {fileID: 5751699257916901930}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fabb595bc4ac2b44b7122a641a140ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
