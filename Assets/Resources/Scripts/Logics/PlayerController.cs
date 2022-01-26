@@ -1007,7 +1007,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             ProccessSkills_AI();
         }
 
-        ProccessMovement();
+        if (!PlayerUI.Instance.IsLobbyState)
+            ProccessMovement();
 
         m_currRoll = Mathf.Lerp(m_currRoll, 0f, 2f * Time.deltaTime);
 
