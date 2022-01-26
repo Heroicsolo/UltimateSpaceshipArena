@@ -454,14 +454,14 @@ public class PlayerUI : MonoBehaviour
 
             int ratingToShow = Mathf.FloorToInt(Mathf.Lerp(startValue, endValue, t));
             int moneyToShow = Mathf.FloorToInt(Mathf.Lerp(startValue, endValue2, t));
-            loseScreenRatingLabel.text = "-" + ratingToShow.ToString();
+            loseScreenRatingLabel.text = ratingToShow.ToString();
             loseScreenCurrencyLabel.text = "+" + moneyToShow.ToString();
 
             yield return null;
         }
         while (t < 1f);
 
-        loseScreenRatingLabel.text = "-" + endValue.ToString();
+        loseScreenRatingLabel.text = endValue.ToString();
         loseScreenCurrencyLabel.text = "+" + endValue2.ToString();
     }
 

@@ -17,6 +17,8 @@ public class Projectile : MonoBehaviourPunCallbacks
     public float dynamicGuidingInterval = 0.5f;
     [Range(0f, 1f)]
     public float guidingForce = 0.4f;
+    [Range(0f, 180f)]
+    public float guidingAngle = 30f;
     public float guidingMaxDist = 200f;
     [HideInInspector]
     public string ownerID = "";
@@ -91,7 +93,7 @@ public class Projectile : MonoBehaviourPunCallbacks
 
                 Vector3 localDir = transform.InverseTransformDirection(dir);
 
-                if (localDir.z > 0f)
+                if (localDir.z > 0f && Mathf.Atan2(localDir.z, localDir.x) < guidingAngle)
                 {
                     Vector3 guidedDir = dir * guidingForce + transform.forward * (1f - guidingForce);
                     transform.LookAt(transform.position + guidedDir);
@@ -112,8 +114,16 @@ public class Projectile : MonoBehaviourPunCallbacks
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("ForceField") || other.CompareTag("Obstacle"))
+        if (other.CompareTag("Obstacle"))
         {
+            Explode();
+        }
+        else if (other.CompareTag("ForceField"))
+        {
+            PhotonView view = other.transform.parent.GetComponent<PhotonView>();
+
+            if (view && view.IsMine) return;
+
             Explode();
         }
     }
