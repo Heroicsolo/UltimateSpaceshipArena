@@ -157,6 +157,9 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     public GameObject SelectedShipPrefab { get { return m_selectedShip; } set { m_selectedShip = value; } }
 
     public BalanceInfo Balance{ get{ return m_balanceData; } }
+
+    public int Currency{ get{ return m_currency;} set{ m_currency = value; } }
+
     public bool IsSoundOn { get { return isSoundOn; } set { isSoundOn = value; PlayerPrefs.SetInt("soundOn", isSoundOn ? 1 : 0); } }
 
     public const string ELO_PROP_KEY = "C0";
@@ -509,17 +512,63 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         });
     }
 
-    public void SaveProfile()
+    public int GetShipNumber(PlayerController ship)
     {
-        if (!m_signedIn || !m_loadedProfile) return;
+        return availableShips.FindIndex(x => x.name == ship.name);
+    }
 
-        DatabaseReference userTable = mDatabaseRef.Child(m_userId);
+    public int GetUpgradeLevel(PlayerController ship, UpgradeData upgrade)
+    {
+        CheckUpgradesInfo();
 
-        userTable.Child("username").SetValueAsync(m_userName);
-        userTable.Child("email").SetValueAsync(m_email);
-        userTable.Child("arenaRating").SetValueAsync(m_arenaRating);
-        userTable.Child("currency").SetValueAsync(m_currency);
+        int shipIdx = GetShipNumber(ship);
+        int upgradeIdx = ship.GetUpgradeNumber(upgrade);
 
+        return m_upgradesInfo.shipUpgradeLevels[shipIdx].upgradeLevels[upgradeIdx];
+    }
+
+    public int GetUpgradeLevel(int shipNumber, int upgradeNumber)
+    {
+        CheckUpgradesInfo();
+
+        return m_upgradesInfo.shipUpgradeLevels[shipNumber].upgradeLevels[upgradeNumber];
+    }
+
+    public void IncreaseUpgradeLevel(PlayerController ship, UpgradeData upgrade)
+    {
+        CheckUpgradesInfo();
+
+        int shipIdx = GetShipNumber(ship);
+        int upgradeIdx = ship.GetUpgradeNumber(upgrade);
+
+        m_upgradesInfo.shipUpgradeLevels[shipIdx].upgradeLevels[upgradeIdx] += 1;
+
+        SaveProfile();
+    }
+
+    public void SetUpgradeLevel(PlayerController ship, UpgradeData upgrade, int level)
+    {
+        CheckUpgradesInfo();
+
+        int shipIdx = GetShipNumber(ship);
+        int upgradeIdx = ship.GetUpgradeNumber(upgrade);
+
+        m_upgradesInfo.shipUpgradeLevels[shipIdx].upgradeLevels[upgradeIdx] = level;
+
+        SaveProfile();
+    }
+
+    public void SetUpgradeLevel(int shipNumber, int upgradeNumber, int level)
+    {
+        CheckUpgradesInfo();
+
+        m_upgradesInfo.shipUpgradeLevels[shipNumber].upgradeLevels[upgradeNumber] = level;
+
+        SaveProfile();
+    }
+
+    void CheckUpgradesInfo()
+    {
         if (m_upgradesInfo.shipUpgradeLevels == null || m_upgradesInfo.shipUpgradeLevels.Count == 0)
         {
             m_upgradesInfo.shipUpgradeLevels = new List<ShipUpgradesInfo>();
@@ -535,6 +584,20 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
                 }
             }
         }
+    }
+
+    public void SaveProfile()
+    {
+        if (!m_signedIn || !m_loadedProfile) return;
+
+        DatabaseReference userTable = mDatabaseRef.Child(m_userId);
+
+        userTable.Child("username").SetValueAsync(m_userName);
+        userTable.Child("email").SetValueAsync(m_email);
+        userTable.Child("arenaRating").SetValueAsync(m_arenaRating);
+        userTable.Child("currency").SetValueAsync(m_currency);
+
+        CheckUpgradesInfo();
 
         string saveData = JsonUtility.ToJson(m_upgradesInfo);
 

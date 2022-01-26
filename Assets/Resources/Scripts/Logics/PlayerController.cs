@@ -66,6 +66,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     private float m_durability = 100f;
 
+    private float m_critBonus = 0f;
+    private float m_critDamageBonus = 0f;
+
     [SerializeField]
     private float m_forceField = 0f;
 
@@ -144,6 +147,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private float m_globalCD = 0f;
     private Vector3 m_spawnPoint;
     private float m_currRespawnTime = 0f;
+    private float m_respawnTimeBonus = 0f;
+    private float m_stealthSpeedBonus = 0f;
+    private float m_stealthLengthBonus = 0f;
+    private float m_stealthCritBonus = 0f;
+    private float m_repairBonus = 0f;
+    private float m_immortalityTimeBonus = 0f;
     private int m_killsCount = 0;
     private int m_deathsCount = 0;
 
@@ -160,6 +169,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     public int MaxShield => m_maxField;
 
     public float MaxSpeed => m_maxSpeed;
+
+    public Projectile MainProjectile => ProjectilePrefab.GetComponent<Projectile>();
 
     public bool IsAI => isAI;
 
@@ -226,6 +237,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         cameraTransform.localEulerAngles = new Vector3(90f, 0f, 0f);
 
+        if (!IsAI && photonView.IsMine)
+        {
+            ApplyUpgrades();
+        }
+
         timer = new Timer();
         timer.Initialize("lobbyTimer");
 
@@ -244,7 +260,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             {
                 GameObject _uiGo = Instantiate(PlayerUiPrefab);
                 _uiGo.SendMessage("SetTarget", this, SendMessageOptions.RequireReceiver);
-                m_immuneTime = timer.GetTime() + 3f;
+                m_immuneTime = timer.GetTime() + 3f + m_immortalityTimeBonus;
             }
             else
             {
@@ -341,6 +357,43 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         //transform.position = new Vector3(transform.position.x, initPos.y, transform.position.z);
     }
 
+    void ApplyUpgrades()
+    {
+        foreach (var upgrade in m_upgrades)
+        {
+            int upgradeLevel = Launcher.instance.GetUpgradeLevel(this, upgrade);
+
+            if (upgradeLevel > 0)
+            {
+                m_maxDurability = Mathf.CeilToInt(m_maxDurability * (1f + upgrade.durabilityBonus * upgradeLevel));
+                m_maxField = Mathf.CeilToInt(m_maxField * (1f + upgrade.shieldBonus * upgradeLevel));
+                m_maxSpeed = m_maxSpeed * (1f + upgrade.speedBonus * upgradeLevel);
+
+                m_critBonus += upgrade.critChanceBonus * upgradeLevel;
+                m_critDamageBonus += upgrade.critDamageBonus * upgradeLevel;
+
+                m_durabilityRegen = m_durabilityRegen * (1f + upgrade.durabilityRegenBonus * upgradeLevel);
+                m_fieldRegen = m_fieldRegen * (1f + upgrade.shieldRegenBonus * upgradeLevel);
+
+                m_respawnTimeBonus += upgrade.respawnTimeBonus * upgradeLevel;
+                m_immortalityTimeBonus += upgrade.respawnImmortalityTimeBonus * upgradeLevel;
+
+                m_stealthSpeedBonus += upgrade.stealthSpeedBonus * upgradeLevel;
+                m_stealthLengthBonus += upgrade.stealthLengthBonus * upgradeLevel;
+                m_stealthCritBonus += upgrade.stealthCritChanceBonus * upgradeLevel;
+
+                m_repairBonus += upgrade.repairBonus * upgradeLevel;
+            }
+        }
+
+        m_durability = m_maxDurability;
+    }
+
+    public int GetUpgradeNumber(UpgradeData upgrade)
+    {
+        return m_upgrades.FindIndex(x => x == upgrade);
+    }
+
     public void SendRating()
     {
         photonView.RPC("GetRating_RPC", RpcTarget.All, Name, Launcher.instance.CurrentRating);
@@ -430,7 +483,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         if (skill.durabilityBonus > 0f)
         {
-            int amount = Mathf.CeilToInt(skill.durabilityBonus * m_maxDurability);
+            int amount = Mathf.CeilToInt(skill.durabilityBonus * m_maxDurability * (1f + m_repairBonus));
             m_durability = Mathf.Min(m_durability + amount, m_maxDurability);
             SpawnRepairText(amount);
         }
@@ -524,7 +577,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         if (audioSource && deathSound)
             audioSource.PlayOneShot(deathSound);
 
-        m_currRespawnTime = ArenaController.instance.RespawnTime + Mathf.Min(DeathsCount * DeathsCount, m_balance.respawnTimeMax);
+        m_currRespawnTime = ArenaController.instance.RespawnTime + Mathf.Min(DeathsCount * DeathsCount, m_balance.respawnTimeMax) - m_respawnTimeBonus;
 
         if (DeathEffect)
         {
@@ -581,6 +634,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     public void BeginStealth(float length = 5f)
     {
+        length += m_stealthLengthBonus;
         photonView.RPC("BeginStealth_RPC", RpcTarget.All, length);
     }
 
@@ -666,17 +720,25 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     public void LaunchProjectile()
     {
-        if (m_stealthTime > 0f)
-            EndStealth();
+        bool fromStealth = false;
 
-        photonView.RPC("LaunchProjectile_RPC", RpcTarget.All);
+        if (m_stealthTime > 0f)
+        {
+            fromStealth = true;
+            EndStealth();
+        }
+
+        photonView.RPC("LaunchProjectile_RPC", RpcTarget.All, fromStealth ? m_stealthCritBonus : 0f, m_critDamageBonus);
     }
 
     [PunRPC]
-    void LaunchProjectile_RPC()
+    void LaunchProjectile_RPC(float critBonus, float critDmgBonus)
     {
         GameObject proj = PhotonNetwork.Instantiate(ProjectilePrefab.name, ShootPosition.position, transform.rotation);
-        proj.GetComponent<Projectile>().SetOwner(m_name, photonView.Owner.UserId);
+        Projectile p = proj.GetComponent<Projectile>();
+        p.SetOwner(m_name, photonView.Owner.UserId);
+        p.critChance += critBonus;
+        p.critDamageModifier += critDmgBonus;
 
         if (audioSource && shootSound)
             audioSource.PlayOneShot(shootSound, 0.6f);
@@ -1132,7 +1194,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             if (movementDir.magnitude > 0f)
                 transform.LookAt(transform.position + movementDir);
 
-            charController.Move(transform.forward * m_speed * (1f + m_speedBonus) * Time.deltaTime);
+            charController.Move(transform.forward * m_speed * (1f + m_speedBonus + (m_stealthTime > 0f ? m_stealthSpeedBonus : 0f)) * Time.deltaTime);
         }
     }
 
