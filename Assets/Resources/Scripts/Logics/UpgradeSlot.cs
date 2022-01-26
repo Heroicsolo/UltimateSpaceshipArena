@@ -15,9 +15,15 @@ public class UpgradeSlot : MonoBehaviour
     private int currentLevel = 0;
     private UpgradeData data;
     private PlayerController pc;
+    private UpgradesScreen upgradesScreen;
 
-    public void SetData(UpgradeData _data, int level)
+    public int Level => currentLevel;
+    public UpgradeData Upgrade => data;
+
+    public void SetData(UpgradeData _data, int level, UpgradesScreen _us, PlayerController _pc)
     {
+        upgradesScreen = _us;
+        pc = _pc;
         data = _data;
         currentLevel = level;
         icon.sprite = data.icon;
@@ -42,6 +48,7 @@ public class UpgradeSlot : MonoBehaviour
         currentLevel++;
         currentCost = data.cost + Mathf.CeilToInt(currentLevel * data.cost * 0.5f);
         Refresh();
+        upgradesScreen.Refresh();
 
         Launcher.instance.IncreaseUpgradeLevel(pc, data);
     }
