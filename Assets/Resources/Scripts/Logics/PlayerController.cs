@@ -156,6 +156,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private float m_immortalityTimeBonus = 0f;
     private int m_killsCount = 0;
     private int m_deathsCount = 0;
+    private int m_upgradesScore = 0;
 
     private AudioSource audioSource;
 
@@ -384,6 +385,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
                 m_stealthCritBonus += upgrade.stealthCritChanceBonus * upgradeLevel;
 
                 m_repairBonus += upgrade.repairBonus * upgradeLevel;
+
+                m_upgradesScore += upgradeLevel;
             }
         }
 
@@ -395,20 +398,20 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         return m_upgrades.FindIndex(x => x == upgrade);
     }
 
-    public void SendRating()
+    public void SendRatingAndUpgrades()
     {
-        photonView.RPC("GetRating_RPC", RpcTarget.All, Name, Launcher.instance.CurrentRating);
+        photonView.RPC("SendRatingAndUpgrades_RPC", RpcTarget.All, Name, Launcher.instance.CurrentRating, m_upgradesScore);
     }
 
     [PunRPC]
-    void GetRating_RPC(string playerName, int rating)
+    void SendRatingAndUpgrades_RPC(string playerName, int rating, int upgradesScore)
     {
         ArenaController.instance.SetPlayerRating(playerName, rating);
 
         PlayerController pc = ArenaController.instance.GetPlayerByName(playerName);
 
         if (pc)
-            PlayerUI.Instance.AddPlayerStatsSlot(pc, rating);
+            PlayerUI.Instance.AddPlayerStatsSlot(pc, rating, upgradesScore);
     }
 
     public void Spawn()

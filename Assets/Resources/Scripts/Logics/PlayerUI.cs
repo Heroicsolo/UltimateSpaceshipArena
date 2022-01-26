@@ -136,11 +136,11 @@ public class PlayerUI : MonoBehaviour
         LowDurability
     }
 
-    public void AddPlayerStatsSlot(PlayerController pc, int rating)
+    public void AddPlayerStatsSlot(PlayerController pc, int rating, int upgradesScore)
     {
         GameObject slot = Instantiate(m_battleStatsItemPrefab, m_battleStatsItemsHolder);
         PlayerStatsSlot ps = slot.GetComponent<PlayerStatsSlot>();
-        ps.SetData(pc, rating);
+        ps.SetData(pc, rating, upgradesScore);
         m_battleStatsSlots.Add(ps);
     }
 
@@ -539,7 +539,7 @@ public class PlayerUI : MonoBehaviour
                 matchTimerLabel.transform.parent.gameObject.SetActive(true);
                 PlaySound(SoundType.LobbyTimerEnd);
 
-                target.SendRating();
+                target.SendRatingAndUpgrades();
 
                 if (PhotonNetwork.IsMasterClient)
                 {

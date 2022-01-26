@@ -113,7 +113,7 @@ public class ArenaController : MonoBehaviourPunCallbacks
         {
             if (p.IsAI)
             {
-                p.SendRating();
+                p.SendRatingAndUpgrades();
             }
         }
     }

@@ -11,6 +11,7 @@ public class PlayerStatsSlot : MonoBehaviour
     [SerializeField] private TextMeshProUGUI killsLabel;
     [SerializeField] private TextMeshProUGUI deathsLabel;
     [SerializeField] private TextMeshProUGUI ratingLabel;
+    [SerializeField] private TextMeshProUGUI upgradesLabel;
 
     private PlayerController target;
     private string playerName = "";
@@ -18,9 +19,10 @@ public class PlayerStatsSlot : MonoBehaviour
     public string PlayerName => playerName;
     public int Score => target != null ? target.Score : 0;
 
-    public void SetData(PlayerController pc, int rating)
+    public void SetData(PlayerController pc, int rating, int upgradesScore)
     {
         ratingLabel.text = pc.IsAI ? "Bot" : rating.ToString();
+        upgradesLabel.text = upgradesScore.ToString();
         shipIcon.sprite = pc.ShipIcon;
         playerNameLabel.text = pc.Name;
         killsLabel.text = "0";
