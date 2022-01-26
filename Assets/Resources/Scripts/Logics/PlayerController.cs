@@ -225,6 +225,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         m_immuneTime = 5f;
         m_spectacleTime = m_balance.spectacleTime;
         m_isDied = false;
+        m_isWon = false;
+        m_isLoss = false;
 
         m_durability = m_maxDurability;
         m_forceField = 0;
@@ -1243,7 +1245,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     void OnLoss(int place)
     {
-        if (m_isWon || m_isLoss) return;
+        if (m_isWon || m_isLoss || !photonView.IsMine) return;
         m_isLoss = true;
 
         int oldRating = Launcher.instance.CurrentRating;
@@ -1257,7 +1259,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     void OnWin(int place = 1)
     {
-        if (m_isWon || m_isLoss) return;
+        if (m_isWon || m_isLoss || !photonView.IsMine) return;
         m_isWon = true;
 
         int oldRating = Launcher.instance.CurrentRating;
