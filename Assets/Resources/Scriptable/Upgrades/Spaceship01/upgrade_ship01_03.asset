@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0740ff4ffb7b7a14180f735a0353f03a, type: 3}
   m_Name: upgrade_ship01_03
   m_EditorClassIdentifier: 
-  title: Improved Stealth Generator
+  title: Improved Stealth
   desc: Stealth length increased by 25%
   icon: {fileID: 21300000, guid: 6b95d3f790568194dbbf85952ada4868, type: 3}
   cost: 3000

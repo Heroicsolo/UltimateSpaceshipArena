@@ -581,7 +581,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         if (audioSource && deathSound)
             audioSource.PlayOneShot(deathSound);
 
-        m_currRespawnTime = ArenaController.instance.RespawnTime + Mathf.Min(DeathsCount * DeathsCount, m_balance.respawnTimeMax) - m_respawnTimeBonus;
+        m_currRespawnTime = ArenaController.instance.RespawnTime + Mathf.Min(DeathsCount * DeathsCount, m_balance.respawnTimeMax);
+        m_currRespawnTime *= (1f - m_respawnTimeBonus);
 
         if (DeathEffect)
         {
@@ -846,6 +847,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     [PunRPC]
     void EndMatch_RPC()
     {
+        if (IsAI)
+        {
+            PhotonNetwork.Destroy(gameObject);
+        }
+
         List<PlayerController> sortedPlayers = ArenaController.instance.RoomPlayers.OrderByDescending(x => x.Score).ToList();
 
         int place = sortedPlayers.FindIndex(x => x == this);
@@ -1215,6 +1221,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     [PunRPC]
     void OnNexusUsed_RPC(string byPlayer, Vector3 pos)
     {
+        if (IsAI)
+        {
+            PhotonNetwork.Destroy(gameObject);
+        }
+
         targetCameraPos = pos;
         m_nexusUsed = true;
 

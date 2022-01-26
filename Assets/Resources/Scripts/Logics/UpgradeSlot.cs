@@ -33,7 +33,7 @@ public class UpgradeSlot : MonoBehaviour
         Refresh();
     }
 
-    void Refresh()
+    public void Refresh()
     {
         costLabel.text = currentCost.ToString();
         levelLabel.text = "lvl " + currentLevel.ToString();

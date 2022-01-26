@@ -123,7 +123,7 @@ MonoBehaviour:
   isGuiding: 1
   isDynamicGuiding: 0
   dynamicGuidingInterval: 0
-  guidingForce: 0.4
+  guidingForce: 0.1
   guidingMaxDist: 200
   ownerID: 
   ownerName: 

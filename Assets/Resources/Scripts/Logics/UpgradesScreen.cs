@@ -78,6 +78,8 @@ public class UpgradesScreen : MonoBehaviour
                     modifiedCrit += data.critChanceBonus * upgradeLevel;
                     modifiedCritDamage += data.critDamageBonus * upgradeLevel;
                 }
+
+                upgrade.Refresh();
             }
         }
 
