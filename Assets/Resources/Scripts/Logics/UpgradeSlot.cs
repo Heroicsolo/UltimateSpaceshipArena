@@ -40,6 +40,11 @@ public class UpgradeSlot : MonoBehaviour
         if (currentCost > Launcher.instance.Currency) costLabel.color = Color.red;
     }
 
+    public void ShowDesc()
+    {
+        MessageBox.instance.Show(data.desc);
+    }
+
     public void TryUpgrade()
     {
         if (currentCost > Launcher.instance.Currency) return;

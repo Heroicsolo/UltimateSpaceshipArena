@@ -18,16 +18,12 @@ public class UpgradesScreen : MonoBehaviour
     private List<UpgradeSlot> upgradeSlots = new List<UpgradeSlot>();
     private PlayerController playerController;
 
-    public void SetData(PlayerController pc)
+    public void SetData(PlayerController pc, bool refreshOnly = false)
     {
         shipImage.sprite = pc.ShipIcon;
 
-        bool ignoreUpgradeSlots = false;
-
         if (playerController == null)
             playerController = pc;
-        else
-            ignoreUpgradeSlots = true;
 
         int modifiedDurability = pc.MaxDurability;
         int modifiedShield = pc.MaxShield;
@@ -37,7 +33,7 @@ public class UpgradesScreen : MonoBehaviour
 
         List<UpgradeData> upgradesList = pc.Upgrades;
 
-        if (!ignoreUpgradeSlots)
+        if (!refreshOnly)
         {
             if (upgradeSlots.Count > 0)
             {
@@ -94,6 +90,6 @@ public class UpgradesScreen : MonoBehaviour
 
     public void Refresh()
     {
-        SetData(playerController);
+        SetData(playerController, true);
     }
 }
