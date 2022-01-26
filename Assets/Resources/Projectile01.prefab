@@ -124,6 +124,7 @@ MonoBehaviour:
   isDynamicGuiding: 0
   dynamicGuidingInterval: 0
   guidingForce: 0.05
+  guidingAngle: 10
   guidingMaxDist: 200
   ownerID: 
   ownerName: 

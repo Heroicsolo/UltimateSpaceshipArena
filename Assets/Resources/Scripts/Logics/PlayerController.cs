@@ -856,7 +856,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         List<PlayerController> sortedPlayers = ArenaController.instance.RoomPlayers.OrderByDescending(x => x.Score).ToList();
 
-        int place = sortedPlayers.FindIndex(x => x == this);
+        int place = Mathf.Min(m_balance.maxPlayersPerRoom, sortedPlayers.FindIndex(x => x == this) + 1);
 
         if (place < m_balance.winnersCount + 1)
             OnWin(place);
@@ -1234,12 +1234,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         List<PlayerController> sortedPlayers = ArenaController.instance.RoomPlayers.OrderByDescending(x => x.Score).ToList();
 
-        int place = sortedPlayers.FindIndex(x => x == this);
+        int place = Mathf.Min(m_balance.maxPlayersPerRoom, sortedPlayers.FindIndex(x => x == this) + 1);
 
         if (Name == byPlayer)
             OnWin();
         else
-            OnLoss(place);
+            OnLoss(place + 1);
     }
 
 
