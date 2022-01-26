@@ -809,6 +809,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76cc1393008af1246a00f7478afb6219, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ID: 2
   PlayerUiPrefab: {fileID: 1230693119171667625, guid: c63fcc0c278eb06429a02437e3197887, type: 3}
   ProjectilePrefab: {fileID: 6987788691464400540, guid: e993edab32e2c9f4d8a37078a40ad57c, type: 3}
   ShootPosition: {fileID: 440382154438058265}
@@ -834,6 +835,7 @@ MonoBehaviour:
   AIPickupsFindingRadius: 400
   AINexusFindingRadius: 600
   AIDurabilityPercentToRetreat: 0.3
+  m_upgrades: []
   m_skills:
   - {fileID: 11400000, guid: 4a7c2be73870cb747a877de63d3cda01, type: 2}
   - {fileID: 11400000, guid: ab833239f36936b43905ddf8fc0597d6, type: 2}

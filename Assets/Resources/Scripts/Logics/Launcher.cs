@@ -514,7 +514,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
     public int GetShipNumber(PlayerController ship)
     {
-        return availableShips.FindIndex(x => x.name == ship.name);
+        return availableShips.FindIndex(x => x.ID == ship.ID);
     }
 
     public int GetUpgradeLevel(PlayerController ship, UpgradeData upgrade)

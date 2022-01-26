@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     public static GameObject LocalPlayerInstance;
     public static PlayerController LocalPlayer;
 
+    public int ID = 0;
     [SerializeField]
     public GameObject PlayerUiPrefab;
     [SerializeField]

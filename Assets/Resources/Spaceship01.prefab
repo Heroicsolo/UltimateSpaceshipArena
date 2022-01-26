@@ -810,6 +810,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76cc1393008af1246a00f7478afb6219, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ID: 1
   PlayerUiPrefab: {fileID: 1230693119171667625, guid: c63fcc0c278eb06429a02437e3197887, type: 3}
   ProjectilePrefab: {fileID: 6987788691464400540, guid: afb06e1a100b2d44a9d6d5e4091dc4e1, type: 3}
   ShootPosition: {fileID: 440382154438058265}
