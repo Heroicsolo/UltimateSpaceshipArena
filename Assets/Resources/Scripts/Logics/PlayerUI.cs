@@ -12,6 +12,8 @@ public class PlayerUI : MonoBehaviour
 
     [Header("Battle UI")]
     [SerializeField]
+    private GameObject statsButton;
+    [SerializeField]
     private Image playerHealthBar;
     [SerializeField]
     private Image playerForceFieldBar;
@@ -381,6 +383,11 @@ public class PlayerUI : MonoBehaviour
         if (IsLobbyState) PlaySound(SoundType.GetReady, 20f);
 
         OnLobbyPlayerAdded(PhotonNetwork.NickName, target.ShipIcon, false);
+
+        if (isMissionMode)
+        {
+            statsButton.SetActive(false);
+        }
 
         IsInitialized = true;
     }

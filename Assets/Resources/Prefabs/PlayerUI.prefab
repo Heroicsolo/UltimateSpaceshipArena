@@ -1801,6 +1801,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a4fb75c0fb8bde4caef785cce8c82d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  statsButton: {fileID: 7413324159588015929}
   playerHealthBar: {fileID: 1230693119570200648}
   playerForceFieldBar: {fileID: 1230693120866728669}
   joystick: {fileID: 2535730357591399760}
@@ -1828,6 +1829,9 @@ MonoBehaviour:
   loseScreenCurrencyLabel: {fileID: 1989293347804232329}
   loseScreenPlaceLabel: {fileID: 8845618291819948459}
   lossScreen: {fileID: 2110724608828625682}
+  missionCompletedScreen: {fileID: 0}
+  missionCompletedCurrencyLabel: {fileID: 0}
+  missionFailedScreen: {fileID: 0}
   lobbyScreenTitle: {fileID: 4526596109104641382}
   killAnnounceObject: {fileID: 1449964224729398429}
   killAnnounceKillerLabel: {fileID: 4195537840114075501}

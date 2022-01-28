@@ -900,14 +900,21 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             PhotonNetwork.Destroy(gameObject);
         }
 
-        List<PlayerController> sortedPlayers = m_roomPlayers.OrderByDescending(x => x.Score).ToList();
+        if (!isMissionMode)
+        {
+            List<PlayerController> sortedPlayers = m_roomPlayers.OrderByDescending(x => x.Score).ToList();
 
-        int place = Mathf.Min(m_balance.maxPlayersPerRoom, sortedPlayers.FindIndex(x => x == this) + 1);
+            int place = Mathf.Min(m_balance.maxPlayersPerRoom, sortedPlayers.FindIndex(x => x == this) + 1);
 
-        if (place < m_balance.winnersCount + 1)
-            OnWin(place);
+            if (place < m_balance.winnersCount + 1)
+                OnWin(place);
+            else
+                OnLoss(place);
+        }
         else
-            OnLoss(place);
+        {
+            OnLoss(1);
+        }
     }
 
     // Update is called once per frame
@@ -1279,14 +1286,21 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         targetCameraPos = pos;
         m_nexusUsed = true;
 
-        List<PlayerController> sortedPlayers = m_roomPlayers.OrderByDescending(x => x.Score).ToList();
+        if (!isMissionMode)
+        {
+            List<PlayerController> sortedPlayers = m_roomPlayers.OrderByDescending(x => x.Score).ToList();
 
-        int place = Mathf.Min(m_balance.maxPlayersPerRoom, sortedPlayers.FindIndex(x => x == this) + 1);
+            int place = Mathf.Min(m_balance.maxPlayersPerRoom, sortedPlayers.FindIndex(x => x == this) + 1);
 
-        if (Name == byPlayer)
-            OnWin();
+            if (Name == byPlayer)
+                OnWin();
+            else
+                OnLoss(place + 1);
+        }
         else
-            OnLoss(place + 1);
+        {
+            OnWin();
+        }
     }
 
 
