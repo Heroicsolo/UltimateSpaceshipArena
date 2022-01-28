@@ -63,6 +63,12 @@ public class PlayerUI : MonoBehaviour
     [SerializeField]
     private GameObject lossScreen;
     [SerializeField]
+    private GameObject missionCompletedScreen;
+    [SerializeField]
+    private TextMeshProUGUI missionCompletedCurrencyLabel;
+    [SerializeField]
+    private GameObject missionFailedScreen;
+    [SerializeField]
     private TextMeshProUGUI lobbyScreenTitle;
     [Header("UI Announcements")]
     [SerializeField]
@@ -114,6 +120,10 @@ public class PlayerUI : MonoBehaviour
     private List<Transform> enemiesIcons = new List<Transform>();
     private List<LobbyPlayerSlot> m_lobbyPlayers = new List<LobbyPlayerSlot>();
     private List<PlayerStatsSlot> m_battleStatsSlots = new List<PlayerStatsSlot>();
+
+    private MissionController missionController;
+    private ArenaController arenaController;
+    private bool isMissionMode = false;
 
     public bool IsLobbyState = true;
     private bool IsInitialized = false;
@@ -330,6 +340,17 @@ public class PlayerUI : MonoBehaviour
         enemiesIcons.Add(miniMapEnemy.transform);
     }
 
+    public void AddMissionBotToMiniMap(PlayerController _enemy)
+    {
+        if (enemies.Contains(_enemy)) return;
+
+        enemies.Add(_enemy);
+        GameObject miniMapEnemy = Instantiate(minimapEnemyPrefab, minimapPlayer.parent);
+        miniMapEnemy.transform.localPosition = new Vector3(_enemy.transform.position.x / 5f, _enemy.transform.position.z / 5f, 0f);
+        miniMapEnemy.transform.localEulerAngles = new Vector3(0f, 0f, -_enemy.transform.localEulerAngles.y);
+        enemiesIcons.Add(miniMapEnemy.transform);
+    }
+
     public void SetTarget(PlayerController _target)
     {
         if (_target == null)
@@ -415,7 +436,45 @@ public class PlayerUI : MonoBehaviour
         StartCoroutine(WinScreenAnim(currRating, ratingChange, moneyGained));
     }
 
-    public bool ResultsScreenShown => winScreen.activeSelf || lossScreen.activeSelf;
+    public void OnMissionCompleted(int moneyGained)
+    {
+        missionCompletedScreen.SetActive(true);
+        missionCompletedCurrencyLabel.text = "+0";
+        
+        PlaySound(SoundType.Victory, 5f);
+
+        StartCoroutine(MissionCompletedScreenAnim(moneyGained));
+    }
+
+    public void OnMissionFailed()
+    {
+        missionFailedScreen.SetActive(true);
+        
+        PlaySound(SoundType.Loss, 5f);
+    }
+
+    public bool ResultsScreenShown => winScreen.activeSelf || lossScreen.activeSelf || missionCompletedScreen.activeSelf;
+
+    private IEnumerator MissionCompletedScreenAnim(int moneyGained)
+    {
+        float t = 0f;
+
+        int startValue = 0;
+        int endValue = moneyGained;
+
+        do
+        {
+            t += Time.deltaTime * 2f;
+
+            int moneyToShow = Mathf.FloorToInt(Mathf.Lerp(startValue, endValue, t));
+            missionCompletedCurrencyLabel.text = "+" + moneyToShow.ToString();
+
+            yield return null;
+        }
+        while (t < 1f);
+
+        missionCompletedCurrencyLabel.text = "+" + endValue.ToString();
+    }
 
     private IEnumerator WinScreenAnim(int currRating, int ratingChange, int moneyGained)
     {
@@ -469,7 +528,11 @@ public class PlayerUI : MonoBehaviour
 
     public void LeaveArena(bool changeRating = false)
     {
-        ArenaController.instance.LeaveRoom();
+        if (!isMissionMode)
+            ArenaController.instance.LeaveRoom();
+        else
+            MissionController.instance.LeaveRoom();
+
         if (changeRating)
             Launcher.instance.OnFightLoss();
     }
@@ -512,7 +575,16 @@ public class PlayerUI : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        if (ArenaController.instance != null)
+        {
+            arenaController = ArenaController.instance;
+            isMissionMode = false;
+        }
+        else if (MissionController.instance != null)
+        {
+            missionController = MissionController.instance;
+            isMissionMode = true;
+        }
     }
 
     // Update is called once per frame
@@ -543,7 +615,7 @@ public class PlayerUI : MonoBehaviour
 
                 target.SendRatingAndUpgrades();
 
-                if (PhotonNetwork.IsMasterClient)
+                if (PhotonNetwork.IsMasterClient && !isMissionMode)
                 {
                     ArenaController.instance.OnBattleStarted();
                 }

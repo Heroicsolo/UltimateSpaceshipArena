@@ -22,6 +22,10 @@ public class Pickup : MonoBehaviourPunCallbacks
     private int capturersCount = 0;
     private bool capturingAnnounceDone = false;
 
+    private MissionController missionController;
+    private ArenaController arenaController;
+    private bool isMissionMode = false;
+
     public bool IsActive => m_collider.enabled;
 
     public int BotsTargetedCount => botsTargetedCount;
@@ -29,6 +33,7 @@ public class Pickup : MonoBehaviourPunCallbacks
 
     private Collider m_collider;
     private BalanceInfo m_balance;
+    private List<PlayerController> m_roomPlayers;
 
     private void Awake()
     {
@@ -38,6 +43,19 @@ public class Pickup : MonoBehaviourPunCallbacks
     private void Start()
     {
         m_balance = Launcher.instance.Balance;
+
+        if (ArenaController.instance != null)
+        {
+            arenaController = ArenaController.instance;
+            isMissionMode = false;
+        }
+        else if (MissionController.instance != null)
+        {
+            missionController = MissionController.instance;
+            isMissionMode = true;
+        }
+
+        m_roomPlayers = isMissionMode ? missionController.RoomPlayers : arenaController.RoomPlayers;
     }
 
     void Activate()
@@ -145,7 +163,7 @@ public class Pickup : MonoBehaviourPunCallbacks
 
     void CheckDeadCapturers()
     {
-        foreach (var p in ArenaController.instance.RoomPlayers)
+        foreach (var p in m_roomPlayers)
         {
             if (p.DurabilityPercent <= 0f)
             {
@@ -155,7 +173,7 @@ public class Pickup : MonoBehaviourPunCallbacks
 
         foreach (var c in currCapturerNames)
         {
-            PlayerController pc = ArenaController.instance.RoomPlayers.Find(x => x.Name == c);
+            PlayerController pc = m_roomPlayers.Find(x => x.Name == c);
 
             if (pc == null)
             {

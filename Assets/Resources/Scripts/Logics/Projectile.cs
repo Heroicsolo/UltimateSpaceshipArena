@@ -31,21 +31,37 @@ public class Projectile : MonoBehaviourPunCallbacks
     private float timeToDeath = 3f;
     private float timeToChangeTarget = 0f;
 
+    private MissionController missionController;
+    private ArenaController arenaController;
+    private bool isMissionMode = false;
+    private List<PlayerController> m_roomPlayers;
+
     [SerializeField] private ParticleSystem explodeEffect;
 
     // Start is called before the first frame update
     void Start()
     {
         timeToDeath = lifeTime;
+
+        if (ArenaController.instance != null)
+        {
+            arenaController = ArenaController.instance;
+            isMissionMode = false;
+        }
+        else if (MissionController.instance != null)
+        {
+            missionController = MissionController.instance;
+            isMissionMode = true;
+        }
+
+        m_roomPlayers = isMissionMode ? missionController.RoomPlayers : arenaController.RoomPlayers;
     }
 
     void FindNewGuidingTarget()
     {
-        List<PlayerController> players = ArenaController.instance.RoomPlayers;
-
         List<PlayerController> selectedPlayers = new List<PlayerController>();
 
-        foreach (var player in players)
+        foreach (var player in m_roomPlayers)
         {
             if (player.Name != ownerName && player.transform.Distance(transform) < guidingMaxDist && player.DurabilityPercent > 0f && !player.InStealth)
                 selectedPlayers.Add(player);

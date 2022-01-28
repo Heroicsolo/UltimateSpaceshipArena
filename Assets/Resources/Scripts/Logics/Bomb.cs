@@ -24,6 +24,11 @@ public class Bomb : MonoBehaviourPunCallbacks
     private float timeToEnable = 2f;
     private bool isActivated = false;
 
+    private MissionController missionController;
+    private ArenaController arenaController;
+    private bool isMissionMode = false;
+    private List<PlayerController> m_roomPlayers;
+
     [SerializeField] private GameObject explosionObject;
     [SerializeField] private GameObject activationObject;
 
@@ -35,6 +40,19 @@ public class Bomb : MonoBehaviourPunCallbacks
         timeToDeath = lifeTime;
         timeToEnable = activationTime;
         isActivated = false;
+
+        if (ArenaController.instance != null)
+        {
+            arenaController = ArenaController.instance;
+            isMissionMode = false;
+        }
+        else if (MissionController.instance != null)
+        {
+            missionController = MissionController.instance;
+            isMissionMode = true;
+        }
+
+        m_roomPlayers = isMissionMode ? missionController.RoomPlayers : arenaController.RoomPlayers;
     }
 
     // Update is called once per frame
@@ -103,7 +121,7 @@ public class Bomb : MonoBehaviourPunCallbacks
             Destroy(explosionObject, 2f);
         }
 
-        foreach( var p in ArenaController.instance.RoomPlayers )
+        foreach( var p in m_roomPlayers )
         {
             if (p.transform.Distance(transform) < explosionRadius)
             {

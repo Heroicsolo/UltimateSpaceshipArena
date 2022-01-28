@@ -18,6 +18,7 @@ public class MissionController : MonoBehaviourPunCallbacks
     public Vector3 RandomSpawnPoint => spawnPoints.GetRandomElement().position;
 
     private List<PlayerController> m_roomPlayers = new List<PlayerController>();
+    private List<PlayerController> m_missionBots = new List<PlayerController>();
     private List<Pickup> m_roomPickups = new List<Pickup>();
     private List<Transform> m_availableSpawnPoints = new List<Transform>();
     private List<string> m_connectedPlayersNames = new List<string>();
@@ -25,6 +26,7 @@ public class MissionController : MonoBehaviourPunCallbacks
     private float m_timeToJoin = 0f;
 
     public List<PlayerController> RoomPlayers => m_roomPlayers;
+    public List<PlayerController> MissionBots => m_missionBots;
     public List<Pickup> RoomPickups => m_roomPickups;
 
     [PunRPC]
@@ -60,21 +62,41 @@ public class MissionController : MonoBehaviourPunCallbacks
 
     public void RegisterPlayer(PlayerController player)
     {
-        if (!m_roomPlayers.Contains(player))
+        if (player.IsAI)
         {
-            m_roomPlayers.Add(player);
+            if (!m_missionBots.Contains(player))
+            {
+                m_missionBots.Add(player);
+            }
+        }
+        else
+        {
+            if (!m_roomPlayers.Contains(player))
+            {
+                m_roomPlayers.Add(player);
+            }
         }
     }
 
     public void UnregisterPlayer(PlayerController player)
     {
-        if (m_roomPlayers.Contains(player))
+        if (player.IsAI)
         {
-            m_roomPlayers.Remove(player);
-
-            if (PlayerUI.Instance != null)
+            if (m_missionBots.Contains(player))
             {
-                PlayerUI.Instance.OnLobbyPlayerDeleted(player.Name);
+                m_missionBots.Remove(player);
+            }
+        }
+        else
+        {
+            if (m_roomPlayers.Contains(player))
+            {
+                m_roomPlayers.Remove(player);
+
+                if (PlayerUI.Instance != null)
+                {
+                    PlayerUI.Instance.OnLobbyPlayerDeleted(player.Name);
+                }
             }
         }
     }
@@ -211,6 +233,11 @@ public class MissionController : MonoBehaviourPunCallbacks
         foreach (var p in m_roomPlayers)
         {
             PlayerUI.Instance.OnLobbyPlayerAdded(p.Name, p.ShipIcon, false);
+        }
+
+        foreach (var b in m_missionBots)
+        {
+            PlayerUI.Instance.AddMissionBotToMiniMap(b);
         }
     }
 }

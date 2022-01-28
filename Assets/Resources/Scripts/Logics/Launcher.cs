@@ -37,6 +37,8 @@ public class BalanceInfo
     public int currencyPerFightMin;
     public int currencyPerWin;
     public int currencyPlaceBonus;
+    public int currencyPerMissionMin;
+    public float missionTimeRewardModifier;
 }
 
 [Serializable]
@@ -458,6 +460,20 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         m_loadingScreen.SetActive(false);
 
         SaveProfile();
+    }
+
+    public int OnMissionCompleted(float completionTime)
+    {
+        int moneyGained = Balance.currencyPerMissionMin + Mathf.CeilToInt((180f / (10f + completionTime)) * Balance.missionTimeRewardModifier * 100);
+        m_currency += moneyGained;
+        SaveProfile();
+        currencyLabel.text = m_currency.ToString();
+        return moneyGained;
+    }
+
+    public void OnMissionFailed()
+    {
+
     }
 
     public int OnFightLoss()

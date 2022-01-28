@@ -160,6 +160,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private int m_deathsCount = 0;
     private int m_upgradesScore = 0;
 
+    private MissionController missionController;
+    private ArenaController arenaController;
+    private bool isMissionMode = false;
+    private List<PlayerController> m_roomPlayers;
+
     private AudioSource audioSource;
 
     private BalanceInfo m_balance;
@@ -180,8 +185,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     public bool IsDied => m_durability <= 0 || m_isDied;
 
-    public int KillsCount{ get{ return m_killsCount; } set {m_killsCount = value; } }
-    public int DeathsCount{ get{ return m_deathsCount; } set {m_deathsCount = value; } }
+    public int KillsCount { get { return m_killsCount; } set { m_killsCount = value; } }
+    public int DeathsCount { get { return m_deathsCount; } set { m_deathsCount = value; } }
 
     public int Score => KillsCount > 0 ? KillsCount - DeathsCount + 1 : KillsCount - DeathsCount;
 
@@ -212,6 +217,19 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             LocalPlayer = this;
         }
 
+        if (ArenaController.instance != null)
+        {
+            arenaController = ArenaController.instance;
+            isMissionMode = false;
+        }
+        else if (MissionController.instance != null)
+        {
+            missionController = MissionController.instance;
+            isMissionMode = true;
+        }
+
+        m_roomPlayers = isMissionMode ? missionController.RoomPlayers : arenaController.RoomPlayers;
+
         m_balance = Launcher.instance.Balance;
 
         charController = GetComponent<CharacterController>();
@@ -238,7 +256,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         cameraTransform = Camera.main.transform;
 
-        m_name = IsAI ? ArenaController.instance.RandomBotName : photonView.Owner.NickName;
+        if (!isMissionMode)
+            m_name = IsAI ? ArenaController.instance.RandomBotName : photonView.Owner.NickName;
+        else
+            m_name = IsAI ? "" : photonView.Owner.NickName;
+
         NameLabel.text = m_name;
 
         cameraTransform.localEulerAngles = new Vector3(90f, 0f, 0f);
@@ -289,7 +311,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             ShieldBar.transform.parent.gameObject.SetActive(false);
         }
 
-        ArenaController.instance.RegisterPlayer(this);
+        if (!isMissionMode)
+            ArenaController.instance.RegisterPlayer(this);
+        else
+            MissionController.instance.RegisterPlayer(this);
 
         if (IsAI)
         {
@@ -331,7 +356,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     void OnDestroy()
     {
-        ArenaController.instance.UnregisterPlayer(this);
+        if (!isMissionMode)
+            ArenaController.instance.UnregisterPlayer(this);
+        else
+            MissionController.instance.UnregisterPlayer(this);
     }
 
     void ReconstructUI()
@@ -404,7 +432,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     public void SendRatingAndUpgrades()
     {
-        photonView.RPC("SendRatingAndUpgrades_RPC", RpcTarget.All, Name, Launcher.instance.CurrentRating, m_upgradesScore);
+        if (!isMissionMode)
+            photonView.RPC("SendRatingAndUpgrades_RPC", RpcTarget.All, Name, Launcher.instance.CurrentRating, m_upgradesScore);
     }
 
     [PunRPC]
@@ -585,8 +614,22 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         if (audioSource && deathSound)
             audioSource.PlayOneShot(deathSound);
 
-        m_currRespawnTime = ArenaController.instance.RespawnTime + Mathf.Min(DeathsCount * DeathsCount, m_balance.respawnTimeMax);
-        m_currRespawnTime *= (1f - m_respawnTimeBonus);
+        if (!isMissionMode)
+        {
+            m_currRespawnTime = ArenaController.instance.RespawnTime + Mathf.Min(DeathsCount * DeathsCount, m_balance.respawnTimeMax);
+            m_currRespawnTime *= (1f - m_respawnTimeBonus);
+
+            Invoke("StartSpawning", m_spectacleTime);
+
+            ArenaController.instance.OnPlayerKilled(m_lastEnemyName, Name);
+
+            if (!LocalPlayer.m_isDied)
+                PlayerUI.Instance.DoKillAnnounce(m_lastEnemyName, Name);
+        }
+        else
+        {
+            OnLoss(1);
+        }
 
         if (DeathEffect)
         {
@@ -598,13 +641,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         {
             PlayerUI.Instance.OnDeath();
         }
-
-        Invoke("StartSpawning", m_spectacleTime);
-
-        if (!LocalPlayer.m_isDied)
-            PlayerUI.Instance.DoKillAnnounce(m_lastEnemyName, Name);
-
-        ArenaController.instance.OnPlayerKilled(m_lastEnemyName, Name);
     }
 
     public void StartSpawning()
@@ -637,8 +673,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     void ExitFromRoom()
     {
-        ArenaController.instance.UnregisterPlayer(this);
-        ArenaController.instance.LeaveRoom();
+        if (!isMissionMode)
+        {
+            ArenaController.instance.UnregisterPlayer(this);
+            ArenaController.instance.LeaveRoom();
+        }
+        else
+        {
+            MissionController.instance.UnregisterPlayer(this);
+            MissionController.instance.LeaveRoom();
+        }
     }
 
     public void BeginStealth(float length = 5f)
@@ -804,7 +848,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         {
             m_durability -= actualDamage;
 
-            PlayerController enemy = ArenaController.instance.RoomPlayers.Find(x => x.Name == owner);
+            PlayerController enemy = m_roomPlayers.Find(x => x.Name == owner);
 
             if (enemy)
             {
@@ -835,8 +879,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (!m_isWon && PlayerUI.Instance != null &&
             !PlayerUI.Instance.IsLobbyState &&
-            ArenaController.instance.RoomPlayers.Count == 1 &&
-            ArenaController.instance.RoomPlayers[0] == this &&
+            m_roomPlayers.Count == 1 &&
+            m_roomPlayers[0] == this &&
             DurabilityPercent > 0f)
         {
             OnWin();
@@ -856,7 +900,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             PhotonNetwork.Destroy(gameObject);
         }
 
-        List<PlayerController> sortedPlayers = ArenaController.instance.RoomPlayers.OrderByDescending(x => x.Score).ToList();
+        List<PlayerController> sortedPlayers = m_roomPlayers.OrderByDescending(x => x.Score).ToList();
 
         int place = Mathf.Min(m_balance.maxPlayersPerRoom, sortedPlayers.FindIndex(x => x == this) + 1);
 
@@ -1018,7 +1062,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         m_currRoll -= transform.InverseTransformDirection(movementDir).x * m_rollForce;
 
-        if (m_durability <= 0 && !m_isWon )
+        if (m_durability <= 0 && !m_isWon)
         {
             Die();
         }
@@ -1050,7 +1094,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     void ProccessShooting_AI()
     {
-        List<PlayerController> playersList = new List<PlayerController>(ArenaController.instance.RoomPlayers);
+        List<PlayerController> playersList = new List<PlayerController>(m_roomPlayers);
 
         List<PlayerController> selectedPlayers = new List<PlayerController>();
 
@@ -1096,8 +1140,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         if (m_currentAITarget == null || m_currentAITarget.Distance(transform) > 500f || m_currAITargetChangeDelay <= 0f || (m_currentAIEnemy != null && DurabilityPercent < 0.4f))
         {
-            List<PlayerController> playersList = new List<PlayerController>(ArenaController.instance.RoomPlayers);
-            List<Pickup> pickupsList = new List<Pickup>(ArenaController.instance.RoomPickups);
+            List<PlayerController> playersList = new List<PlayerController>(m_roomPlayers);
+
+            List<Pickup> pickupsList = isMissionMode ? new List<Pickup>(MissionController.instance.RoomPickups) : new List<Pickup>(ArenaController.instance.RoomPickups);
 
             List<PlayerController> selectedPlayers = new List<PlayerController>();
 
@@ -1234,7 +1279,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         targetCameraPos = pos;
         m_nexusUsed = true;
 
-        List<PlayerController> sortedPlayers = ArenaController.instance.RoomPlayers.OrderByDescending(x => x.Score).ToList();
+        List<PlayerController> sortedPlayers = m_roomPlayers.OrderByDescending(x => x.Score).ToList();
 
         int place = Mathf.Min(m_balance.maxPlayersPerRoom, sortedPlayers.FindIndex(x => x == this) + 1);
 
@@ -1250,11 +1295,18 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         if (m_isWon || m_isLoss || !photonView.IsMine || PlayerUI.Instance.ResultsScreenShown) return;
         m_isLoss = true;
 
-        int oldRating = Launcher.instance.CurrentRating;
-        int moneyGained = Launcher.instance.OnFightLoss();
-        int newRating = Launcher.instance.CurrentRating;
+        if (!isMissionMode)
+        {
+            int oldRating = Launcher.instance.CurrentRating;
+            int moneyGained = Launcher.instance.OnFightLoss();
+            int newRating = Launcher.instance.CurrentRating;
 
-        PlayerUI.Instance.OnLoss(oldRating, newRating - oldRating, place, moneyGained);
+            PlayerUI.Instance.OnLoss(oldRating, newRating - oldRating, place, moneyGained);
+        }
+        else
+        {
+            Launcher.instance.OnMissionFailed();
+        }
 
         Invoke("ExitFromRoom", 5f);
     }
@@ -1264,11 +1316,19 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         if (m_isWon || m_isLoss || !photonView.IsMine || PlayerUI.Instance.ResultsScreenShown) return;
         m_isWon = true;
 
-        int oldRating = Launcher.instance.CurrentRating;
-        int moneyGained = Launcher.instance.OnFightWon(place);
-        int newRating = Launcher.instance.CurrentRating;
+        if (!isMissionMode)
+        {
+            int oldRating = Launcher.instance.CurrentRating;
+            int moneyGained = Launcher.instance.OnFightWon(place);
+            int newRating = Launcher.instance.CurrentRating;
 
-        PlayerUI.Instance.OnWin(oldRating, newRating - oldRating, place, moneyGained);
+            PlayerUI.Instance.OnWin(oldRating, newRating - oldRating, place, moneyGained);
+        }
+        else
+        {
+            int moneyGained = Launcher.instance.OnMissionCompleted(MatchTimer);
+            PlayerUI.Instance.OnMissionCompleted(moneyGained);
+        }
 
         Invoke("ExitFromRoom", 5f);
     }
@@ -1326,6 +1386,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         {
             Projectile proj = other.GetComponent<Projectile>();
 
+            PlayerController owner = isMissionMode ? missionController.GetPlayerByName(proj.ownerName) : arenaController.GetPlayerByName(proj.ownerName);
+
+            if (isMissionMode && !owner.IsAI) return;
+
             if (proj.ownerName != m_name)
             {
                 int actualDamage = Random.Range(proj.damageMin, proj.damageMax + 1);
@@ -1340,6 +1404,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         else if (other.CompareTag("Bomb") && m_immuneTime <= 0f && !m_isWon)
         {
             Bomb bomb = other.GetComponent<Bomb>();
+
+            PlayerController owner = isMissionMode ? missionController.GetPlayerByName(bomb.ownerName) : arenaController.GetPlayerByName(bomb.ownerName);
+
+            if (isMissionMode && !owner.IsAI) return;
 
             if (bomb.IsActive)
             {
