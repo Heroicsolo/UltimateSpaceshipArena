@@ -45,6 +45,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField]
     private bool isAI = false;
     [SerializeField]
+    private bool isMissionBot = false;
+    [SerializeField]
     private Image HPBar;
     [SerializeField]
     private Image ShieldBar;
@@ -1125,7 +1127,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
             m_targetIsNexus = false;
 
-            if (selectedPickups.Count > 0)
+            if (selectedPickups.Count > 0 && !isMissionBot)
             {
                 Pickup nexus = selectedPickups.Find(x => x.isNexus == true);
 
