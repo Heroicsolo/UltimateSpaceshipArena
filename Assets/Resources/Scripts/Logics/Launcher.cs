@@ -165,8 +165,10 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     public bool IsSoundOn { get { return isSoundOn; } set { isSoundOn = value; PlayerPrefs.SetInt("soundOn", isSoundOn ? 1 : 0); } }
 
     public const string ELO_PROP_KEY = "C0";
+    public const string MAP_PROP_KEY = "C1";
     private TypedLobby sqlLobby = new TypedLobby("customSqlLobby", LobbyType.SqlLobby);
     private LoadBalancingClient loadBalancingClient;
+    private string selectedMap = "Arena00";
 
     /// <summary>
     /// MonoBehaviour method called on GameObject by Unity during early initialization phase.
@@ -933,10 +935,28 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     {
         if (PhotonNetwork.IsConnected && !PhotonNetwork.InRoom && isConnectedToMaster)
         {
+            selectedMap = "Arena00";
             m_loadingScreen.SetActive(true);
             m_loadingText.text = "FINDING A GAME...";
             // #Critical we need at this point to attempt joining a Random Room. If it fails, we'll get notified in OnJoinRandomFailed() and we'll create one.
-            string sqlLobbyFilter = string.Format("C0 BETWEEN {0} AND {1}", Mathf.Max(0, m_arenaRating - Balance.matchmakingGap), m_arenaRating + Balance.matchmakingGap);
+            string sqlLobbyFilter = string.Format("C0 BETWEEN {0} AND {1} AND C1 = 'Arena00'", Mathf.Max(0, m_arenaRating - Balance.matchmakingGap), m_arenaRating + Balance.matchmakingGap);
+            OpJoinRandomRoomParams opJoinRandomRoomParams = new OpJoinRandomRoomParams();
+            opJoinRandomRoomParams.SqlLobbyFilter = sqlLobbyFilter;
+            if (loadBalancingClient == null)
+                loadBalancingClient = PhotonNetwork.NetworkingClient;
+            loadBalancingClient.OpJoinRandomRoom(opJoinRandomRoomParams);
+        }
+    }
+
+    public void FindMission()
+    {
+        if (PhotonNetwork.IsConnected && !PhotonNetwork.InRoom && isConnectedToMaster)
+        {
+            selectedMap = "Mission00";
+            m_loadingScreen.SetActive(true);
+            m_loadingText.text = "FINDING A GAME...";
+            // #Critical we need at this point to attempt joining a Random Room. If it fails, we'll get notified in OnJoinRandomFailed() and we'll create one.
+            string sqlLobbyFilter = string.Format("C1 = '{0}'", selectedMap);
             OpJoinRandomRoomParams opJoinRandomRoomParams = new OpJoinRandomRoomParams();
             opJoinRandomRoomParams.SqlLobbyFilter = sqlLobbyFilter;
             if (loadBalancingClient == null)
@@ -1012,8 +1032,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         RoomOptions roomOptions = new RoomOptions();
         roomOptions.MaxPlayers = (byte)Balance.maxPlayersPerRoom;
         roomOptions.EmptyRoomTtl = 1000;
-        roomOptions.CustomRoomProperties = new ExitGames.Client.Photon.Hashtable { { ELO_PROP_KEY, m_arenaRating } };
-        roomOptions.CustomRoomPropertiesForLobby = new string[] { ELO_PROP_KEY };
+        roomOptions.CustomRoomProperties = new ExitGames.Client.Photon.Hashtable { { ELO_PROP_KEY, m_arenaRating }, { MAP_PROP_KEY, selectedMap } };
+        roomOptions.CustomRoomPropertiesForLobby = new string[] { ELO_PROP_KEY, MAP_PROP_KEY };
         EnterRoomParams enterRoomParams = new EnterRoomParams();
         enterRoomParams.RoomOptions = roomOptions;
         enterRoomParams.Lobby = sqlLobby;
@@ -1027,7 +1047,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         isRoomLoading = true;
         Debug.Log("OnJoinedRoom() called by PUN. Now this client is in a room.");
         m_homeScreen.SetActive(false);
-        PhotonNetwork.LoadLevel("Arena00");
+        PhotonNetwork.LoadLevel(selectedMap);
     }
 
     public void OnArenaLoaded()
