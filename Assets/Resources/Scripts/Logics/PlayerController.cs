@@ -295,9 +295,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
                 Debug.LogWarning("<Color=Red><a>Missing</a></Color> PlayerUiPrefab reference on player Prefab.", this);
             }
         }
-        else if (PlayerUI.Instance != null)
+        else if (PlayerUI.Instance != null && !isMissionBot)
         {
             PlayerUI.Instance.AddEnemyToMiniMap(this, m_name, IsAI);
+        }
+        else if (PlayerUI.Instance != null)
+        {
+            PlayerUI.Instance.AddMissionBotToMiniMap(this);
         }
 
         if (IsAI || LocalPlayer != this)
