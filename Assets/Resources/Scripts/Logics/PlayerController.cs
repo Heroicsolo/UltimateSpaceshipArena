@@ -283,7 +283,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             if (PhotonNetwork.IsMasterClient)
                 timer.Start(m_balance.lobbyLength);
 
-            if (PhotonNetwork.IsMasterClient)
+            if (PhotonNetwork.IsMasterClient && !isMissionMode)
                 matchTimer.Start(m_balance.lobbyLength + m_balance.fightLength);
 
             if (PlayerUiPrefab != null)
@@ -375,6 +375,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             GameObject _uiGo = Instantiate(this.PlayerUiPrefab);
             _uiGo.SendMessage("SetTarget", this, SendMessageOptions.RequireReceiver);
         }
+    }
+
+    public void OnMissionStarted()
+    {
+        matchTimer.Start(missionController.MissionTime);
     }
 
 #if UNITY_5_4_OR_NEWER

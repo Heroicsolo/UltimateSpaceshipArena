@@ -53,6 +53,10 @@ public class PlayerUI : MonoBehaviour
     private TextMeshProUGUI lobbyTimer;
     [SerializeField]
     private Transform lobbyPlayersHolder;
+    [SerializeField]
+    private GameObject lobbyMissionButtons;
+    [SerializeField]
+    private GameObject lobbyArenaButtons;
     [Header("Win/Loss Screens")]
     [SerializeField]
     private GameObject winScreen;
@@ -336,6 +340,17 @@ public class PlayerUI : MonoBehaviour
         captureAnnounceObject.SetActive(false);
     }
 
+    public void StartMission()
+    {
+        IsLobbyState = false;
+        lobbyScreen.SetActive(false);
+        matchTimerLabel.transform.parent.gameObject.SetActive(true);
+        PlaySound(SoundType.LobbyTimerEnd);
+
+        target.SendRatingAndUpgrades();
+        target.OnMissionStarted();
+    }
+
     public void AddEnemyToMiniMap(PlayerController _enemy, string nickname, bool isAI)
     {
         if (enemies.Contains(_enemy)) return;
@@ -375,11 +390,15 @@ public class PlayerUI : MonoBehaviour
         {
             arenaController = ArenaController.instance;
             isMissionMode = false;
+            lobbyMissionButtons.SetActive(false);
+            lobbyArenaButtons.SetActive(true);
         }
         else if (MissionController.instance != null)
         {
             missionController = MissionController.instance;
             isMissionMode = true;
+            lobbyMissionButtons.SetActive(true);
+            lobbyArenaButtons.SetActive(false);
         }
 
 #if UNITY_STANDALONE || UNITY_EDITOR
@@ -467,7 +486,7 @@ public class PlayerUI : MonoBehaviour
     {
         missionCompletedScreen.SetActive(true);
         missionCompletedCurrencyLabel.text = "+0";
-        
+
         PlaySound(SoundType.Victory, 5f);
 
         StartCoroutine(MissionCompletedScreenAnim(moneyGained));
@@ -476,7 +495,7 @@ public class PlayerUI : MonoBehaviour
     public void OnMissionFailed()
     {
         missionFailedScreen.SetActive(true);
-        
+
         PlaySound(SoundType.Loss, 5f);
     }
 
@@ -602,7 +621,7 @@ public class PlayerUI : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame

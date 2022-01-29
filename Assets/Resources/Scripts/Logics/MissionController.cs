@@ -14,6 +14,7 @@ public class MissionController : MonoBehaviourPunCallbacks
     [SerializeField] private List<GameObject> botsPrefabs;
     [SerializeField] private List<Transform> pickupPoints;
     [SerializeField] Transform nexusPosition;
+    [SerializeField] float missionTime = 180f;
 
     public Vector3 RandomSpawnPoint => spawnPoints.GetRandomElement().position;
 
@@ -28,6 +29,7 @@ public class MissionController : MonoBehaviourPunCallbacks
     public int InitBotsCount => botsSpawnPoints.Count;
     public int KilledBotsCount => botsSpawnPoints.Count - m_missionBots.Count;
 
+    public float MissionTime => missionTime;
     public bool IsObjectiveDone => KilledBotsCount >= InitBotsCount;
     public bool IsNexusCaptured{ get{ return m_nexusCaptured; } set{ m_nexusCaptured = value; } }
 
