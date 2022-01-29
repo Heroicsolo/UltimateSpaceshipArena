@@ -371,6 +371,17 @@ public class PlayerUI : MonoBehaviour
 
         target.SetJoystick(joystick);
 
+        if (ArenaController.instance != null)
+        {
+            arenaController = ArenaController.instance;
+            isMissionMode = false;
+        }
+        else if (MissionController.instance != null)
+        {
+            missionController = MissionController.instance;
+            isMissionMode = true;
+        }
+
 #if UNITY_STANDALONE || UNITY_EDITOR
         joystick.gameObject.SetActive(false);
 #endif
@@ -591,16 +602,7 @@ public class PlayerUI : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (ArenaController.instance != null)
-        {
-            arenaController = ArenaController.instance;
-            isMissionMode = false;
-        }
-        else if (MissionController.instance != null)
-        {
-            missionController = MissionController.instance;
-            isMissionMode = true;
-        }
+        
     }
 
     // Update is called once per frame
