@@ -24,6 +24,12 @@ public class MissionController : MonoBehaviourPunCallbacks
     private List<string> m_connectedPlayersNames = new List<string>();
 
     private float m_timeToJoin = 0f;
+    private bool m_nexusCaptured = false;
+    public int InitBotsCount => botsSpawnPoints.Count;
+    public int KilledBotsCount => botsSpawnPoints.Count - m_missionBots.Count;
+
+    public bool IsObjectiveDone => KilledBotsCount >= InitBotsCount;
+    public bool IsNexusCaptured{ get{ return m_nexusCaptured; } set{ m_nexusCaptured = value; } }
 
     public List<PlayerController> RoomPlayers => m_roomPlayers;
     public List<PlayerController> MissionBots => m_missionBots;

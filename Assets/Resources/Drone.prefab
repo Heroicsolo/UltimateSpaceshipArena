@@ -196,6 +196,7 @@ MonoBehaviour:
   isMissionBot: 1
   HPBar: {fileID: 8427018906572113634}
   ShieldBar: {fileID: 3449344697821147479}
+  BarsOffset: 22
   AIEnemyFindingRadius: 150
   AIPickupsFindingRadius: 100
   AINexusFindingRadius: 0

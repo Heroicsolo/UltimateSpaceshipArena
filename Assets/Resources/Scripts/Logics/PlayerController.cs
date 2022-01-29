@@ -51,6 +51,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField]
     private Image ShieldBar;
     [SerializeField]
+    private float BarsOffset = 17f;
+    [SerializeField]
     private float AIEnemyFindingRadius = 500f;
     [SerializeField]
     private float AIPickupsFindingRadius = 600f;
@@ -891,13 +893,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
-    void EndMatch()
+    public void EndMatch(bool isVictory = false)
     {
-        photonView.RPC("EndMatch_RPC", RpcTarget.All);
+        photonView.RPC("EndMatch_RPC", RpcTarget.All, isVictory);
     }
 
     [PunRPC]
-    void EndMatch_RPC()
+    void EndMatch_RPC(bool isVictory = false)
     {
         if (IsAI)
         {
@@ -917,7 +919,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         }
         else
         {
-            OnLoss(1);
+            if (isVictory)
+                OnWin(1);
+            else
+                OnLoss(1);
         }
     }
 
@@ -943,8 +948,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             }
         }
 
-        NameLabel.transform.position = transform.position + Vector3.forward * 20f;
-        barsHolder.position = transform.position + Vector3.forward * 17f;
+        NameLabel.transform.position = transform.position + Vector3.forward * (BarsOffset + 3f);
+        barsHolder.position = transform.position + Vector3.forward * BarsOffset;
 
         if (m_immuneTime <= 0f && ImmortalityOrb.activeSelf) ImmortalityOrb.SetActive(false);
 
@@ -1333,7 +1338,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         }
         else
         {
-            OnWin();
+            missionController.IsNexusCaptured = true;
         }
     }
 

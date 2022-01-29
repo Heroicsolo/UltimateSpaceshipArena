@@ -14,6 +14,12 @@ public class PlayerUI : MonoBehaviour
     [SerializeField]
     private GameObject statsButton;
     [SerializeField]
+    private GameObject missionObjectiveHolder;
+    [SerializeField]
+    private TextMeshProUGUI missionObjectiveLabel;
+    [SerializeField]
+    private TextMeshProUGUI missionObjectiveLabel2;
+    [SerializeField]
     private Image playerHealthBar;
     [SerializeField]
     private Image playerForceFieldBar;
@@ -387,6 +393,9 @@ public class PlayerUI : MonoBehaviour
         if (isMissionMode)
         {
             statsButton.SetActive(false);
+            missionObjectiveHolder.SetActive(true);
+            missionObjectiveLabel.text = string.Format("Drones killed: {0}/{1}", missionController.KilledBotsCount, missionController.InitBotsCount);
+            missionObjectiveLabel2.text = "Nexus captured: 0/1";
         }
 
         IsInitialized = true;
@@ -675,6 +684,17 @@ public class PlayerUI : MonoBehaviour
             {
                 enemiesIcons[i].gameObject.SetActive(false);
                 continue;
+            }
+        }
+
+        if (isMissionMode)
+        {
+            missionObjectiveLabel.text = string.Format("Drones killed: {0}/{1}", missionController.KilledBotsCount, missionController.InitBotsCount);
+            missionObjectiveLabel2.text = string.Format("Nexus captured: {0}/{1}", missionController.IsNexusCaptured ? 1 : 0, 1);
+
+            if (missionController.IsObjectiveDone && missionController.IsNexusCaptured && PhotonNetwork.IsMasterClient)
+            {
+                target.EndMatch(true);
             }
         }
 
