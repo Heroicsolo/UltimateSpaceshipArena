@@ -30,6 +30,8 @@ public class PlayerUI : MonoBehaviour
     [SerializeField]
     private GameObject minimapEnemyPrefab;
     [SerializeField]
+    private GameObject minimapNexus;
+    [SerializeField]
     private Transform radar;
     [SerializeField]
     private List<SkillButton> m_skillsButtons;
@@ -423,6 +425,7 @@ public class PlayerUI : MonoBehaviour
         if (isMissionMode)
         {
             statsButton.SetActive(false);
+            minimapNexus.SetActive(false);
             missionObjectiveHolder.SetActive(true);
             missionObjectiveLabel.text = string.Format("Drones killed: {0}/{1}", missionController.KilledBotsCount, missionController.InitBotsCount);
             missionObjectiveLabel2.text = "Nexus captured: 0/1";

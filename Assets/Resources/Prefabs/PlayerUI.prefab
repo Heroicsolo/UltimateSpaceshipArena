@@ -2098,6 +2098,7 @@ MonoBehaviour:
   joystick: {fileID: 2535730357591399760}
   minimapPlayer: {fileID: 3791812043177784850}
   minimapEnemyPrefab: {fileID: 6998879652148493001, guid: eb74042344965344a87c040e0e465b6c, type: 3}
+  minimapNexus: {fileID: 5831567039306639984}
   radar: {fileID: 2583786608264973532}
   m_skillsButtons:
   - {fileID: 3027528667900217326}
