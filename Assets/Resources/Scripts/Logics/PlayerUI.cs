@@ -652,6 +652,11 @@ public class PlayerUI : MonoBehaviour
 
                 target.SendRatingAndUpgrades();
 
+                if (isMissionMode)
+                {
+                    target.OnMissionStarted();
+                }
+
                 if (PhotonNetwork.IsMasterClient && !isMissionMode)
                 {
                     ArenaController.instance.OnBattleStarted();

@@ -117,6 +117,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private bool isFiring = false;
     private bool isNitroActive = false;
 
+    private bool missionStarted = false;
+
     private VirtualJoystick joystick;
 
     private Transform cameraTransform;
@@ -248,7 +250,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         DontDestroyOnLoad(this.gameObject);
 
-        m_immuneTime = 5f;
         m_spectacleTime = m_balance.spectacleTime;
         m_isDied = false;
         m_isWon = false;
@@ -297,7 +298,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             {
                 GameObject _uiGo = Instantiate(PlayerUiPrefab);
                 _uiGo.SendMessage("SetTarget", this, SendMessageOptions.RequireReceiver);
-                m_immuneTime = timer.GetTime() + 3f + m_immortalityTimeBonus;
             }
             else
             {
@@ -312,6 +312,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         {
             PlayerUI.Instance.AddMissionBotToMiniMap(this);
         }
+
+        m_immuneTime = timer.GetTime() + 3f + m_immortalityTimeBonus;
 
         if (IsAI || LocalPlayer != this)
         {
@@ -386,7 +388,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     public void OnMissionStarted()
     {
-        matchTimer.Start(missionController.MissionTime);
+        if (PhotonNetwork.IsMasterClient)
+            matchTimer.Start(missionController.MissionTime);
+
+        m_immuneTime = 3f + m_immortalityTimeBonus;
+
+        missionStarted = true;
     }
 
 #if UNITY_5_4_OR_NEWER
@@ -968,7 +975,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             timer.Update(Time.deltaTime);
             matchTimer.Update(Time.deltaTime);
 
-            if (MatchTimer <= 0f && PhotonNetwork.IsMasterClient && !PlayerUI.Instance.IsLobbyState)
+            if (MatchTimer <= 0f && PhotonNetwork.IsMasterClient && !PlayerUI.Instance.IsLobbyState && ((isMissionMode && missionStarted) || !isMissionMode))
             {
                 matchTimer.Stop();
                 EndMatch();
@@ -1386,6 +1393,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         else
         {
             Launcher.instance.OnMissionFailed();
+            PlayerUI.Instance.OnMissionFailed();
         }
 
         Invoke("ExitFromRoom", 5f);
