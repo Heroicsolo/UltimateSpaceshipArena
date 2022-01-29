@@ -69,8 +69,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     /// <summary>
     /// This client's version number. Users are separated from each other by gameVersion (which allows you to make breaking changes).
     /// </summary>
-    const string gameVersion = "4";
-    const int clientVersion = 2;
+    const string gameVersion = "5";
+    const int clientVersion = 3;
     const string chatAppId = "e1f0448d-06a1-40c0-8653-93ffc1b0bee7";
     [SerializeField] private int initArenaRating = 1000;
     [SerializeField] private int maxChatMessagesCount = 20;
