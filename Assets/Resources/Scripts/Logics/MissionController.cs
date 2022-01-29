@@ -52,7 +52,13 @@ public class MissionController : MonoBehaviourPunCallbacks
 
     public PlayerController GetPlayerByName(string name)
     {
-        return m_roomPlayers.Find(x => x.Name == name);
+        PlayerController pc = m_roomPlayers.Find(x => x.Name == name);
+
+        if (pc) return pc;
+
+        pc = m_missionBots.Find(x => x.Name == name);
+
+        return pc;
     }
 
     public void RemoveRoomFromList()

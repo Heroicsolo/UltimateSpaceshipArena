@@ -1112,10 +1112,21 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         List<PlayerController> selectedPlayers = new List<PlayerController>();
 
-        foreach (var player in playersList)
+        if (!isMissionBot)
         {
-            if (player != this && player.transform.Distance(transform) < 90f && player.DurabilityPercent > 0f && !player.InStealth)
-                selectedPlayers.Add(player);
+            foreach (var player in playersList)
+            {
+                if (player != this && player.transform.Distance(transform) < 90f && player.DurabilityPercent > 0f && !player.InStealth)
+                    selectedPlayers.Add(player);
+            }
+        }
+        else
+        {
+            foreach (var player in playersList)
+            {
+                if (player != this && player.transform.Distance(transform) < 90f && player.DurabilityPercent > 0f && !player.InStealth && !player.IsAI)
+                    selectedPlayers.Add(player);
+            }
         }
 
         if (selectedPlayers.Count > 1)
@@ -1160,10 +1171,21 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
             List<PlayerController> selectedPlayers = new List<PlayerController>();
 
-            foreach (var player in playersList)
+            if (!isMissionBot)
             {
-                if (player != this && player.transform.Distance(transform) < AIEnemyFindingRadius && player.DurabilityPercent > 0f && !player.InStealth)
-                    selectedPlayers.Add(player);
+                foreach (var player in playersList)
+                {
+                    if (player != this && player.DurabilityPercent > 0f && !player.InStealth && player.transform.Distance(transform) < AIEnemyFindingRadius)
+                        selectedPlayers.Add(player);
+                }
+            }
+            else
+            {
+                foreach (var player in playersList)
+                {
+                    if (player != this && !player.IsAI && !player.InStealth && player.DurabilityPercent > 0f && player.transform.Distance(transform) < AIEnemyFindingRadius)
+                        selectedPlayers.Add(player);
+                }
             }
 
             List<Pickup> selectedPickups = new List<Pickup>();
