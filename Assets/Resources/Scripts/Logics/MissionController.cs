@@ -88,6 +88,8 @@ public class MissionController : MonoBehaviourPunCallbacks
             if (!m_roomPlayers.Contains(player))
             {
                 m_roomPlayers.Add(player);
+
+                ScaleBots();
             }
         }
     }
@@ -107,11 +109,21 @@ public class MissionController : MonoBehaviourPunCallbacks
             {
                 m_roomPlayers.Remove(player);
 
+                ScaleBots();
+
                 if (PlayerUI.Instance != null)
                 {
                     PlayerUI.Instance.OnLobbyPlayerDeleted(player.Name);
                 }
             }
+        }
+    }
+
+    void ScaleBots()
+    {
+        foreach (var bot in m_missionBots)
+        {
+            bot.ScaleStats((float)RoomPlayers.Count / 4f);
         }
     }
 

@@ -93,6 +93,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField]
     private int m_maxField = 100;
 
+    private int m_scaledMaxDurability;
+    private int m_scaledMaxField;
+    private float m_damageModifier = 1f;
+
     private float m_speed = 0f;
     private float m_currShieldRegenDelay = 0f;
 
@@ -171,13 +175,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     private BalanceInfo m_balance;
 
-    public float DurabilityPercent => (float)m_durability / (float)m_maxDurability;
-    public float FieldPercent => (float)m_forceField / (float)m_maxField;
+    public float DurabilityPercent => (float)m_durability / (float)m_scaledMaxDurability;
+    public float FieldPercent => (float)m_forceField / (float)m_scaledMaxField;
 
     public float RadarRadius => m_radarRadius;
 
-    public int MaxDurability => m_maxDurability;
-    public int MaxShield => m_maxField;
+    public int MaxDurability => m_scaledMaxDurability;
+    public int MaxShield => m_scaledMaxField;
 
     public float MaxSpeed => m_maxSpeed;
 
@@ -253,6 +257,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         m_durability = m_maxDurability;
         m_forceField = 0;
         m_speed = 0f;
+
+        m_scaledMaxDurability = m_maxDurability;
+        m_scaledMaxField = m_maxField;
 
         ImmortalityOrb.SetActive(true);
 
@@ -434,6 +441,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         }
 
         m_durability = m_maxDurability;
+    }
+
+    public void ScaleStats(float modifier)
+    {
+        m_scaledMaxDurability = Mathf.CeilToInt(m_maxDurability * modifier);
+        m_scaledMaxField = Mathf.CeilToInt(m_maxField * modifier);
+        m_damageModifier = modifier;
+
+        m_durability = m_scaledMaxDurability;
     }
 
     public int GetUpgradeNumber(UpgradeData upgrade)
@@ -803,6 +819,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         p.SetOwner(m_name, photonView.Owner.UserId);
         p.critChance += critBonus;
         p.critDamageModifier += critDmgBonus;
+        p.damageMin = Mathf.CeilToInt(p.damageMin * m_damageModifier);
+        p.damageMax = Mathf.CeilToInt(p.damageMax * m_damageModifier);
 
         if (audioSource && shootSound)
             audioSource.PlayOneShot(shootSound, 0.6f);
@@ -823,10 +841,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         {
             projObj.transform.position = BombLaunchPosition.position;
             bomb.SetOwner(m_name, photonView.Owner.UserId);
+            bomb.damageMin = Mathf.CeilToInt(bomb.damageMin * m_damageModifier);
+            bomb.damageMax = Mathf.CeilToInt(bomb.damageMax * m_damageModifier);
         }
         else if (proj)
         {
             proj.SetOwner(m_name, photonView.Owner.UserId);
+            proj.damageMin = Mathf.CeilToInt(proj.damageMin * m_damageModifier);
+            proj.damageMax = Mathf.CeilToInt(proj.damageMax * m_damageModifier);
         }
     }
 
