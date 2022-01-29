@@ -971,14 +971,17 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             }
         }
 
-        if (isNitroActive && m_stealthTime <= 0f && !NitroEffect.isPlaying)
+        if (NitroEffect != null)
         {
-            NitroEffect.Play();
-        }
+            if (isNitroActive && m_stealthTime <= 0f && !NitroEffect.isPlaying)
+            {
+                NitroEffect.Play();
+            }
 
-        if ((!isNitroActive || m_stealthTime > 0f) && NitroEffect.isPlaying)
-        {
-            NitroEffect.Stop();
+            if ((!isNitroActive || m_stealthTime > 0f) && NitroEffect.isPlaying)
+            {
+                NitroEffect.Stop();
+            }
         }
 
         if (!photonView.IsMine)
