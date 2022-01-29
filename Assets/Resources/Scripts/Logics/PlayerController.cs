@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField]
     private GameObject ProjectilePrefab;
     [SerializeField]
-    private Transform ShootPosition;
+    private List<Transform> ShootPositions;
     [SerializeField]
     private Transform BombLaunchPosition;
     [SerializeField]
@@ -413,7 +413,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     void LateUpdate()
     {
         transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, transform.localEulerAngles.y, m_currRoll);
-        //transform.position = new Vector3(transform.position.x, initPos.y, transform.position.z);
+        transform.position = new Vector3(transform.position.x, initPos.y, transform.position.z);
     }
 
     void ApplyUpgrades()
@@ -660,7 +660,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             if (!LocalPlayer.m_isDied)
                 PlayerUI.Instance.DoKillAnnounce(m_lastEnemyName, Name);
         }
-        else
+        else if (this == LocalPlayer)
         {
             OnLoss(1);
         }
@@ -821,13 +821,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     [PunRPC]
     void LaunchProjectile_RPC(float critBonus, float critDmgBonus)
     {
-        GameObject proj = PhotonNetwork.Instantiate(ProjectilePrefab.name, ShootPosition.position, transform.rotation);
-        Projectile p = proj.GetComponent<Projectile>();
-        p.SetOwner(m_name, photonView.Owner.UserId);
-        p.critChance += critBonus;
-        p.critDamageModifier += critDmgBonus;
-        p.damageMin = Mathf.CeilToInt(p.damageMin * m_damageModifier);
-        p.damageMax = Mathf.CeilToInt(p.damageMax * m_damageModifier);
+        foreach (var shootPos in ShootPositions)
+        {
+            GameObject proj = PhotonNetwork.Instantiate(ProjectilePrefab.name, shootPos.position, transform.rotation);
+            Projectile p = proj.GetComponent<Projectile>();
+            p.SetOwner(m_name, photonView.Owner.UserId);
+            p.critChance += critBonus;
+            p.critDamageModifier += critDmgBonus;
+            p.damageMin = Mathf.CeilToInt(p.damageMin * m_damageModifier);
+            p.damageMax = Mathf.CeilToInt(p.damageMax * m_damageModifier);
+        }
 
         if (audioSource && shootSound)
             audioSource.PlayOneShot(shootSound, 0.6f);
@@ -841,21 +844,25 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     [PunRPC]
     void LaunchProjectileCustom_RPC(string projectilePrefabName)
     {
-        GameObject projObj = PhotonNetwork.Instantiate(projectilePrefabName, ShootPosition.position, transform.rotation);
-        Bomb bomb = projObj.GetComponent<Bomb>();
-        Projectile proj = projObj.GetComponent<Projectile>();
-        if (bomb)
+        foreach (var shootPos in ShootPositions)
         {
-            projObj.transform.position = BombLaunchPosition.position;
-            bomb.SetOwner(m_name, photonView.Owner.UserId);
-            bomb.damageMin = Mathf.CeilToInt(bomb.damageMin * m_damageModifier);
-            bomb.damageMax = Mathf.CeilToInt(bomb.damageMax * m_damageModifier);
-        }
-        else if (proj)
-        {
-            proj.SetOwner(m_name, photonView.Owner.UserId);
-            proj.damageMin = Mathf.CeilToInt(proj.damageMin * m_damageModifier);
-            proj.damageMax = Mathf.CeilToInt(proj.damageMax * m_damageModifier);
+            GameObject projObj = PhotonNetwork.Instantiate(projectilePrefabName, shootPos.position, transform.rotation);
+            Bomb bomb = projObj.GetComponent<Bomb>();
+            Projectile proj = projObj.GetComponent<Projectile>();
+            if (bomb)
+            {
+                projObj.transform.position = BombLaunchPosition.position;
+                bomb.SetOwner(m_name, photonView.Owner.UserId);
+                bomb.damageMin = Mathf.CeilToInt(bomb.damageMin * m_damageModifier);
+                bomb.damageMax = Mathf.CeilToInt(bomb.damageMax * m_damageModifier);
+                return;
+            }
+            else if (proj)
+            {
+                proj.SetOwner(m_name, photonView.Owner.UserId);
+                proj.damageMin = Mathf.CeilToInt(proj.damageMin * m_damageModifier);
+                proj.damageMax = Mathf.CeilToInt(proj.damageMax * m_damageModifier);
+            }
         }
     }
 

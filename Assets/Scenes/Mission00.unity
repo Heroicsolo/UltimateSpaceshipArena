@@ -4664,6 +4664,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 4116177799508318048, guid: ec0a46caf8ee7c441a4ff0fa20074cbf, type: 3}
+      propertyPath: missionTime
+      value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 4116177799508318048, guid: ec0a46caf8ee7c441a4ff0fa20074cbf, type: 3}
       propertyPath: nexusPosition
       value: 
       objectReference: {fileID: 1889824416}

@@ -935,7 +935,8 @@ MonoBehaviour:
   ID: 0
   PlayerUiPrefab: {fileID: 1230693119171667625, guid: c63fcc0c278eb06429a02437e3197887, type: 3}
   ProjectilePrefab: {fileID: 6987788691464400540, guid: f9f318ae2b8587144b45bcba97c19e11, type: 3}
-  ShootPosition: {fileID: 440382154438058265}
+  ShootPositions:
+  - {fileID: 440382154438058265}
   BombLaunchPosition: {fileID: 2180226660458417659}
   FloatingTextSpawnPosition: {fileID: 6016336048886456366}
   ImmortalityOrb: {fileID: 7482507792824328463}
@@ -952,8 +953,10 @@ MonoBehaviour:
   InfoTextPrefab: {fileID: 5291071739982511377, guid: 52862688ba3d3004f9d1c3e90484faef, type: 3}
   DeathEffect: {fileID: 2951722784499470423}
   isAI: 1
+  isMissionBot: 0
   HPBar: {fileID: 1960007641732886178}
   ShieldBar: {fileID: 1137062393494646647}
+  BarsOffset: 17
   AIEnemyFindingRadius: 500
   AIPickupsFindingRadius: 600
   AINexusFindingRadius: 600
