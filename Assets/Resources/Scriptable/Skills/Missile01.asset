@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ba184e5b3547b344853556afb50d8bc, type: 3}
   m_Name: Missile01
   m_EditorClassIdentifier: 
-  cooldown: 15
+  cooldown: 20
   icon: {fileID: 21300000, guid: 0b951e462b9f8554a9ceb017cbae163e, type: 3}
   stealthLength: 0
   speedBonus: 0
   speedBonusLength: 0
   durabilityBonus: 0
   shieldBonus: 0
-  projectilePrefab: {fileID: 6987788691464400540, guid: ae5ccf6e67bb55a438dfc29b932609ba, type: 3}
+  projectilePrefab: {fileID: 6987788691464400540, guid: e2f1191006b076047893db86957e617d, type: 3}
   sound: {fileID: 8300000, guid: 281e15cc92254794eaf05caf4d044b76, type: 3}
