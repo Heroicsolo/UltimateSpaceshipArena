@@ -210,9 +210,9 @@ MonoBehaviour:
   ShipTitle: Drone
   m_forceField: 0
   m_radarRadius: 40
-  m_durabilityRegen: 0.02
-  m_fieldRegen: 0.04
-  m_maxDurability: 100
+  m_durabilityRegen: 0
+  m_fieldRegen: 0.05
+  m_maxDurability: 200
   m_maxField: 100
   m_maxSpeed: 50
   shootSound: {fileID: 8300000, guid: c1e99d871f2580347ad67130bbb1902a, type: 3}

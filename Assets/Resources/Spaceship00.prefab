@@ -876,8 +876,10 @@ MonoBehaviour:
   InfoTextPrefab: {fileID: 5291071739982511377, guid: 52862688ba3d3004f9d1c3e90484faef, type: 3}
   DeathEffect: {fileID: 2951722784499470423}
   isAI: 0
+  isMissionBot: 0
   HPBar: {fileID: 8334718601102283435}
   ShieldBar: {fileID: 5729474071440033151}
+  BarsOffset: 17
   AIEnemyFindingRadius: 500
   AIPickupsFindingRadius: 600
   AINexusFindingRadius: 600
