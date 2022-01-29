@@ -1441,7 +1441,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
             PlayerController owner = isMissionMode ? missionController.GetPlayerByName(proj.ownerName) : arenaController.GetPlayerByName(proj.ownerName);
 
-            if (isMissionMode && !owner.IsAI) return;
+            if (isMissionMode && owner.IsAI && IsAI) return;
 
             if (proj.ownerName != m_name)
             {
@@ -1460,7 +1460,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
             PlayerController owner = isMissionMode ? missionController.GetPlayerByName(bomb.ownerName) : arenaController.GetPlayerByName(bomb.ownerName);
 
-            if (isMissionMode && !owner.IsAI) return;
+            if (isMissionMode && owner.IsAI && IsAI) return;
 
             if (bomb.IsActive)
             {
