@@ -1096,6 +1096,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
                 m_AI_skillsCD[i] -= Time.deltaTime;
         }
 
+        if (isMissionBot)
+        {
+            if (m_currentAITarget == null || !m_targetIsPlayer) return;
+        }
+
         if (selectedSkills.Count > 0)
         {
             SkillData skillToUse = selectedSkills.GetRandomElement();
