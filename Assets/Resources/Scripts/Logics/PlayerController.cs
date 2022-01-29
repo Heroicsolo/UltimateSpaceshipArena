@@ -413,7 +413,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     void LateUpdate()
     {
         transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, transform.localEulerAngles.y, m_currRoll);
-        transform.position = new Vector3(transform.position.x, initPos.y, transform.position.z);
+        if (m_spawnPoint != Vector3.zero)
+            transform.position = new Vector3(transform.position.x, m_spawnPoint.y, transform.position.z);
     }
 
     void ApplyUpgrades()
