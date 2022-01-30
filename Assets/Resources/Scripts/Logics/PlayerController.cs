@@ -1069,13 +1069,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         if (m_forceField < m_maxField && m_fieldRegen > 0f && m_currShieldRegenDelay <= 0f)
         {
             m_forceField = Mathf.Min(m_maxField, m_forceField + m_maxField * m_fieldRegen * Time.deltaTime);
-            fieldEffect.Play();
+            //if (fieldEffect) fieldEffect.Play();
         }
 
-        if (m_forceField <= 0f)
+        /*if (m_forceField <= 0f && fieldEffect && fieldEffect.isPlaying)
         {
             fieldEffect.Stop();
-        }
+        }*/
 
         if (m_immuneTime > 0f) m_immuneTime -= Time.deltaTime;
 
