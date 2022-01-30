@@ -677,9 +677,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             PlayerUI.Instance.OnDeath();
         }
 
-        if (isMissionBot && PhotonNetwork.IsMasterClient)
+        if (PhotonNetwork.IsMasterClient)
         {
-            PhotonNetwork.Destroy(gameObject);
+            PhotonNetwork.InstantiateRoomObject("PickupDurability", transform.position, Quaternion.identity);
+
+            if (isMissionBot)
+            {
+                PhotonNetwork.Destroy(gameObject);
+            }
         }
     }
 
@@ -908,6 +913,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
                 m_lastEnemy = enemy.transform;
 
                 m_lastEnemyName = enemy.Name;
+
+                if (IsAI && isMissionMode)
+                {
+                    m_currentAITarget = enemy.transform;
+                    m_currentAIEnemy = enemy;
+                    m_targetIsPlayer = true;
+                }
             }
 
             m_currShieldRegenDelay = m_balance.shieldRegenDelay;
@@ -1479,7 +1491,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     void OnTriggerEnter(Collider other)
     {
-        if (!photonView.IsMine)
+        if (!photonView.IsMine || m_isDied)
         {
             return;
         }

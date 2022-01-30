@@ -2089,6 +2089,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a4fb75c0fb8bde4caef785cce8c82d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mainCanvas: {fileID: 1230693119171667629}
   statsButton: {fileID: 7413324159588015929}
   missionObjectiveHolder: {fileID: 8432997019198222289}
   missionObjectiveLabel: {fileID: 8938504068648175596}
@@ -2106,6 +2107,8 @@ MonoBehaviour:
   - {fileID: 6151421337620713334}
   announcementsLabel: {fileID: 2660944833106071905}
   matchTimerLabel: {fileID: 483843223194173654}
+  enemyArrowPrefab: {fileID: 9084836660717933089, guid: 0fd523ee5403d6d46b85a75c5aca37f4, type: 3}
+  nexusArrowPrefab: {fileID: 9084836660717933089, guid: 7e18bc42228696c488ce0ae281745989, type: 3}
   m_battleStatsScreen: {fileID: 1513367400149200570}
   m_battleStatsItemsHolder: {fileID: 1817371865651387620}
   m_battleStatsItemPrefab: {fileID: 33372469089443423, guid: 31b862c6f63a0a0488b49151bf62eb36, type: 3}

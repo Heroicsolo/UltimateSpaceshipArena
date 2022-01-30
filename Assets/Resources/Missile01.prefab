@@ -13795,8 +13795,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 662e17200c3a96a4ea04fd2153255837, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damageMin: 22
-  damageMax: 24
+  damageMin: 14
+  damageMax: 16
   critChance: 0.05
   critDamageModifier: 2
   speed: 60

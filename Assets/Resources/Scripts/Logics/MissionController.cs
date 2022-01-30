@@ -13,6 +13,10 @@ public class MissionController : MonoBehaviourPunCallbacks
     [SerializeField] private List<Transform> botsSpawnPoints;
     [SerializeField] private List<GameObject> botsPrefabs;
     [SerializeField] private List<Transform> pickupPoints;
+    [SerializeField] private Transform leftBound;
+    [SerializeField] private Transform rightBound;
+    [SerializeField] private Transform topBound;
+    [SerializeField] private Transform bottomBound;
     [SerializeField] Transform nexusPosition;
     [SerializeField] float missionTime = 180f;
 
@@ -31,8 +35,13 @@ public class MissionController : MonoBehaviourPunCallbacks
 
     public float MissionTime => missionTime;
     public bool IsObjectiveDone => KilledBotsCount >= InitBotsCount;
-    public bool IsNexusCaptured{ get{ return m_nexusCaptured; } set{ m_nexusCaptured = value; } }
+    public bool IsNexusCaptured { get { return m_nexusCaptured; } set { m_nexusCaptured = value; } }
 
+    public float MapHeight => topBound.Distance(bottomBound);
+    public float MapWidth => leftBound.Distance(rightBound);
+
+    public Transform NexusTransform => nexusPosition;
+    public Vector3 NexusPosition => nexusPosition.position;
     public List<PlayerController> RoomPlayers => m_roomPlayers;
     public List<PlayerController> MissionBots => m_missionBots;
     public List<Pickup> RoomPickups => m_roomPickups;
@@ -133,8 +142,18 @@ public class MissionController : MonoBehaviourPunCallbacks
         {
             foreach (var point in pickupPoints)
             {
-                GameObject go = PhotonNetwork.InstantiateRoomObject(Random.value < 0.5f ? "PickupShield" : "PickupDurability", point.position, Quaternion.identity);
-                m_roomPickups.Add(go.GetComponent<Pickup>());
+                PredefinedPickup pp = point.GetComponent<PredefinedPickup>();
+
+                if (!pp)
+                {
+                    GameObject go = PhotonNetwork.InstantiateRoomObject(Random.value < 0.5f ? "PickupShield" : "PickupDurability", point.position, Quaternion.identity);
+                    m_roomPickups.Add(go.GetComponent<Pickup>());
+                }
+                else
+                {
+                    GameObject go = PhotonNetwork.InstantiateRoomObject(pp.PickupPrefab.name, point.position, Quaternion.identity);
+                    m_roomPickups.Add(go.GetComponent<Pickup>());
+                }
             }
         }
 

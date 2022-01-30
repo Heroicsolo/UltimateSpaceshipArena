@@ -10,6 +10,8 @@ public class PlayerUI : MonoBehaviour
 {
     public static PlayerUI Instance;
 
+    [SerializeField]
+    private Transform mainCanvas;
     [Header("Battle UI")]
     [SerializeField]
     private GameObject statsButton;
@@ -39,6 +41,10 @@ public class PlayerUI : MonoBehaviour
     private TextMeshProUGUI announcementsLabel;
     [SerializeField]
     private TextMeshProUGUI matchTimerLabel;
+    [SerializeField]
+    private GameObject enemyArrowPrefab;
+    [SerializeField]
+    private GameObject nexusArrowPrefab;
     [Header("Battle stats screen")]
     [SerializeField]
     private GameObject m_battleStatsScreen;
@@ -139,9 +145,13 @@ public class PlayerUI : MonoBehaviour
     private ArenaController arenaController;
     private bool isMissionMode = false;
 
+    private float mapSizeAmplifier = 5f;
+
     public bool IsLobbyState = true;
     private bool IsInitialized = false;
     private Dictionary<SoundType, float> soundsCDs = new Dictionary<SoundType, float>();
+
+    private Dictionary<PlayerController, GameObject> enemyArrows = new Dictionary<PlayerController, GameObject>();
 
     public enum SoundType
     {
@@ -360,7 +370,7 @@ public class PlayerUI : MonoBehaviour
         OnLobbyPlayerAdded(nickname, _enemy.ShipIcon, isAI);
         enemies.Add(_enemy);
         GameObject miniMapEnemy = Instantiate(minimapEnemyPrefab, minimapPlayer.parent);
-        miniMapEnemy.transform.localPosition = new Vector3(_enemy.transform.position.x / 5f, _enemy.transform.position.z / 5f, 0f);
+        miniMapEnemy.transform.localPosition = new Vector3(_enemy.transform.position.x / mapSizeAmplifier, _enemy.transform.position.z / mapSizeAmplifier, 0f);
         miniMapEnemy.transform.localEulerAngles = new Vector3(0f, 0f, -_enemy.transform.localEulerAngles.y);
         enemiesIcons.Add(miniMapEnemy.transform);
     }
@@ -371,7 +381,7 @@ public class PlayerUI : MonoBehaviour
 
         enemies.Add(_enemy);
         GameObject miniMapEnemy = Instantiate(minimapEnemyPrefab, minimapPlayer.parent);
-        miniMapEnemy.transform.localPosition = new Vector3(_enemy.transform.position.x / 5f, _enemy.transform.position.z / 5f, 0f);
+        miniMapEnemy.transform.localPosition = new Vector3(_enemy.transform.position.x / mapSizeAmplifier, _enemy.transform.position.z / mapSizeAmplifier, 0f);
         miniMapEnemy.transform.localEulerAngles = new Vector3(0f, 0f, -_enemy.transform.localEulerAngles.y);
         enemiesIcons.Add(miniMapEnemy.transform);
     }
@@ -394,6 +404,8 @@ public class PlayerUI : MonoBehaviour
             isMissionMode = false;
             lobbyMissionButtons.SetActive(false);
             lobbyArenaButtons.SetActive(true);
+
+            mapSizeAmplifier = 5f;
         }
         else if (MissionController.instance != null)
         {
@@ -401,6 +413,11 @@ public class PlayerUI : MonoBehaviour
             isMissionMode = true;
             lobbyMissionButtons.SetActive(true);
             lobbyArenaButtons.SetActive(false);
+
+            mapSizeAmplifier = Mathf.Max(missionController.MapWidth, missionController.MapHeight) * 5f / 1000f;
+
+            GameObject arrow = Instantiate(nexusArrowPrefab, mainCanvas);
+            arrow.GetComponent<HUDArrow>().target = missionController.NexusTransform;
         }
 
 #if UNITY_STANDALONE || UNITY_EDITOR
@@ -425,7 +442,7 @@ public class PlayerUI : MonoBehaviour
         if (isMissionMode)
         {
             statsButton.SetActive(false);
-            minimapNexus.SetActive(false);
+            minimapNexus.transform.localPosition = new Vector3(missionController.NexusPosition.x / mapSizeAmplifier, missionController.NexusPosition.z / mapSizeAmplifier, 0f);
             missionObjectiveHolder.SetActive(true);
             missionObjectiveLabel.text = string.Format("Drones killed: {0}/{1}", missionController.KilledBotsCount, missionController.InitBotsCount);
             missionObjectiveLabel2.text = "Nexus captured: 0/1";
@@ -500,6 +517,26 @@ public class PlayerUI : MonoBehaviour
         missionFailedScreen.SetActive(true);
 
         PlaySound(SoundType.Loss, 5f);
+    }
+
+    void AddEnemyArrow(PlayerController enemy)
+    {
+        if (!enemyArrows.ContainsKey(enemy))
+        {
+            GameObject arrow = Instantiate(enemyArrowPrefab, mainCanvas);
+            arrow.GetComponent<HUDArrow>().target = enemy.transform;
+            enemyArrows.Add(enemy, arrow);
+        }
+    }
+
+    void RemoveEnemyArrow(PlayerController enemy)
+    {
+        if (enemyArrows.ContainsKey(enemy))
+        {
+            GameObject arrow = enemyArrows[enemy];
+            enemyArrows.Remove(enemy);
+            Destroy(arrow);
+        }
     }
 
     public bool ResultsScreenShown => winScreen.activeSelf || lossScreen.activeSelf || missionCompletedScreen.activeSelf;
@@ -697,21 +734,27 @@ public class PlayerUI : MonoBehaviour
             matchTimerLabel.text = minutes.ToString("00") + ":" + seconds.ToString("00");
         }
 
-        minimapPlayer.localPosition = new Vector3(target.transform.position.x / 5f, target.transform.position.z / 5f, 0f);
+        minimapPlayer.localPosition = new Vector3(target.transform.position.x / mapSizeAmplifier, target.transform.position.z / mapSizeAmplifier, 0f);
         minimapPlayer.localEulerAngles = new Vector3(0f, 0f, -target.transform.localEulerAngles.y);
 
         for (int i = 0; i < enemies.Count; i++)
         {
             if (enemies[i])
             {
-                enemiesIcons[i].localPosition = new Vector3(enemies[i].transform.position.x / 5f, enemies[i].transform.position.z / 5f, 0f);
+                enemiesIcons[i].localPosition = new Vector3(enemies[i].transform.position.x / mapSizeAmplifier, enemies[i].transform.position.z / mapSizeAmplifier, 0f);
                 enemiesIcons[i].localEulerAngles = new Vector3(0f, 0f, -enemies[i].transform.localEulerAngles.y);
 
                 enemiesIcons[i].gameObject.SetActive(enemies[i].DurabilityPercent > 0f && enemiesIcons[i].localPosition.Distance(minimapPlayer.localPosition) < target.RadarRadius);
+
+                if (enemiesIcons[i].gameObject.activeSelf)
+                    AddEnemyArrow(enemies[i]);
+                else
+                    RemoveEnemyArrow(enemies[i]);
             }
             else
             {
                 enemiesIcons[i].gameObject.SetActive(false);
+                RemoveEnemyArrow(enemies[i]);
                 continue;
             }
         }
