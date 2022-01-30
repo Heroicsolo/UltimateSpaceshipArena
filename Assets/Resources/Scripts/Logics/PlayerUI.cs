@@ -751,7 +751,7 @@ public class PlayerUI : MonoBehaviour
         {
             if (enemies[i])
             {
-                Vector3 mapPos = missionController.GetMapPosition(enemies[i].transform.position);
+                Vector3 mapPos = isMissionMode ? missionController.GetMapPosition(enemies[i].transform.position) : enemies[i].transform.position;
 
                 enemiesIcons[i].localPosition = new Vector3(mapPos.x / mapSizeAmplifier, mapPos.z / mapSizeAmplifier, 0f);
                 enemiesIcons[i].localEulerAngles = new Vector3(0f, 0f, -enemies[i].transform.localEulerAngles.y);

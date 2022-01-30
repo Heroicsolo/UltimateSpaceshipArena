@@ -29,6 +29,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField]
     private List<ParticleSystem> EngineFlames;
     [SerializeField]
+    private ParticleSystem repairEffect;
+    [SerializeField]
+    private ParticleSystem fieldEffect;
+    [SerializeField]
     private MeshRenderer meshRenderer;
     [SerializeField]
     private Material transparentMaterial;
@@ -775,6 +779,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     {
         GameObject txt = Instantiate(RepairTextPrefab, FloatingTextSpawnPosition.position, Quaternion.identity);
         txt.GetComponent<FloatingText>().SetText(amount.ToString() + (isCrit ? "!" : ""));
+        repairEffect.Play();
     }
 
     void SpawnDamageText(int amount, bool isCrit = false)
@@ -915,8 +920,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
                 m_lastEnemyName = enemy.Name;
             }
 
-            m_currShieldRegenDelay = m_balance.shieldRegenDelay;
-
             SpawnDamageText(actualDamage, isCrit);
 
             if (DurabilityPercent < 0.25f && photonView.IsMine && !IsAI)
@@ -928,6 +931,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         {
             SpawnInfoText("Absorbed");
         }
+
+        m_currShieldRegenDelay = m_balance.shieldRegenDelay;
 
         if (enemy && IsAI && isMissionMode)
         {
@@ -1064,6 +1069,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         if (m_forceField < m_maxField && m_fieldRegen > 0f && m_currShieldRegenDelay <= 0f)
         {
             m_forceField = Mathf.Min(m_maxField, m_forceField + m_maxField * m_fieldRegen * Time.deltaTime);
+            fieldEffect.Play();
+        }
+
+        if (m_forceField <= 0f)
+        {
+            fieldEffect.Stop();
         }
 
         if (m_immuneTime > 0f) m_immuneTime -= Time.deltaTime;
@@ -1216,7 +1227,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             movementDir.y = 0f;
         }
 
-        if (m_currentAIEnemy != null && m_currentAIEnemy.transform.Distance(transform) < 300f && m_currentAIEnemy.transform.Distance(transform) > 10f && !InStealth)
+        if (m_currentAIEnemy != null && m_currentAIEnemy.transform.Distance(transform) < 300f && m_currentAIEnemy.transform.Distance(transform) > 10f && !InStealth && CheckLineOfSight(m_currentAITarget))
         {
             StartShooting();
         }
@@ -1226,12 +1237,21 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
+    bool CheckLineOfSight(Transform target)
+    {
+        RaycastHit[] hits = new RaycastHit[1];
+
+        Physics.RaycastNonAlloc(transform.position, target.position - transform.position, hits, 500f, 1 << 6);
+        
+        return hits[0].transform == target;
+    }
+
     void ProccessMovement_AI()
     {
         if (m_currAITargetChangeDelay > 0f)
             m_currAITargetChangeDelay -= Time.deltaTime;
 
-        if (m_targetIsPlayer && (m_currentAIEnemy == null || m_currentAIEnemy != null && (m_currentAIEnemy.DurabilityPercent <= 0f || m_currentAIEnemy.InStealth)))
+        if (m_targetIsPlayer && (m_currentAIEnemy == null || m_currentAIEnemy != null && (m_currentAIEnemy.DurabilityPercent <= 0f || m_currentAIEnemy.InStealth || (!CheckLineOfSight(m_currentAITarget) && m_currentAITarget.Distance(transform) > 300f))))
         {
             m_currentAITarget = null;
             m_currentAIEnemy = null;
@@ -1352,7 +1372,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             float minDist = 5f;
 
             if (m_targetIsNexus) minDist = 30f;
-            if (m_targetIsPlayer) minDist = 90f;
+            if (m_targetIsPlayer)
+            {
+                if (CheckLineOfSight(m_currentAITarget))
+                    minDist = 90f;
+                else
+                    minDist = 30f;
+            }
 
             if (IsAI && (m_currentAITarget == null || m_currentAITarget.Distance(transform) < minDist))
             {

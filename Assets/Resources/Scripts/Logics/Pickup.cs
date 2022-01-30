@@ -14,6 +14,7 @@ public class Pickup : MonoBehaviourPunCallbacks
     public float respawnTime = 30f;
     [SerializeField] private GameObject effectsHolder;
     [SerializeField] private Image capturingBar;
+    [SerializeField] private ParticleSystem captureEffect;
 
     private float timeToRespawn = 0f;
     private float currCapturingTime = 0f;
@@ -87,6 +88,8 @@ public class Pickup : MonoBehaviourPunCallbacks
         Deactivate();
         if (!isNexus)
             timeToRespawn = respawnTime;
+        if (captureEffect)
+            captureEffect.Play();
     }
 
     public void OnTargetedByBot()
@@ -217,6 +220,7 @@ public class Pickup : MonoBehaviourPunCallbacks
                 if (currCapturingTime >= m_balance.nexusCaptureTime && capturersCount == 1)
                 {
                     PlayerController.LocalPlayer.OnNexusUsed(currCapturerNames[0], transform.position);
+                    if (captureEffect) captureEffect.Play();
                     Deactivate();
                     return;
                 }
