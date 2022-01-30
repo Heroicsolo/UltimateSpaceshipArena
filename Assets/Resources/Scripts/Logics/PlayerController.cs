@@ -1068,7 +1068,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             if (!m_isDied)
             {
                 if (targetCameraPos != null && m_nexusUsed)
-                    cameraTransform.position = Vector3.Lerp(cameraTransform.position, targetCameraPos + Vector3.up * 90f, Time.deltaTime * 8f);
+                {
+                    if (!isMissionMode || (isMissionMode && missionController.IsObjectiveDone))
+                        cameraTransform.position = Vector3.Lerp(cameraTransform.position, targetCameraPos + Vector3.up * 90f, Time.deltaTime * 8f);
+                    else
+                        cameraTransform.position = Vector3.Lerp(cameraTransform.position, transform.position + Vector3.up * 90f, Time.deltaTime * 8f);
+                }
                 else
                     cameraTransform.position = Vector3.Lerp(cameraTransform.position, transform.position + Vector3.up * 90f, Time.deltaTime * 8f);
             }
