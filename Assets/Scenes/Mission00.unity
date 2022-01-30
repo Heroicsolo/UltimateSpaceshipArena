@@ -4807,6 +4807,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1534396527}
     - target: {fileID: 4116177799508318048, guid: ec0a46caf8ee7c441a4ff0fa20074cbf, type: 3}
+      propertyPath: mapCenter
+      value: 
+      objectReference: {fileID: 1285833933}
+    - target: {fileID: 4116177799508318048, guid: ec0a46caf8ee7c441a4ff0fa20074cbf, type: 3}
       propertyPath: rightBound
       value: 
       objectReference: {fileID: 997212166}

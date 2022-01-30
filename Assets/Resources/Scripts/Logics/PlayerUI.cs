@@ -442,7 +442,8 @@ public class PlayerUI : MonoBehaviour
         if (isMissionMode)
         {
             statsButton.SetActive(false);
-            minimapNexus.transform.localPosition = new Vector3(missionController.NexusPosition.x / mapSizeAmplifier, missionController.NexusPosition.z / mapSizeAmplifier, 0f);
+            Vector3 mapPos = missionController.GetMapPosition(missionController.NexusPosition);
+            minimapNexus.transform.localPosition = new Vector3(mapPos.x / mapSizeAmplifier, mapPos.z / mapSizeAmplifier, 0f);
             missionObjectiveHolder.SetActive(true);
             missionObjectiveLabel.text = string.Format("Drones killed: {0}/{1}", missionController.KilledBotsCount, missionController.InitBotsCount);
             missionObjectiveLabel2.text = "Nexus captured: 0/1";
@@ -734,14 +735,25 @@ public class PlayerUI : MonoBehaviour
             matchTimerLabel.text = minutes.ToString("00") + ":" + seconds.ToString("00");
         }
 
-        minimapPlayer.localPosition = new Vector3(target.transform.position.x / mapSizeAmplifier, target.transform.position.z / mapSizeAmplifier, 0f);
+        if (!isMissionMode)
+        {
+            minimapPlayer.localPosition = new Vector3(target.transform.position.x / mapSizeAmplifier, target.transform.position.z / mapSizeAmplifier, 0f);
+        }
+        else
+        {
+            Vector3 mapPos = missionController.GetMapPosition(target.transform.position);
+            minimapPlayer.localPosition = new Vector3(mapPos.x / mapSizeAmplifier, mapPos.z / mapSizeAmplifier, 0f);
+        }
+
         minimapPlayer.localEulerAngles = new Vector3(0f, 0f, -target.transform.localEulerAngles.y);
 
         for (int i = 0; i < enemies.Count; i++)
         {
             if (enemies[i])
             {
-                enemiesIcons[i].localPosition = new Vector3(enemies[i].transform.position.x / mapSizeAmplifier, enemies[i].transform.position.z / mapSizeAmplifier, 0f);
+                Vector3 mapPos = missionController.GetMapPosition(enemies[i].transform.position);
+
+                enemiesIcons[i].localPosition = new Vector3(mapPos.x / mapSizeAmplifier, mapPos.z / mapSizeAmplifier, 0f);
                 enemiesIcons[i].localEulerAngles = new Vector3(0f, 0f, -enemies[i].transform.localEulerAngles.y);
 
                 enemiesIcons[i].gameObject.SetActive(enemies[i].DurabilityPercent > 0f && enemiesIcons[i].localPosition.Distance(minimapPlayer.localPosition) < target.RadarRadius);

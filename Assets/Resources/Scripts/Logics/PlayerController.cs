@@ -902,24 +902,17 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             actualDamage -= damageToField;
         }
 
+        PlayerController enemy = m_roomPlayers.Find(x => x.Name == owner);
+
         if (actualDamage > 0)
         {
             m_durability -= actualDamage;
-
-            PlayerController enemy = m_roomPlayers.Find(x => x.Name == owner);
 
             if (enemy)
             {
                 m_lastEnemy = enemy.transform;
 
                 m_lastEnemyName = enemy.Name;
-
-                if (IsAI && isMissionMode)
-                {
-                    m_currentAITarget = enemy.transform;
-                    m_currentAIEnemy = enemy;
-                    m_targetIsPlayer = true;
-                }
             }
 
             m_currShieldRegenDelay = m_balance.shieldRegenDelay;
@@ -934,6 +927,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         else
         {
             SpawnInfoText("Absorbed");
+        }
+
+        if (enemy && IsAI && isMissionMode)
+        {
+            m_currentAITarget = enemy.transform;
+            m_currentAIEnemy = enemy;
+            m_targetIsPlayer = true;
+            m_currAITargetChangeDelay = m_AITargetChangeDelay;
         }
 
         if (m_stealthTime > 0f)
@@ -1330,7 +1331,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             }
 
             if (m_currentAITarget != null)
-                m_currAITargetChangeDelay = m_targetIsPlayer ? m_AITargetChangeDelay * 0.5f : m_AITargetChangeDelay;
+            {
+                if (!isMissionMode)
+                    m_currAITargetChangeDelay = m_targetIsPlayer ? m_AITargetChangeDelay * 0.5f : m_AITargetChangeDelay;
+                else
+                    m_currAITargetChangeDelay = m_AITargetChangeDelay;
+            }
         }
 
         if (m_currentAITarget != null)

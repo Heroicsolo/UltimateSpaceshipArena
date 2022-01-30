@@ -18,6 +18,7 @@ public class MissionController : MonoBehaviourPunCallbacks
     [SerializeField] private Transform topBound;
     [SerializeField] private Transform bottomBound;
     [SerializeField] Transform nexusPosition;
+    [SerializeField] Transform mapCenter;
     [SerializeField] float missionTime = 180f;
 
     public Vector3 RandomSpawnPoint => spawnPoints.GetRandomElement().position;
@@ -45,6 +46,13 @@ public class MissionController : MonoBehaviourPunCallbacks
     public List<PlayerController> RoomPlayers => m_roomPlayers;
     public List<PlayerController> MissionBots => m_missionBots;
     public List<Pickup> RoomPickups => m_roomPickups;
+
+    public Vector3 GetMapPosition(Vector3 worldPos)
+    {
+        Vector3 mapPos = new Vector3(worldPos.x - mapCenter.position.x, worldPos.y, worldPos.z - mapCenter.position.z);
+
+        return mapPos;
+    }
 
     [PunRPC]
     public void FreeSpawnPointResponse_RPC(int spawnPointIdx)
