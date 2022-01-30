@@ -676,6 +676,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         {
             PlayerUI.Instance.OnDeath();
         }
+
+        if (isMissionBot && PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.Destroy(gameObject);
+        }
     }
 
     public void StartSpawning()
