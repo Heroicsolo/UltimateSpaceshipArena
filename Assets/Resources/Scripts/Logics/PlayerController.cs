@@ -293,7 +293,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         if (photonView.IsMine && !IsAI)
         {
             if (PhotonNetwork.IsMasterClient)
-                timer.Start(m_balance.lobbyLength);
+                timer.Start(isMissionMode ? 30f : m_balance.lobbyLength);
 
             if (PhotonNetwork.IsMasterClient && !isMissionMode)
                 matchTimer.Start(m_balance.lobbyLength + m_balance.fightLength);

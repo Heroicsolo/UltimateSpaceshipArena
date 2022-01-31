@@ -204,7 +204,7 @@ public class MissionController : MonoBehaviourPunCallbacks
         {
             if (PhotonNetwork.IsMasterClient)
             {
-                m_timeToJoin = Launcher.instance.Balance.joinStageLength;
+                m_timeToJoin = Launcher.instance.Balance.lobbyLength;
 
                 m_availableSpawnPoints.AddRange(spawnPoints);
 

@@ -19015,6 +19015,7 @@ MonoBehaviour:
   respawnTime: 30
   effectsHolder: {fileID: 8213307917496181798}
   capturingBar: {fileID: 0}
+  captureEffect: {fileID: 0}
 --- !u!114 &33564264532032792
 MonoBehaviour:
   m_ObjectHideFlags: 0
