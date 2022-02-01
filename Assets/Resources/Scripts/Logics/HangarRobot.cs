@@ -6,13 +6,17 @@ public class HangarRobot : MonoBehaviour
 {
     private Animator animator;
     [SerializeField] ParticleSystem sparks;
+    [SerializeField] List<Transform> points;
 
     private float timeToNextSparks = 3f;
     private float timeToDeactivate = 12f;
     private float timeToRotate = 5f;
+    private float timeToMove = 10f;
     private float targetRot = 0f;
     private float initRot = 0f;
     private bool isActive = true;
+    private bool isMoving = false;
+    private int pointIdx = 0;
 
     private void Awake()
     {
@@ -26,10 +30,16 @@ public class HangarRobot : MonoBehaviour
         targetRot = transform.localEulerAngles.y + Random.Range(-20f, 20f);
     }
 
+    void MoveToNextPoint()
+    {
+        pointIdx++;
+        if (pointIdx > points.Count - 1) pointIdx = 0;
+    }
+
     // Update is called once per frame
     void Update()
     {
-        if (timeToNextSparks > 0f && isActive)
+        if (timeToNextSparks > 0f && isActive && !isMoving)
         {
             timeToNextSparks -= Time.deltaTime;
 
@@ -51,9 +61,32 @@ public class HangarRobot : MonoBehaviour
             }
         }
 
-        transform.localEulerAngles = Vector3.Lerp(transform.localEulerAngles, new Vector3(transform.localEulerAngles.x, targetRot, transform.localEulerAngles.z), 6f * Time.deltaTime);
+        if (timeToMove > 0f && isActive && !isMoving)
+        {
+            timeToMove -= Time.deltaTime;
 
-        if (timeToDeactivate > 0f)
+            if (timeToMove <= 0f)
+            {
+                timeToMove = Random.Range(10f, 15f);
+                isMoving = true;
+                MoveToNextPoint();
+            }
+        }
+
+        if (!isMoving)
+            transform.localEulerAngles = Vector3.Lerp(transform.localEulerAngles, new Vector3(transform.localEulerAngles.x, targetRot, transform.localEulerAngles.z), 6f * Time.deltaTime);
+
+        if (isMoving && transform.Distance(points[pointIdx]) < 0.5f)
+        {
+            isMoving = false;
+        }
+        else if (isMoving)
+        {
+            transform.position = Vector3.Lerp(transform.position, points[pointIdx].position, 2f * Time.deltaTime);
+            transform.LookAt(points[pointIdx].position);
+        }
+
+        if (timeToDeactivate > 0f && !isMoving)
         {
             timeToDeactivate -= Time.deltaTime;
 

@@ -98,6 +98,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     [SerializeField] private TextMeshProUGUI currencyLabel;
     [SerializeField] private TextMeshProUGUI ratingLabel;
     [SerializeField] private List<PlayerController> availableShips;
+    [SerializeField] private List<GameObject> hangarShips;
 
     private UpgradesInfo m_upgradesInfo;
     private BalanceInfo m_balanceData;
@@ -156,7 +157,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     public string UserName => m_userName;
 
     public int CurrentRating => m_arenaRating;
-    public GameObject SelectedShipPrefab { get { return m_selectedShip; } set { m_selectedShip = value; } }
+    public GameObject SelectedShipPrefab { get { return m_selectedShip; } set { m_selectedShip = value; SelectHangarShip(m_selectedShip.name); } }
 
     public BalanceInfo Balance{ get{ return m_balanceData; } }
 
@@ -169,6 +170,14 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     private TypedLobby sqlLobby = new TypedLobby("customSqlLobby", LobbyType.SqlLobby);
     private LoadBalancingClient loadBalancingClient;
     private string selectedMap = "Arena00";
+
+    void SelectHangarShip(string shipName)
+    {
+        foreach (var ship in hangarShips)
+        {
+            ship.SetActive(ship.name == shipName);
+        }
+    }
 
     /// <summary>
     /// MonoBehaviour method called on GameObject by Unity during early initialization phase.
