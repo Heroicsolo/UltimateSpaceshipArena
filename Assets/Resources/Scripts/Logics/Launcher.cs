@@ -179,6 +179,14 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         }
     }
 
+    void HideHangarShips()
+    {
+        foreach (var ship in hangarShips)
+        {
+            ship.SetActive(false);
+        }
+    }
+
     /// <summary>
     /// MonoBehaviour method called on GameObject by Unity during early initialization phase.
     /// </summary>
@@ -1003,6 +1011,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         isConnectedToMaster = false;
         isRoomLoading = false;
         m_homeScreen.SetActive(true);
+        SelectHangarShip(SelectedShipPrefab.name);
         OnMainScreenLoaded();
     }
 
@@ -1055,6 +1064,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         isRoomCreating = false;
         isRoomLoading = true;
         Debug.Log("OnJoinedRoom() called by PUN. Now this client is in a room.");
+        HideHangarShips();
         m_homeScreen.SetActive(false);
         PhotonNetwork.LoadLevel(selectedMap);
     }
