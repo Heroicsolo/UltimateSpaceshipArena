@@ -15,6 +15,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "230129856572-jr1an1vbr1luj12r9k3c2juhv3hv1tsj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.marktsemma.ultimatespaceshiparena",
+            "certificate_hash": "faf83d34005845efb8ba92e2b21ea8cc3ac6885d"
+          }
+        },
+        {
+          "client_id": "230129856572-nf23fe95p9pmj86h1acr2mq6rn20d236.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.marktsemma.ultimatespaceshiparena",
+            "certificate_hash": "7401b0a06fca509553fd463261a84d9b46220438"
+          }
+        },
+        {
           "client_id": "230129856572-1utcs54rg4ecogs1touv116nqetovidh.apps.googleusercontent.com",
           "client_type": 3
         }

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Google Play game services IDs. Save this file as res/values/games-ids.xml in your project.-->
+<resources>
+  <!--app_id-->
+  <string name="app_id" translatable="false">230129856572</string>
+  <!--package_name-->
+  <string name="package_name" translatable="false">com.marktsemma.ultimatespaceshiparena</string>
+  <!--achievement First steps in space!-->
+  <string name="achievement_first_steps_in_space" translatable="false">CgkIvOC7ptkGEAIQAg</string>
+  <!--event upgrade_purchase-->
+  <string name="event_upgrade_purchase" translatable="false">CgkIvOC7ptkGEAIQAw</string>
+  <!--leaderboard Arena-->
+  <string name="leaderboard_arena" translatable="false">CgkIvOC7ptkGEAIQBA</string>
+</resources>

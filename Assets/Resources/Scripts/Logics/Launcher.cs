@@ -12,6 +12,8 @@ using Photon.Chat;
 using ExitGames.Client.Photon;
 using Google;
 using System.Threading.Tasks;
+using GooglePlayGames.BasicApi;
+using GooglePlayGames;
 
 [Serializable]
 public class BalanceInfo
@@ -119,6 +121,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     private bool m_signingIn = false;
     private bool m_signedIn = false;
     private bool m_signInFailed = false;
+    private bool m_playGamesSignInEnded = false;
+    private bool m_playGamesSignInSuccess = false;
     private bool m_googlePlayConnected = false;
     private bool m_loadedProfile = false;
     private bool m_closeGameOnError = false;
@@ -159,9 +163,9 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     public int CurrentRating => m_arenaRating;
     public GameObject SelectedShipPrefab { get { return m_selectedShip; } set { m_selectedShip = value; SelectHangarShip(m_selectedShip.name); } }
 
-    public BalanceInfo Balance{ get{ return m_balanceData; } }
+    public BalanceInfo Balance { get { return m_balanceData; } }
 
-    public int Currency{ get{ return m_currency; } set{ m_currency = value; currencyLabel.text = m_currency.ToString(); } }
+    public int Currency { get { return m_currency; } set { m_currency = value; currencyLabel.text = m_currency.ToString(); } }
 
     public bool IsSoundOn { get { return isSoundOn; } set { isSoundOn = value; PlayerPrefs.SetInt("soundOn", isSoundOn ? 1 : 0); } }
 
@@ -211,6 +215,11 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         isSoundOn = PlayerPrefs.GetInt("soundOn", 1) == 1;
 
         AudioListener.volume = IsSoundOn ? 1f : 0f;
+
+        PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder().RequestServerAuthCode(false).Build();
+
+        PlayGamesPlatform.InitializeInstance(config);
+        PlayGamesPlatform.Activate();
 
         Firebase.FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
         {
@@ -333,12 +342,12 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     {
         string restoredData = snapshot.GetRawJsonValue();
 
-        if( restoredData.Length < 2 )
+        if (restoredData.Length < 2)
         {
             m_balanceData = new BalanceInfo();
         }
         else
-		    m_balanceData = JsonUtility.FromJson<BalanceInfo>(restoredData);
+            m_balanceData = JsonUtility.FromJson<BalanceInfo>(restoredData);
 
         m_loadedBalance = true;
     }
@@ -353,12 +362,12 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
         RefreshBalance(args.Snapshot);
 
-        if( Balance.version > clientVersion )
+        if (Balance.version > clientVersion)
         {
             MessageBox.instance.Show("Your game client version is old. Please, update it on Google Play.");
             CloseGameDelayed();
         }
-        else if( Balance.techWorks != 0 )
+        else if (Balance.techWorks != 0)
         {
             if (Balance.techWorksDelay < 1)
             {
@@ -397,6 +406,19 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
             StartCoroutine(AwaitForProfile());
     }
 
+    private void SignInViaPlayGames()
+    {
+        Social.localUser.Authenticate((bool success) =>
+        {
+            if (success)
+            {
+                string authToken = PlayGamesPlatform.Instance.GetServerAuthCode();
+
+                SignInWithPlayGamesOnFirebase(authToken);
+            }
+        });
+    }
+
     private IEnumerator AwaitForProfile(bool skipSignIn = false)
     {
         m_loadingScreen.SetActive(true);
@@ -413,12 +435,19 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
             if (!emailSigningIn)
             {
+                SignInViaPlayGames();
+            }
+
+            yield return new WaitUntil(() => m_playGamesSignInEnded);
+
+            if (!m_playGamesSignInSuccess)
+            {
                 OpenLoginScreen();
             }
 
             yield return new WaitUntil(() => m_signedIn);
 
-            SaveCredentials(false, m_signupScreen.activeSelf);
+            SaveCredentials(false, m_signupScreen.activeSelf, m_playGamesSignInSuccess);
 
             m_signupScreen.SetActive(false);
 
@@ -523,10 +552,13 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         mDatabaseRef.Child(m_userId).Child("deviceId").SetValueAsync(m_deviceId);
     }
 
-    public void SaveCredentials(bool onlyLocal = false, bool isNewAccount = false)
+    public void SaveCredentials(bool onlyLocal = false, bool isNewAccount = false, bool isPlayGames = false)
     {
-        PlayerPrefs.SetString("email", m_email);
-        PlayerPrefs.SetString("pass", m_password);
+        if (!isPlayGames)
+        {
+            PlayerPrefs.SetString("email", m_email);
+            PlayerPrefs.SetString("pass", m_password);
+        }
 
         if (isNewAccount)
             m_userName = m_inputName.text;
@@ -615,7 +647,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
                 for (int u = 0; u < availableShips[i].Upgrades.Count; u++)
                 {
-                    sui.upgradeLevels.Add(0); 
+                    sui.upgradeLevels.Add(0);
                 }
 
                 m_upgradesInfo.shipUpgradeLevels.Add(sui);
@@ -725,13 +757,13 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
         string restoredData = "";
 
-        if( notEmptyProfile )
+        if (notEmptyProfile)
             restoredData = snapshot.Child("UpgradesInfo").GetRawJsonValue();
 
-        if( restoredData == null || restoredData.Length < 2 )
+        if (restoredData == null || restoredData.Length < 2)
             m_upgradesInfo = new UpgradesInfo();
         else
-		    m_upgradesInfo = JsonUtility.FromJson<UpgradesInfo>(restoredData);
+            m_upgradesInfo = JsonUtility.FromJson<UpgradesInfo>(restoredData);
 
         m_loadedProfile = true;
     }
@@ -850,6 +882,52 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     {
         if (task.IsCompleted)
             SignInWithGoogleOnFirebase(task.Result.IdToken);
+    }
+
+    private void SignInWithPlayGamesOnFirebase(string idToken)
+    {
+        Firebase.Auth.FirebaseAuth auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
+        Firebase.Auth.Credential credential =
+            Firebase.Auth.PlayGamesAuthProvider.GetCredential(idToken);
+
+        auth.SignInWithCredentialAsync(credential).ContinueWith(task =>
+        {
+            if (task.IsCanceled)
+            {
+                Debug.LogError("SignInWithCredentialAsync was canceled.");
+                m_loginError = "Logging in was canceled.";
+                m_signInFailed = true;
+                m_signingIn = false;
+                m_playGamesSignInSuccess = false;
+                m_playGamesSignInEnded = true;
+                return;
+            }
+            if (task.IsFaulted)
+            {
+                Debug.LogError("SignInWithCredentialAsync encountered an error: " + task.Exception);
+                m_loginError = task.Exception.Message;
+                m_signInFailed = true;
+                m_signingIn = false;
+                m_playGamesSignInSuccess = true;
+                m_playGamesSignInEnded = true;
+                return;
+            }
+
+            Firebase.Auth.FirebaseUser newUser = task.Result;
+            Debug.LogFormat("User signed in successfully: {0} ({1})",
+                newUser.DisplayName, newUser.UserId);
+
+            m_email = newUser.Email;
+            m_userId = newUser.UserId;
+            m_userName = newUser.DisplayName;
+            m_password = "";
+
+            m_signInFailed = false;
+            m_signedIn = true;
+            m_signingIn = false;
+            m_playGamesSignInSuccess = false;
+            m_playGamesSignInEnded = true;
+        });
     }
 
     private void SignInWithGoogleOnFirebase(string idToken)
