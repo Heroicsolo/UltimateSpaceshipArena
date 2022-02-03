@@ -25,8 +25,8 @@ public class UpgradesScreen : MonoBehaviour
         if (playerController == null)
             playerController = pc;
 
-        int modifiedDurability = pc.MaxDurability;
-        int modifiedShield = pc.MaxShield;
+        int modifiedDurability = pc.BaseDurability;
+        int modifiedShield = pc.BaseShield;
         float modifiedSpeed = pc.MaxSpeed;
         float modifiedCrit = pc.MainProjectile.critChance;
         float modifiedCritDamage = pc.MainProjectile.critDamageModifier;

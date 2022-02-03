@@ -27,8 +27,8 @@ public class ShipToggle : MonoBehaviour
 
     private void Awake()
     {
-        m_barDurability.fillAmount = m_shipData.MaxDurability / 200f;
-        m_barShield.fillAmount = m_shipData.MaxShield / 200f;
+        m_barDurability.fillAmount = m_shipData.BaseDurability / 200f;
+        m_barShield.fillAmount = m_shipData.BaseShield / 200f;
         m_barSpeed.fillAmount = m_shipData.MaxSpeed / 100f;
         m_shipIcon.sprite = m_shipData.ShipIcon;
         m_shipTitle.text = m_shipData.ShipTitle;

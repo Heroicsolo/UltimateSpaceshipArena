@@ -189,6 +189,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     public int MaxDurability => m_scaledMaxDurability;
     public int MaxShield => m_scaledMaxField;
 
+    public int BaseDurability => m_maxDurability;
+    public int BaseShield => m_maxField;
+
     public float MaxSpeed => m_maxSpeed;
 
     public Projectile MainProjectile => ProjectilePrefab.GetComponent<Projectile>();
