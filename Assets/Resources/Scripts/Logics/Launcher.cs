@@ -122,6 +122,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     private bool m_signingIn = false;
     private bool m_signedIn = false;
     private bool m_signInFailed = false;
+    private bool m_GP_initialized = false;
     private bool m_playGamesSignInEnded = false;
     private bool m_playGamesSignInSuccess = false;
     private bool m_googlePlayConnected = false;
@@ -413,23 +414,32 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
     private void SignInViaPlayGames()
     {
-        if (PlayGamesPlatform.Instance != null)
-        {
-            Social.localUser.Authenticate((bool success) =>
-            {
-                if (success)
-                {
-                    string authToken = PlayGamesPlatform.Instance.GetServerAuthCode();
+        #if UNITY_ANDROID && !UNITY_EDITOR
+        SignInWithPlayGamesOnFirebase(authCode);
+        #else
+        m_playGamesSignInEnded = true;
+        m_playGamesSignInSuccess = false;
+        #endif
+    }
 
-                    SignInWithPlayGamesOnFirebase(authToken);
-                }
-            });
-        }
-        else
-        {
-            m_playGamesSignInEnded = true;
-            m_playGamesSignInSuccess = false;
-        }
+    private void InitGP()
+    {
+        #if UNITY_ANDROID && !UNITY_EDITOR
+        Social.localUser.Authenticate((bool success) => {
+            if( success )
+            {
+                authCode = PlayGamesPlatform.Instance.GetServerAuthCode();
+                m_GP_initialized = true;
+                (Social.Active as PlayGamesPlatform).LoadAchievements(InitAchievements);
+            }
+            else
+            {
+                m_GP_initialized = false;
+            }
+        });
+        #else
+        m_GP_initialized = true;
+        #endif
     }
 
     private IEnumerator AwaitForProfile(bool skipSignIn = false)
@@ -439,6 +449,12 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         m_loadingText.text = "CONNECTING TO SERVER...";
 
         yield return new WaitUntil(() => m_DB_loaded);
+
+        m_loadingText.text = "CONNECTING TO GOOGLE PLAY...";
+
+        InitGP();
+
+        yield return new WaitUntil(() => m_GP_initialized);
 
         if (!skipSignIn)
         {
