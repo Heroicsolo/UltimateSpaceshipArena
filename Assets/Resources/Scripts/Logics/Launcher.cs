@@ -42,6 +42,7 @@ public class BalanceInfo
     public int currencyPlaceBonus;
     public int currencyPerMissionMin;
     public float missionTimeRewardModifier;
+    public int nameChangeCost;
 }
 
 [Serializable]
@@ -77,6 +78,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     const string chatAppId = "e1f0448d-06a1-40c0-8653-93ffc1b0bee7";
     [SerializeField] private int initArenaRating = 1000;
     [SerializeField] private int maxChatMessagesCount = 20;
+
+    [Header("SignIn and SignUp UI")]
     [SerializeField] private GameObject m_loginScreen;
     [SerializeField] private GameObject m_signupScreen;
     [SerializeField] private GameObject m_loadingScreen;
@@ -85,10 +88,15 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     [SerializeField] private InputField m_inputSignUpEmail;
     [SerializeField] private InputField m_inputSignUpPass;
     [SerializeField] private InputField m_inputName;
+    [SerializeField] private InputField m_inputProfileName;
+    
+    [Header("Loading Screen")]
     [SerializeField] private TextMeshProUGUI m_loadingText;
     [SerializeField] private TextMeshProUGUI m_loginQueueText;
-    [SerializeField] private TextMeshProUGUI m_playersCountText;
     [SerializeField] private GameObject m_loadingGears;
+
+    [Header("Hangar UI")]
+    [SerializeField] private TextMeshProUGUI m_playersCountText;
     [SerializeField] private Toggle defaultShipToggle;
     [SerializeField] private GameObject m_canvas;
     [SerializeField] private GameObject m_homeScreen;
@@ -102,6 +110,11 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     [SerializeField] private TextMeshProUGUI ratingLabel;
     [SerializeField] private List<PlayerController> availableShips;
     [SerializeField] private List<GameObject> hangarShips;
+
+    [Header("Profile Screen")]
+    [SerializeField] private Button changeNameBtn;
+    [SerializeField] private Button changeNameBtnPaid;
+    [SerializeField] private Text changeNameCostLabel;
 
     private UpgradesInfo m_upgradesInfo;
     private BalanceInfo m_balanceData;
@@ -132,6 +145,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     private bool m_credentialsSaved = false;
     private bool m_newProfile = false;
     private bool m_loadedBalance = false;
+
+    private bool m_nameChanged = false;
 
     private bool isConnecting;
     private bool isConnectedToMaster;
@@ -368,6 +383,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
         RefreshBalance(args.Snapshot);
 
+        changeNameCostLabel.text = Balance.nameChangeCost.ToString();
+
         if (Balance.version > clientVersion)
         {
             MessageBox.instance.Show("Your game client version is old. Please, update it on Google Play.");
@@ -509,6 +526,11 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
         ratingLabel.text = m_arenaRating.ToString();
         currencyLabel.text = m_currency.ToString();
+
+        m_inputProfileName.text = m_userName;
+        changeNameBtn.gameObject.SetActive(!m_nameChanged);
+        changeNameBtnPaid.gameObject.SetActive(m_nameChanged);
+        changeNameCostLabel.text = Balance.nameChangeCost.ToString();
 
         chatClient = new ChatClient(this);
 
@@ -749,6 +771,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         DatabaseReference userTable = mDatabaseRef.Child(m_userId);
 
         userTable.Child("username").SetValueAsync(m_userName);
+        userTable.Child("nameChanged").SetValueAsync(m_nameChanged);
         userTable.Child("email").SetValueAsync(m_email);
         userTable.Child("arenaRating").SetValueAsync(m_arenaRating);
         userTable.Child("currency").SetValueAsync(m_currency);
@@ -834,6 +857,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         }
 
         m_userName = notEmptyProfile && snapshot.HasChild("username") ? snapshot.Child("username").Value.ToString() : m_userName;
+
+        m_nameChanged = notEmptyProfile && snapshot.HasChild("nameChanged") ? bool.Parse(snapshot.Child("nameChanged").Value.ToString()) : false;
 
         if (m_email.Length < 2)
             m_email = notEmptyProfile ? snapshot.Child("email").Value.ToString() : "";
@@ -1004,7 +1029,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
             m_email = newUser.Email;
             m_userId = newUser.UserId;
-            m_userName = newUser.DisplayName;
+            m_userName = "Player" + m_usedNicknamesList.Count.ToString();
             m_password = "";
 
             m_signInFailed = false;
@@ -1090,6 +1115,78 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     public void SignOut()
     {
         auth.SignOut();
+    }
+
+    public void TryChangeName()
+    {
+        string newName = m_inputProfileName.text;
+
+        if (newName.Equals(m_userName))
+        {
+            return;
+        }
+
+        if (newName.Length < 2)
+        {
+            MessageBox.instance.Show("Your nickname is too short!");
+            m_inputProfileName.text = m_userName;
+            return;
+        }
+
+        if (m_usedNicknamesList.Contains(newName))
+        {
+            MessageBox.instance.Show("This nickname is already taken!");
+            m_inputProfileName.text = m_userName;
+            return;
+        }
+
+        m_userName = newName;
+        PhotonNetwork.NickName = newName;
+        m_nameChanged = true;
+        changeNameBtn.gameObject.SetActive(false);
+        changeNameBtnPaid.gameObject.SetActive(true);
+
+        SaveProfile();
+    }
+
+    public void ChangeNamePaid()
+    {
+        string newName = m_inputProfileName.text;
+
+        if (newName.Equals(m_userName))
+        {
+            return;
+        }
+
+        if (newName.Length < 2)
+        {
+            MessageBox.instance.Show("Your nickname is too short!");
+            m_inputProfileName.text = m_userName;
+            return;
+        }
+
+        if (m_usedNicknamesList.Contains(newName))
+        {
+            MessageBox.instance.Show("This nickname is already taken!");
+            m_inputProfileName.text = m_userName;
+            return;
+        }
+
+        if (m_currency < Balance.nameChangeCost)
+        {
+            MessageBox.instance.Show("Not enough money!");
+            m_inputProfileName.text = m_userName;
+            return;
+        }
+
+        m_currency -= Balance.nameChangeCost;
+
+        m_userName = newName;
+        PhotonNetwork.NickName = newName;
+        m_nameChanged = true;
+        changeNameBtn.gameObject.SetActive(false);
+
+        SaveProfile();
     }
 
     /// <summary>
