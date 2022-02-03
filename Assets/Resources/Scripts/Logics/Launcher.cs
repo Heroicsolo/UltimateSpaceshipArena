@@ -89,7 +89,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     [SerializeField] private InputField m_inputSignUpPass;
     [SerializeField] private InputField m_inputName;
     [SerializeField] private InputField m_inputProfileName;
-    
+
     [Header("Loading Screen")]
     [SerializeField] private TextMeshProUGUI m_loadingText;
     [SerializeField] private TextMeshProUGUI m_loginQueueText;
@@ -432,17 +432,17 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
     private void SignInViaPlayGames()
     {
-        #if UNITY_ANDROID && !UNITY_EDITOR
+#if UNITY_ANDROID && !UNITY_EDITOR
         SignInWithPlayGamesOnFirebase(authCode);
-        #else
+#else
         m_playGamesSignInEnded = true;
         m_playGamesSignInSuccess = false;
-        #endif
+#endif
     }
 
     private void InitGP()
     {
-        #if UNITY_ANDROID && !UNITY_EDITOR
+#if UNITY_ANDROID && !UNITY_EDITOR
         Social.localUser.Authenticate((bool success) => {
             if( success )
             {
@@ -455,9 +455,9 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
                 m_GP_initialized = false;
             }
         });
-        #else
+#else
         m_GP_initialized = true;
-        #endif
+#endif
     }
 
     private IEnumerator AwaitForProfile(bool skipSignIn = false)
@@ -555,8 +555,9 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
     public void AddScoreToLeaderBoard()
     {
-        if (Social.localUser.authenticated) {
-            Social.ReportScore(m_arenaRating, GPGSIds.leaderboard_arena, (bool success) => {});
+        if (Social.localUser.authenticated)
+        {
+            Social.ReportScore(m_arenaRating, GPGSIds.leaderboard_arena, (bool success) => { });
         }
     }
 
@@ -628,9 +629,9 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
     public bool IsAchievementUnlocked(string id)
     {
-        foreach( var a in m_achievementsState )
+        foreach (var a in m_achievementsState)
         {
-            if( a.id == id && a.completed ) return true;
+            if (a.id == id && a.completed) return true;
         }
 
         return false;
@@ -1146,6 +1147,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         changeNameBtn.gameObject.SetActive(false);
         changeNameBtnPaid.gameObject.SetActive(true);
 
+        mNicknamesDB.Child(m_usedNicknamesList.Count.ToString()).SetValueAsync(m_userName);
+
         SaveProfile();
     }
 
@@ -1185,6 +1188,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         PhotonNetwork.NickName = newName;
         m_nameChanged = true;
         changeNameBtn.gameObject.SetActive(false);
+
+        mNicknamesDB.Child(m_usedNicknamesList.Count.ToString()).SetValueAsync(m_userName);
 
         SaveProfile();
     }
