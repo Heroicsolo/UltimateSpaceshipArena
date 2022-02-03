@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using GooglePlayGames.BasicApi;
 using GooglePlayGames;
 using UnityEngine.SocialPlatforms;
+using NiobiumStudios;
 
 [Serializable]
 public class BalanceInfo
@@ -110,6 +111,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     [SerializeField] private TextMeshProUGUI ratingLabel;
     [SerializeField] private List<PlayerController> availableShips;
     [SerializeField] private List<GameObject> hangarShips;
+    [SerializeField] private GameObject dailyRewardsScreen;
 
     [Header("Profile Screen")]
     [SerializeField] private Button changeNameBtn;
@@ -127,6 +129,13 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     private string m_loginError = "";
     private string authCode = "";
     private string m_deviceId = "";
+    private int m_lastDailyRewardDebugTime;
+    private string m_lastDailyRewardTime;
+    private int m_lastDailyReward;
+
+    public int LastDailyRewardDebugTime => m_lastDailyRewardDebugTime;
+    public string LastDailyRewardTime => m_lastDailyRewardTime;
+    public int LastDailyReward => m_lastDailyReward;
 
     private int m_currency = 1000;
     private int m_arenaRating = 0;
@@ -536,6 +545,24 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
         chatClient.ChatRegion = "EU";
         chatClient.Connect(PhotonNetwork.PhotonServerSettings.AppSettings.AppIdChat, PhotonNetwork.PhotonServerSettings.AppSettings.AppVersion, new Photon.Chat.AuthenticationValues(UserName));
+
+        dailyRewardsScreen.SetActive(true);
+        DailyRewards.instance.onClaimPrize += OnClaimPrizeDailyRewards;
+    }
+
+    private void OnClaimPrizeDailyRewards(int day)
+    {
+        //This returns a Reward object
+        Reward myReward = DailyRewards.instance.GetReward(day);
+
+        if (myReward.unit == "Credits")
+        {
+            m_currency += myReward.reward;
+        }
+
+        currencyLabel.text = m_currency.ToString();
+
+        SaveProfile();
     }
 
     #endregion
@@ -765,6 +792,15 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         }
     }
 
+    public void OnDailyRewardsChanged(int lastDailyRewardDebugTime, string lastDailyRewardTime, int lastDailyReward)
+    {
+        m_lastDailyRewardDebugTime = lastDailyRewardDebugTime;
+        m_lastDailyRewardTime = lastDailyRewardTime;
+        m_lastDailyReward = lastDailyReward;
+
+        SaveProfile();
+    }
+
     public void SaveProfile()
     {
         if (!m_signedIn || !m_loadedProfile) return;
@@ -776,6 +812,10 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         userTable.Child("email").SetValueAsync(m_email);
         userTable.Child("arenaRating").SetValueAsync(m_arenaRating);
         userTable.Child("currency").SetValueAsync(m_currency);
+
+        userTable.Child("lastDailyRewardDebugTime").SetValueAsync(m_lastDailyRewardDebugTime);
+        userTable.Child("lastDailyRewardTime").SetValueAsync(m_lastDailyRewardTime);
+        userTable.Child("lastDailyReward").SetValueAsync(m_lastDailyReward);
 
         CheckUpgradesInfo();
 
@@ -867,6 +907,10 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         m_arenaRating = notEmptyProfile && snapshot.HasChild("arenaRating") ? int.Parse(snapshot.Child("arenaRating").Value.ToString()) : Balance.initArenaRating;
 
         m_currency = notEmptyProfile && snapshot.HasChild("currency") ? int.Parse(snapshot.Child("currency").Value.ToString()) : Balance.initCurrency;
+
+        m_lastDailyRewardDebugTime = notEmptyProfile && snapshot.HasChild("lastDailyRewardDebugTime") ? int.Parse(snapshot.Child("lastDailyRewardDebugTime").Value.ToString()) : 0;
+        m_lastDailyRewardTime = notEmptyProfile && snapshot.HasChild("lastDailyRewardTime") ? snapshot.Child("lastDailyRewardTime").Value.ToString() : "";
+        m_lastDailyReward = notEmptyProfile && snapshot.HasChild("lastDailyReward") ? int.Parse(snapshot.Child("lastDailyReward").Value.ToString()) : 0;
 
         string restoredData = "";
 
