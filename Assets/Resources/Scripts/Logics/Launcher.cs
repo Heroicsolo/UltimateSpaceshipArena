@@ -408,15 +408,23 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
     private void SignInViaPlayGames()
     {
-        Social.localUser.Authenticate((bool success) =>
+        if (PlayGamesPlatform.Instance != null)
         {
-            if (success)
+            Social.localUser.Authenticate((bool success) =>
             {
-                string authToken = PlayGamesPlatform.Instance.GetServerAuthCode();
+                if (success)
+                {
+                    string authToken = PlayGamesPlatform.Instance.GetServerAuthCode();
 
-                SignInWithPlayGamesOnFirebase(authToken);
-            }
-        });
+                    SignInWithPlayGamesOnFirebase(authToken);
+                }
+            });
+        }
+        else
+        {
+            m_playGamesSignInEnded = true;
+            m_playGamesSignInSuccess = false;
+        }
     }
 
     private IEnumerator AwaitForProfile(bool skipSignIn = false)
@@ -436,13 +444,13 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
             if (!emailSigningIn)
             {
                 SignInViaPlayGames();
-            }
 
-            yield return new WaitUntil(() => m_playGamesSignInEnded);
+                yield return new WaitUntil(() => m_playGamesSignInEnded);
 
-            if (!m_playGamesSignInSuccess)
-            {
-                OpenLoginScreen();
+                if (!m_playGamesSignInSuccess)
+                {
+                    OpenLoginScreen();
+                }
             }
 
             yield return new WaitUntil(() => m_signedIn);
@@ -896,7 +904,6 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
             {
                 Debug.LogError("SignInWithCredentialAsync was canceled.");
                 m_loginError = "Logging in was canceled.";
-                m_signInFailed = true;
                 m_signingIn = false;
                 m_playGamesSignInSuccess = false;
                 m_playGamesSignInEnded = true;
@@ -906,7 +913,6 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
             {
                 Debug.LogError("SignInWithCredentialAsync encountered an error: " + task.Exception);
                 m_loginError = task.Exception.Message;
-                m_signInFailed = true;
                 m_signingIn = false;
                 m_playGamesSignInSuccess = true;
                 m_playGamesSignInEnded = true;
