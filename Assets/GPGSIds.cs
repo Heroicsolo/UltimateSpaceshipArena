@@ -25,6 +25,7 @@
 public static class GPGSIds
 {
         public const string leaderboard_arena = "CgkIvOC7ptkGEAIQBA"; // <GPGSID>
+        public const string achievement_mission_is_possible = "CgkIvOC7ptkGEAIQBQ"; // <GPGSID>
         public const string achievement_first_steps_in_space = "CgkIvOC7ptkGEAIQAg"; // <GPGSID>
         public const string event_upgrade_purchase = "CgkIvOC7ptkGEAIQAw"; // <GPGSID>
 

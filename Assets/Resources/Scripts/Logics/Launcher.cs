@@ -14,6 +14,7 @@ using Google;
 using System.Threading.Tasks;
 using GooglePlayGames.BasicApi;
 using GooglePlayGames;
+using UnityEngine.SocialPlatforms;
 
 [Serializable]
 public class BalanceInfo
@@ -135,6 +136,10 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     private bool isConnectedToMaster;
     private bool isRoomCreating = false;
     private bool isRoomLoading = false;
+
+    private List<IAchievement> m_achievementsState;
+    private List<IAchievementDescription> m_achievementsDesc;
+    private bool m_achievementsLoaded = false;
 
     private bool isSoundOn = true;
 
@@ -499,6 +504,18 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
     #region Public Methods
 
+    public void ShowLeaderBoard()
+    {
+        ((PlayGamesPlatform)Social.Active).ShowLeaderboardUI(GPGSIds.leaderboard_arena);
+    }
+
+    public void AddScoreToLeaderBoard()
+    {
+        if (Social.localUser.authenticated) {
+            Social.ReportScore(m_arenaRating, GPGSIds.leaderboard_arena, (bool success) => {});
+        }
+    }
+
     public void OnMainScreenLoaded()
     {
         if (chatClient.State == ChatState.Disconnected)
@@ -523,6 +540,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         int moneyGained = Balance.currencyPerMissionMin + Mathf.CeilToInt((180f / (10f + completionTime)) * Balance.missionTimeRewardModifier * 100);
         m_currency += moneyGained;
         SaveProfile();
+        UnlockAchievement(GPGSIds.achievement_mission_is_possible);
         currencyLabel.text = m_currency.ToString();
         return moneyGained;
     }
@@ -537,6 +555,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         m_currency += Balance.currencyPerFightMin;
         m_arenaRating = Mathf.Max(0, m_arenaRating - Mathf.FloorToInt(0.1f * Balance.lossRatingMod * m_arenaRating));
         SaveProfile();
+        AddScoreToLeaderBoard();
+        UnlockAchievement(GPGSIds.achievement_first_steps_in_space);
         currencyLabel.text = m_currency.ToString();
         ratingLabel.text = m_arenaRating.ToString();
         return Balance.currencyPerFightMin;
@@ -549,6 +569,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         m_currency += moneyGained;
         m_arenaRating = Mathf.Max(0, m_arenaRating + Mathf.CeilToInt((bonusForPlace + 200) * Balance.victoryRatingMod * 2000f / Mathf.Max(1000f, m_arenaRating)));
         SaveProfile();
+        AddScoreToLeaderBoard();
+        UnlockAchievement(GPGSIds.achievement_first_steps_in_space);
         currencyLabel.text = m_currency.ToString();
         ratingLabel.text = m_arenaRating.ToString();
         return moneyGained;
@@ -558,6 +580,41 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     {
         mDatabaseRef.Child(m_userId).Child("online").SetValueAsync(true);
         mDatabaseRef.Child(m_userId).Child("deviceId").SetValueAsync(m_deviceId);
+    }
+
+    public bool IsAchievementUnlocked(string id)
+    {
+        foreach( var a in m_achievementsState )
+        {
+            if( a.id == id && a.completed ) return true;
+        }
+
+        return false;
+    }
+
+    public void UnlockAchievement(string id)
+    {
+        if (Social.localUser.authenticated && !IsAchievementUnlocked(id))
+            (Social.Active as PlayGamesPlatform).UnlockAchievement(id, achievementUpdated);
+    }
+
+    private void achievementUpdated(bool updated)
+    {
+        (Social.Active as PlayGamesPlatform).LoadAchievements(InitAchievements);
+    }
+
+    private void InitAchievements(IAchievement[] achievements)
+    {
+        m_achievementsState = new List<IAchievement>(achievements);
+
+        m_achievementsLoaded = true;
+
+        (Social.Active as PlayGamesPlatform).LoadAchievementDescriptions(InitAchievementsDesc);
+    }
+
+    private void InitAchievementsDesc(IAchievementDescription[] achievementsDesc)
+    {
+        m_achievementsDesc = new List<IAchievementDescription>(achievementsDesc);
     }
 
     public void SaveCredentials(bool onlyLocal = false, bool isNewAccount = false, bool isPlayGames = false)
