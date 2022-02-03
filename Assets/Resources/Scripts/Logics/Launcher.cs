@@ -371,6 +371,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         if (Balance.version > clientVersion)
         {
             MessageBox.instance.Show("Your game client version is old. Please, update it on Google Play.");
+            OpenAppStorePage();
             CloseGameDelayed();
         }
         else if (Balance.techWorks != 0)
@@ -519,6 +520,11 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
 
     #region Public Methods
+
+    public void OpenAppStorePage()
+    {
+        Application.OpenURL("https://play.google.com/store/apps/details?id=com.marktsemma.ultimatespaceshiparena");
+    }
 
     public void ShowLeaderBoard()
     {
