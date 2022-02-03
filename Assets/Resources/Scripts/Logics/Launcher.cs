@@ -833,7 +833,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
             return;
         }
 
-        m_userName = notEmptyProfile && snapshot.HasChild("username") ? snapshot.Child("username").Value.ToString() : m_inputName.text;
+        m_userName = notEmptyProfile && snapshot.HasChild("username") ? snapshot.Child("username").Value.ToString() : m_userName;
 
         if (m_email.Length < 2)
             m_email = notEmptyProfile ? snapshot.Child("email").Value.ToString() : "";
@@ -1174,7 +1174,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         isConnectedToMaster = false;
         isRoomLoading = false;
         m_homeScreen.SetActive(true);
-        SelectHangarShip(SelectedShipPrefab.name);
+        SelectHangarShip(SelectedShipPrefab != null ? SelectedShipPrefab.name : "Spaceship00");
         OnMainScreenLoaded();
     }
 

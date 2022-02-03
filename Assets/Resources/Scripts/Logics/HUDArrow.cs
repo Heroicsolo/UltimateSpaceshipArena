@@ -17,8 +17,8 @@ public class HUDArrow : MonoBehaviour
     void Start()
     {
         m_camera = Camera.main;
-        halfH = Screen.height * 0.5f;
-        halfW = Screen.width * 0.5f;
+        halfH = 720 * 0.5f;
+        halfW = 1280 * 0.5f;
         img = GetComponent<Image>();
         imgColor = img.color;
     }
