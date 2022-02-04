@@ -333,7 +333,6 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
             }
         });
 
-        mNicknamesDB.ValueChanged += CheckUsedNicknames;
         mQueueValueRef.ValueChanged += OnQueueLengthChanged;
         mBalanceDatabaseRef.ValueChanged += HandleBalanceValueChanged;
     }
@@ -538,6 +537,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         yield return new WaitUntil(() => isConnectedToMaster);
 
         GetProfileData();
+
+        mNicknamesDB.ValueChanged += CheckUsedNicknames;
 
         userIdLabel.text = "User ID: " + UserID;
 
@@ -882,15 +883,29 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     {
         m_usedNicknamesList.Clear();
 
+        bool myNameFound = false;
+
         foreach (var nicknameData in snapshot.Children)
         {
             string name = nicknameData.Value.ToString();
+
             m_usedNicknamesList.Add(name);
-            if (name == m_userName && nicknameData.Key != m_userId)
+
+            if (name == m_userName)
             {
-                mNicknamesDB.Child(nicknameData.Key).RemoveValueAsync();
-                mNicknamesDB.Child(m_userId).SetValueAsync(m_userName);
+                myNameFound = true;
+
+                if (nicknameData.Key != m_userId)
+                {
+                    mNicknamesDB.Child(nicknameData.Key).RemoveValueAsync();
+                    mNicknamesDB.Child(m_userId).SetValueAsync(m_userName);
+                }
             }
+        }
+
+        if (!myNameFound)
+        {
+            mNicknamesDB.Child(m_userId).SetValueAsync(m_userName);
         }
     }
 
@@ -1508,7 +1523,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         for (int i = 0; i < senders.Length; i++)
         {
             GameObject chatMsgGO = Instantiate(chatMessagePrefab, chatContent);
-            
+
             ChatMessage msgObj = JsonUtility.FromJson<ChatMessage>(messages[i].ToString());
 
             chatMsgGO.GetComponent<TextMeshProUGUI>().text = "<color=\"green\">" + msgObj.nickname + ": </color>" + msgObj.msg;
@@ -1526,7 +1541,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
     public void OnPrivateMessage(string sender, object message, string channelName)
     {
-        
+
     }
 
     public void OnSubscribed(string[] channels, bool[] results)
