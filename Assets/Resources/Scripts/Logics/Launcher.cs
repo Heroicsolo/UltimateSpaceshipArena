@@ -894,12 +894,6 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
             if (name == m_userName)
             {
                 myNameFound = true;
-
-                if (nicknameData.Key != m_userId)
-                {
-                    mNicknamesDB.Child(nicknameData.Key).RemoveValueAsync();
-                    mNicknamesDB.Child(m_userId).SetValueAsync(m_userName);
-                }
             }
         }
 

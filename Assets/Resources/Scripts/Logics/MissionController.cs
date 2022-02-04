@@ -75,6 +75,19 @@ public class MissionController : MonoBehaviourPunCallbacks
         }
     }
 
+    public bool TryPassMasterClient()
+    {
+        foreach (var p in m_roomPlayers)
+        {
+            if (p.photonView.Controller != PlayerController.LocalPlayer.photonView.Controller)
+            {
+                return PhotonNetwork.SetMasterClient(p.photonView.Controller);
+            }
+        }
+
+        return false;
+    }
+
     public PlayerController GetPlayerByName(string name)
     {
         PlayerController pc = m_roomPlayers.Find(x => x.Name == name);
@@ -279,6 +292,7 @@ public class MissionController : MonoBehaviourPunCallbacks
     public void LeaveRoom()
     {
         PhotonNetwork.LeaveRoom();
+        PhotonNetwork.SendAllOutgoingCommands();
     }
 
     public void AddRegisteredPlayersToLobbyUI()

@@ -29,6 +29,19 @@ public class ArenaController : MonoBehaviourPunCallbacks
     public List<PlayerController> RoomPlayers => m_roomPlayers;
     public List<Pickup> RoomPickups => m_roomPickups;
 
+    public bool TryPassMasterClient()
+    {
+        foreach (var p in m_roomPlayers)
+        {
+            if (p.photonView.Controller != PlayerController.LocalPlayer.photonView.Controller)
+            {
+                return PhotonNetwork.SetMasterClient(p.photonView.Controller);
+            }
+        }
+
+        return false;
+    }
+
     public PlayerController GetPlayerByName(string name)
     {
         return m_roomPlayers.Find(x => x.Name == name);
@@ -275,5 +288,6 @@ public class ArenaController : MonoBehaviourPunCallbacks
     public void LeaveRoom()
     {
         PhotonNetwork.LeaveRoom();
+        PhotonNetwork.SendAllOutgoingCommands();
     }
 }

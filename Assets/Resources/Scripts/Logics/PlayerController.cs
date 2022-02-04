@@ -489,6 +489,31 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             PlayerUI.Instance.AddPlayerStatsSlot(pc, rating, upgradesScore);
     }
 
+    void OnApplicationPause()
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            bool masterClientChanged = false;
+
+            if (isMissionMode)
+            {
+                masterClientChanged = MissionController.instance.TryPassMasterClient();
+            }
+            else
+            {
+                masterClientChanged = ArenaController.instance.TryPassMasterClient();
+            }
+
+            if (!masterClientChanged)
+            {
+                if (!isMissionMode)
+                    Launcher.instance.OnFightLoss();
+
+                ExitFromRoom();
+            }
+        }
+    }
+
     public void Spawn()
     {
         m_immuneTime = 3f;
@@ -1245,7 +1270,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         RaycastHit[] hits = new RaycastHit[1];
 
         Physics.RaycastNonAlloc(transform.position, target.position - transform.position, hits, 500f, 1 << 6);
-        
+
         return hits[0].transform == target;
     }
 
