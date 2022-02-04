@@ -886,6 +886,11 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         {
             string name = nicknameData.Value.ToString();
             m_usedNicknamesList.Add(name);
+            if (name == m_userName && nicknameData.Key != m_userId)
+            {
+                mNicknamesDB.Child(nicknameData.Key).RemoveValueAsync();
+                mNicknamesDB.Child(m_userId).SetValueAsync(m_userName);
+            }
         }
     }
 
