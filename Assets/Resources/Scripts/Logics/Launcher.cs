@@ -58,6 +58,13 @@ public class UpgradesInfo
     public List<ShipUpgradesInfo> shipUpgradeLevels;
 }
 
+[Serializable]
+public class ChatMessage
+{
+    public string nickname;
+    public string msg;
+}
+
 public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatClientListener
 {
     public static Launcher instance;
@@ -132,6 +139,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     private int m_lastDailyRewardDebugTime;
     private string m_lastDailyRewardTime;
     private int m_lastDailyReward;
+    private string m_currNicknameIdx = "";
 
     public int LastDailyRewardDebugTime => m_lastDailyRewardDebugTime;
     public string LastDailyRewardTime => m_lastDailyRewardTime;
@@ -706,7 +714,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         {
             if (isNewAccount)
             {
-                mNicknamesDB.Child(m_usedNicknamesList.Count.ToString()).SetValueAsync(m_userName).ContinueWith(task =>
+                mNicknamesDB.Child(m_userId).SetValueAsync(m_userName).ContinueWith(task =>
                 {
                     m_credentialsSaved = true;
                 });
@@ -876,7 +884,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
         foreach (var nicknameData in snapshot.Children)
         {
-            m_usedNicknamesList.Add(nicknameData.Value.ToString());
+            string name = nicknameData.Value.ToString();
+            m_usedNicknamesList.Add(name);
         }
     }
 
@@ -1191,7 +1200,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         changeNameBtn.gameObject.SetActive(false);
         changeNameBtnPaid.gameObject.SetActive(true);
 
-        mNicknamesDB.Child(m_usedNicknamesList.Count.ToString()).SetValueAsync(m_userName);
+        mNicknamesDB.Child(UserID).SetValueAsync(m_userName);
 
         SaveProfile();
     }
@@ -1233,7 +1242,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         m_nameChanged = true;
         changeNameBtn.gameObject.SetActive(false);
 
-        mNicknamesDB.Child(m_usedNicknamesList.Count.ToString()).SetValueAsync(m_userName);
+        mNicknamesDB.Child(UserID).SetValueAsync(m_userName);
 
         SaveProfile();
     }
@@ -1454,7 +1463,13 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     {
         if (chatClient.CanChat && chatMessageField.text.Length > 0)
         {
-            chatClient.PublishMessage("General", chatMessageField.text);
+            ChatMessage msg = new ChatMessage();
+            msg.nickname = m_userName;
+            msg.msg = chatMessageField.text;
+
+            string jsonStr = JsonUtility.ToJson(msg);
+
+            chatClient.PublishMessage("General", jsonStr);
             chatMessageField.text = "";
         }
     }
@@ -1488,7 +1503,10 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         for (int i = 0; i < senders.Length; i++)
         {
             GameObject chatMsgGO = Instantiate(chatMessagePrefab, chatContent);
-            chatMsgGO.GetComponent<TextMeshProUGUI>().text = "<color=\"green\">" + senders[i] + ": </color>" + messages[i].ToString();
+            
+            ChatMessage msgObj = JsonUtility.FromJson<ChatMessage>(messages[i].ToString());
+
+            chatMsgGO.GetComponent<TextMeshProUGUI>().text = "<color=\"green\">" + msgObj.nickname + ": </color>" + msgObj.msg;
 
             chatMessages.Add(chatMsgGO);
 
@@ -1503,7 +1521,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
     public void OnPrivateMessage(string sender, object message, string channelName)
     {
-
+        
     }
 
     public void OnSubscribed(string[] channels, bool[] results)
