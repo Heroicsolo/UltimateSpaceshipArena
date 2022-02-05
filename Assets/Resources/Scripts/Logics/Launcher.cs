@@ -558,6 +558,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
         GetProfileData();
 
+        mNicknamesDB.Child(m_userId).SetValueAsync(m_userName);
+
         mNicknamesDB.ValueChanged += CheckUsedNicknames;
 
         userIdLabel.text = "User ID: " + UserID;
@@ -933,23 +935,11 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     {
         m_usedNicknamesList.Clear();
 
-        bool myNameFound = false;
-
         foreach (var nicknameData in snapshot.Children)
         {
             string name = nicknameData.Value.ToString();
 
             m_usedNicknamesList.Add(name);
-
-            if (name == m_userName)
-            {
-                myNameFound = true;
-            }
-        }
-
-        if (!myNameFound)
-        {
-            mNicknamesDB.Child(m_userId).SetValueAsync(m_userName);
         }
     }
 
