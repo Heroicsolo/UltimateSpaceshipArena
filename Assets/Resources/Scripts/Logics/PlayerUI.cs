@@ -440,11 +440,8 @@ public class PlayerUI : MonoBehaviour
         lobbyScreen.SetActive(true);
         matchTimerLabel.transform.parent.gameObject.SetActive(false);
 
-        if (target.LobbyTimer <= 0f)
-            target.timer.OnUpdated += OnLobbyTimerUpdated;
-        else
-            target.timer.OnFinished += OnLobbyTimerEnded;
-
+        target.timer.OnUpdated += OnLobbyTimerUpdated;
+        target.timer.OnFinished += OnLobbyTimerEnded;
         target.matchTimer.OnUpdated += OnMatchTimerUpdated;
 
         if (PhotonNetwork.IsMasterClient)
@@ -471,6 +468,8 @@ public class PlayerUI : MonoBehaviour
         {
             OnLobbyTimerEnded();
         }
+
+        target.matchTimer.OnUpdated -= OnMatchTimerUpdated;
     }
 
     void OnLobbyTimerEnded()
@@ -595,6 +594,13 @@ public class PlayerUI : MonoBehaviour
         PlaySound(SoundType.Loss, 5f);
     }
 
+    public void OnRoomLeft()
+    {
+        target.timer.OnUpdated -= OnLobbyTimerUpdated;
+        target.timer.OnFinished -= OnLobbyTimerEnded;
+        target.matchTimer.OnUpdated -= OnMatchTimerUpdated;
+    }
+
     void AddEnemyArrow(PlayerController enemy)
     {
         if (!enemyArrows.ContainsKey(enemy))
@@ -692,11 +698,11 @@ public class PlayerUI : MonoBehaviour
     {
         if (PhotonNetwork.NetworkClientState == Photon.Realtime.ClientState.Leaving) return;
 
-        if (PhotonNetwork.IsMasterClient)
-        {
-            target.timer.Stop();
-            target.matchTimer.Stop();
-        }
+        //if (PhotonNetwork.IsMasterClient)
+        //{
+            //target.timer.Stop();
+            //target.matchTimer.Stop();
+        //}
 
         if (!isMissionMode)
             ArenaController.instance.LeaveRoom();
@@ -746,6 +752,13 @@ public class PlayerUI : MonoBehaviour
     void Start()
     {
 
+    }
+
+    private void OnDestroy()
+    {
+        target.timer.OnUpdated -= OnLobbyTimerUpdated;
+        target.timer.OnFinished -= OnLobbyTimerEnded;
+        target.matchTimer.OnUpdated -= OnMatchTimerUpdated;
     }
 
     // Update is called once per frame

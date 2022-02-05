@@ -273,12 +273,17 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         cameraTransform = Camera.main.transform;
 
-        if (!isMissionMode)
-            m_name = IsAI ? ArenaController.instance.RandomBotName : photonView.Owner.NickName;
-        else
-            m_name = IsAI ? "" : photonView.Owner.NickName;
+        if (photonView.IsMine)
+        {
+            if (!isMissionMode)
+                m_name = IsAI ? ArenaController.instance.RandomBotName : photonView.Owner.NickName;
+            else
+                m_name = IsAI ? "" : photonView.Owner.NickName;
 
-        NameLabel.text = m_name;
+            NameLabel.text = m_name;
+
+            photonView.RPC("OnNameSet_RPC", RpcTarget.All, m_name);
+        }
 
         cameraTransform.localEulerAngles = new Vector3(90f, 0f, 0f);
 
@@ -334,19 +339,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             ShieldBar.transform.parent.gameObject.SetActive(false);
         }
 
-        if (!isMissionMode)
-            ArenaController.instance.RegisterPlayer(this);
-        else
-            MissionController.instance.RegisterPlayer(this);
-
         if (IsAI)
         {
             foreach (var skill in m_skills)
             {
                 m_AI_skillsCD.Add(0f);
             }
-
-            PlayerUI.Instance.AddPlayerStatsSlot(this, 0, 0);
         }
 
         m_initialized = true;
@@ -393,6 +391,24 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         {
             GameObject _uiGo = Instantiate(this.PlayerUiPrefab);
             _uiGo.SendMessage("SetTarget", this, SendMessageOptions.RequireReceiver);
+        }
+    }
+
+    [PunRPC]
+    void OnNameSet_RPC(string name)
+    {
+        m_name = name;
+
+        NameLabel.text = m_name;
+
+        if (!isMissionMode)
+            ArenaController.instance.RegisterPlayer(this);
+        else
+            MissionController.instance.RegisterPlayer(this);
+
+        if (IsAI)
+        {
+            PlayerUI.Instance.AddPlayerStatsSlot(this, 0, 0);
         }
     }
 
@@ -766,11 +782,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (PhotonNetwork.NetworkClientState == Photon.Realtime.ClientState.Leaving) return;
 
-        if (PhotonNetwork.IsMasterClient)
-        {
-            timer.Stop();
-            matchTimer.Stop();
-        }
+        //if (PhotonNetwork.IsMasterClient)
+        //{
+        //timer.Stop();
+        //matchTimer.Stop();
+        //}
 
         if (!isMissionMode)
         {
@@ -1557,6 +1573,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             stream.SendNext(isNitroActive);
             stream.SendNext(m_killsCount);
             stream.SendNext(m_deathsCount);
+            stream.SendNext(m_name);
         }
         else
         {
@@ -1572,6 +1589,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             this.isNitroActive = (bool)stream.ReceiveNext();
             this.m_killsCount = (int)stream.ReceiveNext();
             this.m_deathsCount = (int)stream.ReceiveNext();
+            this.m_name = (string)stream.ReceiveNext();
         }
     }
 

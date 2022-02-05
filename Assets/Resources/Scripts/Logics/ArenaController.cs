@@ -82,14 +82,11 @@ public class ArenaController : MonoBehaviourPunCallbacks
     [PunRPC]
     void OnPlayerKilled_RPC(string killerName, string victimName)
     {
-        PlayerController killer = GetPlayerByName(killerName);
-        PlayerController victim = GetPlayerByName(victimName);
-
         if (killerName == PlayerController.LocalPlayer.Name && killerName != victimName)
-            killer.KillsCount++;
+            PlayerController.LocalPlayer.KillsCount++;
 
         if (victimName == PlayerController.LocalPlayer.Name)
-            victim.DeathsCount++;
+            PlayerController.LocalPlayer.DeathsCount++;
 
         PlayerUI.Instance.SortPlayerStatsSlots();
     }
@@ -108,7 +105,11 @@ public class ArenaController : MonoBehaviourPunCallbacks
         {
             m_roomPlayers.Add(player);
             botsPossibleNames.Remove(player.Name);
-            PlayerUI.Instance.AddEnemyToMiniMap(player, player.Name, player.IsAI);
+            if (PlayerUI.Instance != null)
+            {
+                if (player != PlayerController.LocalPlayer)
+                    PlayerUI.Instance.AddEnemyToMiniMap(player, player.Name, player.IsAI);
+            }
         }
     }
 
@@ -311,6 +312,7 @@ public class ArenaController : MonoBehaviourPunCallbacks
 
     public void LeaveRoom()
     {
+        PlayerUI.Instance.OnRoomLeft();
         PhotonNetwork.SendAllOutgoingCommands();
         PhotonNetwork.LeaveRoom();
     }

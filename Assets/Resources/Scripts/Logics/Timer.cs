@@ -183,6 +183,8 @@ public class Timer : IOnEventCallback
 				m_started = false;
 				m_currentTime = 0;
 
+				OnUpdated?.Invoke();
+
 				break;
 
 			case MatchTimerEvent.Updated:
