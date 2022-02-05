@@ -35,11 +35,25 @@ public class ArenaController : MonoBehaviourPunCallbacks
         {
             if (p.photonView.Controller != PlayerController.LocalPlayer.photonView.Controller)
             {
-                return PhotonNetwork.SetMasterClient(p.photonView.Controller);
+                bool masterChanged = PhotonNetwork.SetMasterClient(p.photonView.Controller);
+                if (masterChanged)
+                {
+                    this.photonView.RPC("OnMasterChanged_RPC", RpcTarget.All, p.Name);
+                    return true;
+                }
             }
         }
 
         return false;
+    }
+
+    [PunRPC]
+    void OnMasterChanged_RPC(string newMaster)
+    {
+        if (newMaster == PlayerController.LocalPlayer.Name)
+        {
+            PlayerController.LocalPlayer.RunMatchTimer();
+        }
     }
 
     public PlayerController GetPlayerByName(string name)
@@ -71,10 +85,10 @@ public class ArenaController : MonoBehaviourPunCallbacks
         PlayerController killer = GetPlayerByName(killerName);
         PlayerController victim = GetPlayerByName(victimName);
 
-        if (killer.photonView.IsMine && killerName != victimName)
+        if (killerName == PlayerController.LocalPlayer.Name && killerName != victimName)
             killer.KillsCount++;
 
-        if (victim.photonView.IsMine)
+        if (victimName == PlayerController.LocalPlayer.Name)
             victim.DeathsCount++;
 
         PlayerUI.Instance.SortPlayerStatsSlots();
@@ -94,6 +108,7 @@ public class ArenaController : MonoBehaviourPunCallbacks
         {
             m_roomPlayers.Add(player);
             botsPossibleNames.Remove(player.Name);
+            PlayerUI.Instance.AddEnemyToMiniMap(player, player.Name, player.IsAI);
         }
     }
 
@@ -135,15 +150,15 @@ public class ArenaController : MonoBehaviourPunCallbacks
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            foreach( var point in pickupPoints )
+            foreach (var point in pickupPoints)
             {
                 GameObject go = PhotonNetwork.InstantiateRoomObject(Random.value < 0.5f ? "PickupShield" : "PickupDurability", point.position, Quaternion.identity);
                 m_roomPickups.Add(go.GetComponent<Pickup>());
             }
-        }
 
-        GameObject nexusGO = PhotonNetwork.InstantiateRoomObject("PickupNexus", nexusPosition.position, Quaternion.identity);
-        m_roomPickups.Add(nexusGO.GetComponent<Pickup>());
+            GameObject nexusGO = PhotonNetwork.InstantiateRoomObject("PickupNexus", nexusPosition.position, Quaternion.identity);
+            m_roomPickups.Add(nexusGO.GetComponent<Pickup>());
+        }
     }
 
     void SpawnBots()
@@ -208,7 +223,8 @@ public class ArenaController : MonoBehaviourPunCallbacks
             SpawnPickups();
             SpawnBots();
 
-            AddRegisteredPlayersToLobbyUI();
+            if (PhotonNetwork.IsMasterClient)
+                AddRegisteredPlayersToLobbyUI();
         }
 
         Launcher.instance.OnArenaLoaded();
@@ -228,6 +244,14 @@ public class ArenaController : MonoBehaviourPunCallbacks
                     RemoveRoomFromList();
                 }
             }
+        }
+    }
+
+    public override void OnMasterClientSwitched(Player newMasterClient)
+    {
+        if (newMasterClient == this.photonView.Controller)
+        {
+            PlayerController.LocalPlayer.RunMatchTimer();
         }
     }
 
@@ -287,7 +311,7 @@ public class ArenaController : MonoBehaviourPunCallbacks
 
     public void LeaveRoom()
     {
-        PhotonNetwork.LeaveRoom();
         PhotonNetwork.SendAllOutgoingCommands();
+        PhotonNetwork.LeaveRoom();
     }
 }

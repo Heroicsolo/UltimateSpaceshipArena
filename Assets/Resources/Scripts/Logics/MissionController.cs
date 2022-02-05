@@ -291,8 +291,8 @@ public class MissionController : MonoBehaviourPunCallbacks
 
     public void LeaveRoom()
     {
-        PhotonNetwork.LeaveRoom();
         PhotonNetwork.SendAllOutgoingCommands();
+        PhotonNetwork.LeaveRoom();
     }
 
     public void AddRegisteredPlayersToLobbyUI()

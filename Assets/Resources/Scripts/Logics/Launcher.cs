@@ -164,6 +164,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     private bool m_loadedBalance = false;
 
     private bool m_nameChanged = false;
+    private bool m_justEntered = false;
 
     private bool isConnecting;
     private bool isConnectedToMaster;
@@ -550,6 +551,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         changeNameBtnPaid.gameObject.SetActive(m_nameChanged);
         changeNameCostLabel.text = Balance.nameChangeCost.ToString();
 
+        m_justEntered = true;
+
         chatClient = new ChatClient(this);
 
         chatClient.ChatRegion = "EU";
@@ -601,6 +604,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     {
         if (chatClient.State == ChatState.Disconnected)
             chatClient.Connect(PhotonNetwork.PhotonServerSettings.AppSettings.AppIdChat, PhotonNetwork.PhotonServerSettings.AppSettings.AppVersion, new Photon.Chat.AuthenticationValues(UserName));
+        ratingLabel.text = m_arenaRating.ToString();
     }
 
     public void OnShipSelectorOpened()
@@ -1288,12 +1292,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
             m_loadingScreen.SetActive(true);
             m_loadingText.text = "FINDING A GAME...";
             // #Critical we need at this point to attempt joining a Random Room. If it fails, we'll get notified in OnJoinRandomFailed() and we'll create one.
-            string sqlLobbyFilter = string.Format("C0 BETWEEN {0} AND {1} AND C1 = 'Arena00'", Mathf.Max(0, m_arenaRating - Balance.matchmakingGap), m_arenaRating + Balance.matchmakingGap);
-            OpJoinRandomRoomParams opJoinRandomRoomParams = new OpJoinRandomRoomParams();
-            opJoinRandomRoomParams.SqlLobbyFilter = sqlLobbyFilter;
-            if (loadBalancingClient == null)
-                loadBalancingClient = PhotonNetwork.NetworkingClient;
-            loadBalancingClient.OpJoinRandomRoom(opJoinRandomRoomParams);
+            string sqlLobbyFilter = string.Format("C0 BETWEEN {0} AND {1} AND C1 = '{2}'", Mathf.Max(0, m_arenaRating - Balance.matchmakingGap), m_arenaRating + Balance.matchmakingGap, selectedMap);
+            PhotonNetwork.JoinRandomRoom(null, 0, MatchmakingMode.FillRoom, sqlLobby, sqlLobbyFilter);
         }
     }
 
@@ -1306,11 +1306,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
             m_loadingText.text = "FINDING A GAME...";
             // #Critical we need at this point to attempt joining a Random Room. If it fails, we'll get notified in OnJoinRandomFailed() and we'll create one.
             string sqlLobbyFilter = string.Format("C1 = '{0}'", selectedMap);
-            OpJoinRandomRoomParams opJoinRandomRoomParams = new OpJoinRandomRoomParams();
-            opJoinRandomRoomParams.SqlLobbyFilter = sqlLobbyFilter;
-            if (loadBalancingClient == null)
-                loadBalancingClient = PhotonNetwork.NetworkingClient;
-            loadBalancingClient.OpJoinRandomRoom(opJoinRandomRoomParams);
+            PhotonNetwork.JoinRandomRoom(null, 0, MatchmakingMode.FillRoom, sqlLobby, sqlLobbyFilter);
         }
     }
 
@@ -1377,17 +1373,19 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
         Debug.Log("OnJoinRandomFailed() was called by PUN. No random room available, so we create one.\nCalling: PhotonNetwork.CreateRoom");
 
+        CreateRoom();
+    }
+
+    private void CreateRoom()
+    {
         isRoomCreating = true;
-        // #Critical: we failed to join a random room, maybe none exists or they are all full. No worries, we create a new room.
+
         RoomOptions roomOptions = new RoomOptions();
         roomOptions.MaxPlayers = (byte)Balance.maxPlayersPerRoom;
         roomOptions.EmptyRoomTtl = 1000;
         roomOptions.CustomRoomProperties = new ExitGames.Client.Photon.Hashtable { { ELO_PROP_KEY, m_arenaRating }, { MAP_PROP_KEY, selectedMap } };
         roomOptions.CustomRoomPropertiesForLobby = new string[] { ELO_PROP_KEY, MAP_PROP_KEY };
-        EnterRoomParams enterRoomParams = new EnterRoomParams();
-        enterRoomParams.RoomOptions = roomOptions;
-        enterRoomParams.Lobby = sqlLobby;
-        loadBalancingClient.OpCreateRoom(enterRoomParams);
+        PhotonNetwork.CreateRoom(null, roomOptions, sqlLobby);
     }
 
     public override void OnJoinedRoom()
@@ -1488,6 +1486,17 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         }
     }
 
+    public void SendHasEnteredTheGameMessage()
+    {
+        ChatMessage msg = new ChatMessage();
+        msg.nickname = "/online";
+        msg.msg = "";
+
+        string jsonStr = JsonUtility.ToJson(msg);
+
+        chatClient.PublishMessage("General", jsonStr);
+    }
+
     public void DebugReturn(DebugLevel level, string message)
     {
 
@@ -1497,6 +1506,9 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     {
         chatClient.Subscribe("General");
         chatClient.SetOnlineStatus(ChatUserStatus.Online);
+        if (m_justEntered)
+            SendHasEnteredTheGameMessage();
+        m_justEntered = false;
         chatLoadingIndicator.SetActive(false);
         chatMessageField.interactable = true;
     }
@@ -1520,7 +1532,14 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
             ChatMessage msgObj = JsonUtility.FromJson<ChatMessage>(messages[i].ToString());
 
-            chatMsgGO.GetComponent<TextMeshProUGUI>().text = "<color=\"green\">" + msgObj.nickname + ": </color>" + msgObj.msg;
+            if (msgObj.nickname == "/online")
+            {
+                chatMsgGO.GetComponent<TextMeshProUGUI>().text = "<color=\"green\">" + senders[i] + "</color> has entered the game";
+            }
+            else
+            {
+                chatMsgGO.GetComponent<TextMeshProUGUI>().text = "<color=\"green\">" + msgObj.nickname + ": </color>" + msgObj.msg;
+            }
 
             chatMessages.Add(chatMsgGO);
 

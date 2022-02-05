@@ -139,8 +139,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     private Transform barsHolder;
 
-    private Timer timer;
-    private Timer matchTimer;
+    public Timer timer;
+    public Timer matchTimer;
 
     private string m_name = "";
 
@@ -304,7 +304,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             if (PlayerUiPrefab != null)
             {
                 GameObject _uiGo = Instantiate(PlayerUiPrefab);
-                _uiGo.SendMessage("SetTarget", this, SendMessageOptions.RequireReceiver);
+                PlayerUI.Instance.SetTarget(this);
+                //_uiGo.SendMessage("SetTarget", this, SendMessageOptions.RequireReceiver);
             }
             else
             {
@@ -344,6 +345,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             {
                 m_AI_skillsCD.Add(0f);
             }
+
+            PlayerUI.Instance.AddPlayerStatsSlot(this, 0, 0);
         }
 
         m_initialized = true;
@@ -391,6 +394,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             GameObject _uiGo = Instantiate(this.PlayerUiPrefab);
             _uiGo.SendMessage("SetTarget", this, SendMessageOptions.RequireReceiver);
         }
+    }
+
+    public void RunMatchTimer()
+    {
+        if (LobbyTimer > 0f)
+            timer.Start(LobbyTimer);
+        matchTimer.Start(MatchTimer);
     }
 
     public void OnMissionStarted()
@@ -493,7 +503,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            bool masterClientChanged = false;
+            /*bool masterClientChanged = false;
 
             if (isMissionMode)
             {
@@ -504,7 +514,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
                 masterClientChanged = ArenaController.instance.TryPassMasterClient();
             }
 
-            if (!masterClientChanged)
+            if (!masterClientChanged)*/
             {
                 if (!isMissionMode)
                     Launcher.instance.OnFightLoss();
@@ -750,6 +760,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     void ExitFromRoom()
     {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            timer.Stop();
+            matchTimer.Stop();
+        }
+
         if (!isMissionMode)
         {
             ArenaController.instance.UnregisterPlayer(this);
@@ -1084,8 +1100,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         if (!photonView.IsMine)
         {
-            transform.position = Vector3.MoveTowards(transform.position, networkPos, Time.deltaTime * 100.0f);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, networkRot, Time.deltaTime * 180.0f);
+            transform.position = networkPos;
+            transform.rotation = networkRot;
             return;
         }
 

@@ -58,28 +58,28 @@ public class Bomb : MonoBehaviourPunCallbacks
     // Update is called once per frame
     void Update()
     {
-        if( photonView.IsMine )
+        if (photonView.IsMine)
         {
-            if( timeToDeath > 0f && timeToEnable <= 0f )
+            if (timeToDeath > 0f && timeToEnable <= 0f)
             {
                 timeToDeath -= Time.deltaTime;
 
-                if( timeToDeath <= 0f )
+                if (timeToDeath <= 0f)
                 {
                     Explode();
                 }
             }
 
-            if( timeToEnable > 0f )
+            if (timeToEnable > 0f)
             {
                 timeToEnable -= Time.deltaTime;
 
-                if( timeToEnable <= 0f )
+                if (timeToEnable <= 0f)
                 {
                     Activate();
                 }
             }
-            else if( !isActivated )
+            else if (!isActivated)
             {
                 Activate();
             }
@@ -93,7 +93,7 @@ public class Bomb : MonoBehaviourPunCallbacks
             Explode();
         }
     }
-    
+
     public void SetOwner(string ownerName, string ownerID)
     {
         photonView.RPC("SetOwner_RPC", RpcTarget.All, ownerName, ownerID);
@@ -114,20 +114,23 @@ public class Bomb : MonoBehaviourPunCallbacks
     [PunRPC]
     public void DestroyOnNetwork()
     {
-        if( explosionObject )
+        if (explosionObject)
         {
             explosionObject.transform.parent = null;
             explosionObject.SetActive(true);
             Destroy(explosionObject, 2f);
         }
 
-        foreach( var p in m_roomPlayers )
+        if (m_roomPlayers != null && m_roomPlayers.Count > 0)
         {
-            if (p.transform.Distance(transform) < explosionRadius)
+            foreach (var p in m_roomPlayers)
             {
-                bool isCrit = Random.value <= critChance;
+                if (p.transform.Distance(transform) < explosionRadius)
+                {
+                    bool isCrit = Random.value <= critChance;
 
-                p.GetDamage(Random.Range(damageMin, damageMax + 1), damageToShield, ignoreField, isCrit, critDamageModifier, ownerName);
+                    p.GetDamage(Random.Range(damageMin, damageMax + 1), damageToShield, ignoreField, isCrit, critDamageModifier, ownerName);
+                }
             }
         }
 
@@ -142,7 +145,7 @@ public class Bomb : MonoBehaviourPunCallbacks
     [PunRPC]
     public void ActivateOnNetwork()
     {
-        if( activationObject )
+        if (activationObject)
         {
             activationObject.SetActive(true);
         }

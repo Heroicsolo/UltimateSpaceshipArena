@@ -88,7 +88,7 @@ public class Pickup : MonoBehaviourPunCallbacks
         Deactivate();
         if (!isNexus)
             timeToRespawn = respawnTime;
-        if (captureEffect)
+        if (captureEffect && !captureEffect.isPlaying)
             captureEffect.Play();
     }
 
@@ -174,7 +174,7 @@ public class Pickup : MonoBehaviourPunCallbacks
             }
         }
 
-        foreach (var c in currCapturerNames)
+        foreach (var c in currCapturerNames.ToArray())
         {
             PlayerController pc = m_roomPlayers.Find(x => x.Name == c);
 

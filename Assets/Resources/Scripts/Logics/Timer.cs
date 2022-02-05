@@ -23,6 +23,7 @@ public class Timer : IOnEventCallback
 	#region Events
 
 	private Action OnFinished;
+	public Action OnUpdated;
 
 	#endregion
 
@@ -195,6 +196,9 @@ public class Timer : IOnEventCallback
 				var currTime = (float) eventContent[1];
 
 				m_currentTime = currTime;
+
+				OnUpdated?.Invoke();
+
 				break;
 		}
 	}

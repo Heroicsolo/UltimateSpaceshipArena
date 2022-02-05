@@ -1,4 +1,5 @@
 using Photon.Pun;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -172,6 +173,7 @@ public class PlayerUI : MonoBehaviour
 
     public void AddPlayerStatsSlot(PlayerController pc, int rating, int upgradesScore)
     {
+        if (m_battleStatsSlots.FindIndex(x => x.PlayerName == pc.Name) >= 0) return;
         GameObject slot = Instantiate(m_battleStatsItemPrefab, m_battleStatsItemsHolder);
         PlayerStatsSlot ps = slot.GetComponent<PlayerStatsSlot>();
         ps.SetData(pc, rating, upgradesScore);
@@ -369,10 +371,17 @@ public class PlayerUI : MonoBehaviour
 
         OnLobbyPlayerAdded(nickname, _enemy.ShipIcon, isAI);
         enemies.Add(_enemy);
-        GameObject miniMapEnemy = Instantiate(minimapEnemyPrefab, minimapPlayer.parent);
-        miniMapEnemy.transform.localPosition = new Vector3(_enemy.transform.position.x / mapSizeAmplifier, _enemy.transform.position.z / mapSizeAmplifier, 0f);
-        miniMapEnemy.transform.localEulerAngles = new Vector3(0f, 0f, -_enemy.transform.localEulerAngles.y);
-        enemiesIcons.Add(miniMapEnemy.transform);
+        try
+        {
+            GameObject miniMapEnemy = Instantiate(minimapEnemyPrefab, minimapPlayer.parent);
+            miniMapEnemy.transform.localPosition = new Vector3(_enemy.transform.position.x / mapSizeAmplifier, _enemy.transform.position.z / mapSizeAmplifier, 0f);
+            miniMapEnemy.transform.localEulerAngles = new Vector3(0f, 0f, -_enemy.transform.localEulerAngles.y);
+            enemiesIcons.Add(miniMapEnemy.transform);
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+        }
     }
 
     public void AddMissionBotToMiniMap(PlayerController _enemy)
@@ -431,11 +440,10 @@ public class PlayerUI : MonoBehaviour
             m_skillsButtons[i].SetData(target.Skills[i]);
         }
 
-        IsLobbyState = target.LobbyTimer > 0f;
-        lobbyScreen.SetActive(IsLobbyState);
-        matchTimerLabel.transform.parent.gameObject.SetActive(!IsLobbyState);
-
-        if (IsLobbyState) PlaySound(SoundType.GetReady, 20f);
+        IsLobbyState = true;
+        lobbyScreen.SetActive(true);
+        matchTimerLabel.transform.parent.gameObject.SetActive(false);
+        target.timer.OnUpdated += OnLobbyTimerUpdated;
 
         OnLobbyPlayerAdded(PhotonNetwork.NickName, target.ShipIcon, false);
 
@@ -452,9 +460,24 @@ public class PlayerUI : MonoBehaviour
         IsInitialized = true;
     }
 
+    void OnLobbyTimerUpdated()
+    {
+        IsLobbyState = target.LobbyTimer > 0f;
+
+        if (!IsLobbyState)
+        {
+            lobbyScreen.SetActive(false);
+            matchTimerLabel.transform.parent.gameObject.SetActive(true);
+
+            PlaySound(SoundType.GetReady, 20f);
+
+            target.timer.OnUpdated -= OnLobbyTimerUpdated;
+        }
+    }
+
     public void OnLobbyPlayerAdded(string nickname, Sprite shipIcon, bool isAI)
     {
-        if (!IsLobbyState) return;
+        if (!IsLobbyState || m_lobbyPlayers.FindIndex(x => x.Nickname == nickname) >= 0 || PhotonNetwork.CurrentRoom == null) return;
         GameObject playerSlot = Instantiate(lobbyPlayerSlotPrefab, lobbyPlayersHolder);
         LobbyPlayerSlot lps = playerSlot.GetComponent<LobbyPlayerSlot>();
         lps.SetData(nickname, shipIcon, isAI);
@@ -464,7 +487,7 @@ public class PlayerUI : MonoBehaviour
 
     public void OnLobbyPlayerDeleted(string nickname)
     {
-        if (!IsLobbyState) return;
+        if (!IsLobbyState || m_lobbyPlayers.FindIndex(x => x.Nickname == nickname) < 0 || PhotonNetwork.CurrentRoom == null) return;
         LobbyPlayerSlot lps = m_lobbyPlayers.Find(x => x.Nickname == nickname);
         m_lobbyPlayers.Remove(lps);
         Destroy(lps.gameObject);
@@ -615,6 +638,12 @@ public class PlayerUI : MonoBehaviour
 
     public void LeaveArena(bool changeRating = false)
     {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            target.timer.Stop();
+            target.matchTimer.Stop();
+        }
+
         if (!isMissionMode)
             ArenaController.instance.LeaveRoom();
         else
@@ -749,7 +778,7 @@ public class PlayerUI : MonoBehaviour
 
         for (int i = 0; i < enemies.Count; i++)
         {
-            if (enemies[i])
+            if (enemies[i] && !enemies[i].IsDied)
             {
                 Vector3 mapPos = isMissionMode ? missionController.GetMapPosition(enemies[i].transform.position) : enemies[i].transform.position;
 
