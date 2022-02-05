@@ -367,10 +367,12 @@ public class PlayerUI : MonoBehaviour
 
     public void AddEnemyToMiniMap(PlayerController _enemy, string nickname, bool isAI)
     {
+        OnLobbyPlayerAdded(nickname, _enemy.ShipIcon, isAI);
+
         if (enemies.Contains(_enemy)) return;
 
-        OnLobbyPlayerAdded(nickname, _enemy.ShipIcon, isAI);
         enemies.Add(_enemy);
+
         try
         {
             GameObject miniMapEnemy = Instantiate(minimapEnemyPrefab, minimapPlayer.parent);

@@ -281,7 +281,7 @@ public class ArenaController : MonoBehaviourPunCallbacks
 
         PlayerUI.Instance.OnLobbyPlayerDeleted(other.NickName);
 
-        if (m_roomPlayers.Count < Launcher.instance.Balance.maxPlayersPerRoom) AddOneBot();
+        AddOneBot();
 
         if (PhotonNetwork.IsMasterClient)
         {

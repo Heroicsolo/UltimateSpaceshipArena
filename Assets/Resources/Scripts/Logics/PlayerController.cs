@@ -314,7 +314,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         }
         else if (PlayerUI.Instance != null && !isMissionBot)
         {
-            PlayerUI.Instance.AddEnemyToMiniMap(this, m_name, IsAI);
+            //PlayerUI.Instance.AddEnemyToMiniMap(this, m_name, IsAI);
         }
         else if (PlayerUI.Instance != null)
         {
@@ -1050,7 +1050,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             timer.Update(Time.deltaTime);
             matchTimer.Update(Time.deltaTime);
 
-            if (MatchTimer <= 0f && PhotonNetwork.IsMasterClient && !PlayerUI.Instance.IsLobbyState && ((isMissionMode && missionStarted) || !isMissionMode))
+            if (MatchTimer <= 0f && PhotonNetwork.IsMasterClient && matchTimer.IsRunning && !PlayerUI.Instance.IsLobbyState && ((isMissionMode && missionStarted) || !isMissionMode))
             {
                 matchTimer.Stop();
                 EndMatch();
