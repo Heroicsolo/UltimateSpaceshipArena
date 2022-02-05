@@ -175,6 +175,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private MissionController missionController;
     private ArenaController arenaController;
     private bool isMissionMode = false;
+    private bool isNameGot = false;
     private List<PlayerController> m_roomPlayers;
 
     private AudioSource audioSource;
@@ -282,7 +283,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
             NameLabel.text = m_name;
 
-            photonView.RPC("OnNameSet_RPC", RpcTarget.All, m_name);
+            SendNameData();
         }
 
         cameraTransform.localEulerAngles = new Vector3(90f, 0f, 0f);
@@ -394,22 +395,44 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
+    public void SendNameData()
+    {
+        photonView.RPC("OnNameSet_RPC", RpcTarget.All, m_name);
+    }
+
+    private IEnumerator RegisterPlayerCoroutine()
+    {
+        while (!isNameGot)
+        {
+            if (PlayerUI.Instance != null)
+            {
+                if (!isMissionMode)
+                    ArenaController.instance.RegisterPlayer(this);
+                else
+                    MissionController.instance.RegisterPlayer(this);
+
+                if (IsAI)
+                {
+                    PlayerUI.Instance.AddPlayerStatsSlot(this, 0, 0);
+                }
+
+                isNameGot = true;
+            }
+
+            yield return null;
+        }
+    }
+
     [PunRPC]
     void OnNameSet_RPC(string name)
     {
+        if (isNameGot) return;
+
         m_name = name;
 
         NameLabel.text = m_name;
 
-        if (!isMissionMode)
-            ArenaController.instance.RegisterPlayer(this);
-        else
-            MissionController.instance.RegisterPlayer(this);
-
-        if (IsAI)
-        {
-            PlayerUI.Instance.AddPlayerStatsSlot(this, 0, 0);
-        }
+        StartCoroutine(RegisterPlayerCoroutine());
     }
 
     public void RunMatchTimer()

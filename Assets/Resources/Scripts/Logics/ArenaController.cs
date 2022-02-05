@@ -248,6 +248,14 @@ public class ArenaController : MonoBehaviourPunCallbacks
         }
     }
 
+    void SendPlayersNamesData()
+    {
+        foreach (var p in m_roomPlayers)
+        {
+            p.SendNameData();
+        }
+    }
+
     public override void OnMasterClientSwitched(Player newMasterClient)
     {
         if (newMasterClient == this.photonView.Controller)
@@ -261,6 +269,8 @@ public class ArenaController : MonoBehaviourPunCallbacks
         Debug.LogFormat("OnPlayerEnteredRoom() {0}", other.NickName); // not seen if you're the player connecting
 
         PlayerUI.Instance.DoAnnounce(other.NickName + " entered to arena");
+
+        SendPlayersNamesData();
 
         if (m_roomPlayers.Count > Launcher.instance.Balance.maxPlayersPerRoom - 1) RemoveOneBot();
 

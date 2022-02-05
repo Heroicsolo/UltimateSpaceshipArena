@@ -257,6 +257,8 @@ public class MissionController : MonoBehaviourPunCallbacks
 
         PlayerUI.Instance.DoAnnounce(other.NickName + " entered to arena");
 
+        SendPlayersNamesData();
+
         if (PhotonNetwork.IsMasterClient)
         {
             Debug.LogFormat("OnPlayerEnteredRoom IsMasterClient {0}", PhotonNetwork.IsMasterClient); // called before OnPlayerLeftRoom
@@ -294,6 +296,14 @@ public class MissionController : MonoBehaviourPunCallbacks
         PlayerUI.Instance.OnRoomLeft();
         PhotonNetwork.SendAllOutgoingCommands();
         PhotonNetwork.LeaveRoom();
+    }
+
+    void SendPlayersNamesData()
+    {
+        foreach (var p in m_roomPlayers)
+        {
+            p.SendNameData();
+        }
     }
 
     public void AddRegisteredPlayersToLobbyUI()
