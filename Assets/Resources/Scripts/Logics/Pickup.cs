@@ -185,6 +185,20 @@ public class Pickup : MonoBehaviourPunCallbacks
         }
     }
 
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(currCapturingTime);
+            stream.SendNext(capturersCount);
+        }
+        else
+        {
+            this.currCapturingTime = (float)stream.ReceiveNext();
+            this.capturersCount = (int)stream.ReceiveNext();
+        }
+    }
+
     private void Update()
     {
         if (capturingBar)
@@ -220,7 +234,7 @@ public class Pickup : MonoBehaviourPunCallbacks
                 if (currCapturingTime >= m_balance.nexusCaptureTime && capturersCount == 1)
                 {
                     PlayerController.LocalPlayer.OnNexusUsed(currCapturerNames[0], transform.position);
-                    if (captureEffect) captureEffect.Play();
+                    if (captureEffect && !captureEffect.isPlaying) captureEffect.Play();
                     Deactivate();
                     return;
                 }

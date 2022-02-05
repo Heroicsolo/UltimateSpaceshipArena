@@ -216,6 +216,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     public float LobbyTimer => timer.GetTime();
     public float MatchTimer => matchTimer.GetTime();
 
+    public int UpgradesScore => m_upgradesScore;
+
 #if UNITY_5_4_OR_NEWER
     void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode loadingMode)
     {
@@ -406,6 +408,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         {
             if (PlayerUI.Instance != null)
             {
+                if (photonView.IsMine && !IsAI)
+                {
+                    PlayerUI.Instance.OnLobbyPlayerAdded(m_name, ShipIcon, false);
+                    PlayerUI.Instance.AddPlayerStatsSlot(this, Launcher.instance.CurrentRating, m_upgradesScore);
+                }
+
                 if (!isMissionMode)
                     ArenaController.instance.RegisterPlayer(this);
                 else
@@ -1145,8 +1153,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         if (!photonView.IsMine)
         {
-            transform.position = networkPos;
-            transform.rotation = networkRot;
+            if (!IsDied)
+            {
+                transform.position = Vector3.MoveTowards(transform.position, networkPos, 100f * Time.deltaTime);
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, networkRot, 180f * Time.deltaTime);
+            }
+            else
+            {
+                transform.position = networkPos;
+                transform.rotation = networkRot;
+            }
             return;
         }
 

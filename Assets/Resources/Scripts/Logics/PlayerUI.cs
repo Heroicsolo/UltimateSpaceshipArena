@@ -448,6 +448,7 @@ public class PlayerUI : MonoBehaviour
             PlaySound(SoundType.GetReady, 20f);
 
         OnLobbyPlayerAdded(PhotonNetwork.NickName, target.ShipIcon, false);
+        AddPlayerStatsSlot(target, Launcher.instance.CurrentRating, target.UpgradesScore);
 
         if (isMissionMode)
         {
