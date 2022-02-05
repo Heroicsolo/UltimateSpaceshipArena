@@ -22,7 +22,7 @@ public class Timer : IOnEventCallback
 
 	#region Events
 
-	private Action OnFinished;
+	public Action OnFinished;
 	public Action OnUpdated;
 
 	#endregion

@@ -673,6 +673,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         m_isDied = true;
 
+        Pickup currPickup = m_currentAITarget != null ? m_currentAITarget.GetComponent<Pickup>() : null;
+
+        if (currPickup && currPickup.isNexus) currPickup.OnAbandonedByBot();
+
         StopAllCoroutines();
 
         EndShooting();
@@ -1271,7 +1275,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             movementDir.y = 0f;
         }
 
-        if (m_currentAIEnemy != null && m_currentAIEnemy.transform.Distance(transform) < 300f && m_currentAIEnemy.transform.Distance(transform) > 10f && !InStealth && CheckLineOfSight(m_currentAITarget))
+        if (m_currentAIEnemy != null && m_currentAIEnemy.transform.Distance(transform) < 300f && !InStealth && CheckLineOfSight(m_currentAITarget))
         {
             StartShooting();
         }
@@ -1283,11 +1287,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     bool CheckLineOfSight(Transform target)
     {
-        RaycastHit[] hits = new RaycastHit[1];
+        RaycastHit[] hits = new RaycastHit[2];
 
         Physics.RaycastNonAlloc(transform.position, target.position - transform.position, hits, 500f, 1 << 6);
 
-        return hits[0].transform == target;
+        if (hits[0].transform == transform)
+            return hits[1].transform == target || hits[1].transform == null;
+        else
+            return hits[0].transform == target || hits[0].transform == null;
     }
 
     void ProccessMovement_AI()
@@ -1295,14 +1302,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         if (m_currAITargetChangeDelay > 0f)
             m_currAITargetChangeDelay -= Time.deltaTime;
 
-        if (m_targetIsPlayer && (m_currentAIEnemy == null || m_currentAIEnemy != null && (m_currentAIEnemy.DurabilityPercent <= 0f || m_currentAIEnemy.InStealth || (!CheckLineOfSight(m_currentAITarget) && m_currentAITarget.Distance(transform) > 300f))))
+        if (m_targetIsPlayer && (m_currentAIEnemy == null || (m_currentAIEnemy != null && (m_currentAIEnemy.DurabilityPercent <= 0f || m_currentAIEnemy.InStealth) || (!CheckLineOfSight(m_currentAITarget) && m_currentAITarget.Distance(transform) > 300f))))
         {
             m_currentAITarget = null;
             m_currentAIEnemy = null;
             m_targetIsPlayer = false;
         }
 
-        if (m_currentAITarget == null || m_currentAITarget.Distance(transform) > 500f || m_currAITargetChangeDelay <= 0f || (m_currentAIEnemy != null && DurabilityPercent < 0.4f))
+        if (m_currentAITarget == null || m_currentAITarget.Distance(transform) > 700f || m_currAITargetChangeDelay <= 0f || (m_currentAIEnemy != null && DurabilityPercent < AIDurabilityPercentToRetreat))
         {
             List<PlayerController> playersList = new List<PlayerController>(m_roomPlayers);
 
@@ -1358,7 +1365,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
                     if (nexusInPrio)
                     {
                         m_currentAITarget = nexus.transform;
-                        m_currentAIEnemy = null;
+                        //m_currentAIEnemy = null;
                         m_targetIsPlayer = false;
                         nexus.OnTargetedByBot();
                         m_targetIsNexus = true;
@@ -1416,9 +1423,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             float minDist = 5f;
 
             if (m_targetIsNexus) minDist = 30f;
+
             if (m_targetIsPlayer)
             {
-                if (CheckLineOfSight(m_currentAITarget))
+                if (m_currentAITarget == null || CheckLineOfSight(m_currentAITarget))
                     minDist = 90f;
                 else
                     minDist = 30f;
@@ -1648,6 +1656,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
                 m_speedBonusLength = pickup.speedBonusLength;
                 isNitroActive = true;
                 pickup.OnPickupUsed();
+            }
+
+            if (IsAI)
+            {
+                m_currAITargetChangeDelay = 0f;
             }
         }
     }

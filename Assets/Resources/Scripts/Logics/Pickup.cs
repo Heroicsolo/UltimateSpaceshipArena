@@ -88,7 +88,7 @@ public class Pickup : MonoBehaviourPunCallbacks
         Deactivate();
         if (!isNexus)
             timeToRespawn = respawnTime;
-        if (captureEffect && !captureEffect.isPlaying)
+        if (captureEffect && !captureEffect.isPlaying && effectsHolder.activeSelf)
             captureEffect.Play();
     }
 

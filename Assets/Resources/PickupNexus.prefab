@@ -23994,6 +23994,14 @@ PrefabInstance:
       propertyPath: playOnAwake
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 19868708, guid: 2ef436b6c6313494daf190cd68ebf636, type: 3}
+      propertyPath: InitialModule.startSizeY.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 19868708, guid: 2ef436b6c6313494daf190cd68ebf636, type: 3}
+      propertyPath: InitialModule.startSizeZ.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 19901468, guid: 2ef436b6c6313494daf190cd68ebf636, type: 3}
       propertyPath: m_Materials.Array.size
       value: 1

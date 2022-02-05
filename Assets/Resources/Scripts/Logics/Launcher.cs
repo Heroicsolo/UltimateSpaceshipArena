@@ -161,6 +161,10 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     private bool m_DB_loaded = false;
     private bool m_credentialsSaved = false;
     private bool m_newProfile = false;
+    private bool m_tutorialDone = false;
+    private bool m_arenaTutorialDone = false;
+    private bool m_missionTutorialDone = false;
+    private int m_tutorialStep = 0;
     private bool m_loadedBalance = false;
 
     private bool m_nameChanged = false;
@@ -207,6 +211,9 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     public int Currency { get { return m_currency; } set { m_currency = value; currencyLabel.text = m_currency.ToString(); } }
 
     public bool IsSoundOn { get { return isSoundOn; } set { isSoundOn = value; PlayerPrefs.SetInt("soundOn", isSoundOn ? 1 : 0); } }
+
+    public bool IsArenaTutorialDone => m_arenaTutorialDone;
+    public bool IsMissionTutorialDone => m_missionTutorialDone;
 
     public const string ELO_PROP_KEY = "C0";
     public const string MAP_PROP_KEY = "C1";
@@ -286,6 +293,18 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     public void PlayButtonSound()
     {
         audioSource.PlayOneShot(buttonSound);
+    }
+
+    public void OnArenaTutorialDone()
+    {
+        m_arenaTutorialDone = true;
+        SaveProfile();
+    }
+
+    public void OnMissionTutorialDone()
+    {
+        m_missionTutorialDone = true;
+        SaveProfile();
     }
 
     private void InitFirebase()
@@ -558,6 +577,18 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         chatClient.ChatRegion = "EU";
         chatClient.Connect(PhotonNetwork.PhotonServerSettings.AppSettings.AppIdChat, PhotonNetwork.PhotonServerSettings.AppSettings.AppVersion, new Photon.Chat.AuthenticationValues(UserName));
 
+        if (m_tutorialDone)
+        {
+            OpenDailyRewards();
+        }
+        else
+        {
+            TutorialController.instance.ShowFirstTutorial(m_tutorialStep, OpenDailyRewards);
+        }
+    }
+
+    private void OpenDailyRewards()
+    {
         dailyRewardsScreen.SetActive(true);
         DailyRewards.instance.onClaimPrize += OnClaimPrizeDailyRewards;
     }
@@ -830,11 +861,26 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         userTable.Child("lastDailyRewardTime").SetValueAsync(m_lastDailyRewardTime);
         userTable.Child("lastDailyReward").SetValueAsync(m_lastDailyReward);
 
+        userTable.Child("tutorialDone").SetValueAsync(m_tutorialDone);
+        userTable.Child("arenaTutorialDone").SetValueAsync(m_arenaTutorialDone);
+        userTable.Child("missionTutorialDone").SetValueAsync(m_missionTutorialDone);
+
         CheckUpgradesInfo();
 
         string saveData = JsonUtility.ToJson(m_upgradesInfo);
 
         userTable.Child("UpgradesInfo").SetRawJsonValueAsync(saveData);
+    }
+
+    public void SaveTutorialStep()
+    {
+        mDatabaseRef.Child(m_userId).Child("tutorialStep").SetValueAsync(TutorialController.instance.TutorialStep);
+    }
+
+    public void OnTutorialDone()
+    {
+        m_tutorialDone = true;
+        SaveProfile();
     }
 
     public void LoadProfile(bool defaultProfile = false)
@@ -938,6 +984,11 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         m_lastDailyRewardDebugTime = notEmptyProfile && snapshot.HasChild("lastDailyRewardDebugTime") ? int.Parse(snapshot.Child("lastDailyRewardDebugTime").Value.ToString()) : 0;
         m_lastDailyRewardTime = notEmptyProfile && snapshot.HasChild("lastDailyRewardTime") ? snapshot.Child("lastDailyRewardTime").Value.ToString() : "";
         m_lastDailyReward = notEmptyProfile && snapshot.HasChild("lastDailyReward") ? int.Parse(snapshot.Child("lastDailyReward").Value.ToString()) : 0;
+
+        m_tutorialDone = notEmptyProfile && snapshot.HasChild("tutorialDone") ? bool.Parse(snapshot.Child("tutorialDone").Value.ToString()) : false;
+        m_arenaTutorialDone = notEmptyProfile && snapshot.HasChild("arenaTutorialDone") ? bool.Parse(snapshot.Child("arenaTutorialDone").Value.ToString()) : false;
+        m_missionTutorialDone = notEmptyProfile && snapshot.HasChild("missionTutorialDone") ? bool.Parse(snapshot.Child("missionTutorialDone").Value.ToString()) : false;
+        m_tutorialStep = notEmptyProfile && snapshot.HasChild("tutorialStep") ? int.Parse(snapshot.Child("tutorialStep").Value.ToString()) : 0;
 
         string restoredData = "";
 

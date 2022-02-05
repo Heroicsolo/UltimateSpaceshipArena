@@ -445,7 +445,16 @@ public class PlayerUI : MonoBehaviour
         IsLobbyState = true;
         lobbyScreen.SetActive(true);
         matchTimerLabel.transform.parent.gameObject.SetActive(false);
-        target.timer.OnUpdated += OnLobbyTimerUpdated;
+
+        if (target.LobbyTimer <= 0f)
+            target.timer.OnUpdated += OnLobbyTimerUpdated;
+        else
+            target.timer.OnFinished += OnLobbyTimerEnded;
+
+        target.matchTimer.OnUpdated += OnMatchTimerUpdated;
+
+        if (PhotonNetwork.IsMasterClient)
+            PlaySound(SoundType.GetReady, 20f);
 
         OnLobbyPlayerAdded(PhotonNetwork.NickName, target.ShipIcon, false);
 
@@ -462,19 +471,66 @@ public class PlayerUI : MonoBehaviour
         IsInitialized = true;
     }
 
+    void OnMatchTimerUpdated()
+    {
+        if (target.MatchTimer < Launcher.instance.Balance.fightLength)
+        {
+            OnLobbyTimerEnded();
+        }
+    }
+
+    void OnLobbyTimerEnded()
+    {
+        IsLobbyState = false;
+
+        lobbyScreen.SetActive(false);
+        matchTimerLabel.transform.parent.gameObject.SetActive(true);
+
+        target.SendRatingAndUpgrades();
+
+        PlaySound(SoundType.LobbyTimerEnd);
+
+        target.timer.OnUpdated -= OnLobbyTimerUpdated;
+        target.timer.OnFinished -= OnLobbyTimerEnded;
+        target.matchTimer.OnUpdated -= OnMatchTimerUpdated;
+
+        if (isMissionMode)
+        {
+            target.OnMissionStarted();
+
+            if (!Launcher.instance.IsMissionTutorialDone)
+                TutorialController.instance.ShowCustomTutorialUnit("Capture the Nexus on the right side of this area and kill all drones on the way!", minimapNexus.GetComponent<RectTransform>(), OnMissionTutorialDone);
+        }
+        else
+        {
+            if (!Launcher.instance.IsArenaTutorialDone)
+                TutorialController.instance.ShowCustomTutorialUnit("Move to the Nexus on Arena center and try to capture it!", minimapNexus.GetComponent<RectTransform>(), OnArenaTutorialDone);
+        }
+
+        if (PhotonNetwork.IsMasterClient && !isMissionMode)
+        {
+            ArenaController.instance.OnBattleStarted();
+        }
+    }
+
     void OnLobbyTimerUpdated()
     {
         IsLobbyState = target.LobbyTimer > 0f;
 
         if (!IsLobbyState)
         {
-            lobbyScreen.SetActive(false);
-            matchTimerLabel.transform.parent.gameObject.SetActive(true);
-
-            PlaySound(SoundType.GetReady, 20f);
-
-            target.timer.OnUpdated -= OnLobbyTimerUpdated;
+            OnLobbyTimerEnded();
         }
+    }
+
+    void OnArenaTutorialDone()
+    {
+        Launcher.instance.OnArenaTutorialDone();
+    }
+
+    void OnMissionTutorialDone()
+    {
+        Launcher.instance.OnMissionTutorialDone();
     }
 
     public void OnLobbyPlayerAdded(string nickname, Sprite shipIcon, bool isAI)
@@ -715,26 +771,7 @@ public class PlayerUI : MonoBehaviour
 
         if (IsLobbyState)
         {
-            if (target.LobbyTimer <= 0f)
-            {
-                IsLobbyState = false;
-                lobbyScreen.SetActive(false);
-                matchTimerLabel.transform.parent.gameObject.SetActive(true);
-                PlaySound(SoundType.LobbyTimerEnd);
-
-                target.SendRatingAndUpgrades();
-
-                if (isMissionMode)
-                {
-                    target.OnMissionStarted();
-                }
-
-                if (PhotonNetwork.IsMasterClient && !isMissionMode)
-                {
-                    ArenaController.instance.OnBattleStarted();
-                }
-            }
-            else
+            if (target.LobbyTimer > 0f)
             {
                 int deltaSeconds = Mathf.CeilToInt(target.LobbyTimer);
                 int minutes = Mathf.FloorToInt(deltaSeconds / 60);
