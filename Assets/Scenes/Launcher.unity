@@ -13229,7 +13229,7 @@ MonoBehaviour:
   tutorialMessageLabel: {fileID: 1622245528}
   highlightFrame: {fileID: 1301790194}
   arrow: {fileID: 1626680140}
-  arrowOffset: 30
+  arrowOffset: 50
   firstTutorial:
   - message: Welcome to Hangar, hero! Here you can change your name if you want
     target: {fileID: 1228857327}

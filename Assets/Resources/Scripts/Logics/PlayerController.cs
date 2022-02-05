@@ -764,6 +764,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     void ExitFromRoom()
     {
+        if (PhotonNetwork.NetworkClientState == Photon.Realtime.ClientState.Leaving) return;
+
         if (PhotonNetwork.IsMasterClient)
         {
             timer.Stop();

@@ -356,13 +356,7 @@ public class PlayerUI : MonoBehaviour
 
     public void StartMission()
     {
-        IsLobbyState = false;
-        lobbyScreen.SetActive(false);
-        matchTimerLabel.transform.parent.gameObject.SetActive(true);
-        PlaySound(SoundType.LobbyTimerEnd);
-
-        target.SendRatingAndUpgrades();
-        target.OnMissionStarted();
+        OnLobbyTimerEnded();
     }
 
     public void AddEnemyToMiniMap(PlayerController _enemy, string nickname, bool isAI)
@@ -696,6 +690,8 @@ public class PlayerUI : MonoBehaviour
 
     public void LeaveArena(bool changeRating = false)
     {
+        if (PhotonNetwork.NetworkClientState == Photon.Realtime.ClientState.Leaving) return;
+
         if (PhotonNetwork.IsMasterClient)
         {
             target.timer.Stop();
