@@ -176,10 +176,10 @@ public class MissionController : MonoBehaviourPunCallbacks
                     m_roomPickups.Add(go.GetComponent<Pickup>());
                 }
             }
-        }
 
-        GameObject nexusGO = PhotonNetwork.InstantiateRoomObject("PickupNexus", nexusPosition.position, Quaternion.identity);
-        m_roomPickups.Add(nexusGO.GetComponent<Pickup>());
+            GameObject nexusGO = PhotonNetwork.InstantiateRoomObject("PickupNexus", nexusPosition.position, Quaternion.identity);
+            m_roomPickups.Add(nexusGO.GetComponent<Pickup>());
+        }
     }
 
     void SpawnBots()

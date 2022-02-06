@@ -74,7 +74,14 @@ namespace NiobiumStudios
             // We need to know if he can claim another reward or not
             if (!string.IsNullOrEmpty(lastClaimedTimeStr))
             {
-                lastRewardTime = DateTime.ParseExact(lastClaimedTimeStr, "yy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                try
+                {
+                    lastRewardTime = DateTime.ParseExact(lastClaimedTimeStr, "yy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                }
+                catch
+                {
+                    lastRewardTime = DateTime.ParseExact(lastClaimedTimeStr, FMT, CultureInfo.InvariantCulture);
+                }
 
                 // if Debug time was added, we use it to check the difference
                 DateTime advancedTime = now.AddHours(debugTime.TotalHours);
