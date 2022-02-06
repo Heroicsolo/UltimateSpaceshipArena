@@ -133,6 +133,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     private Vector3 networkPos;
     private Quaternion networkRot;
+    //Lag compensation
+    private float currentTime = 0;
+    private double currentPacketTime = 0;
+    private double lastPacketTime = 0;
+    private Vector3 positionAtLastPacket = Vector3.zero;
+    private Quaternion rotationAtLastPacket = Quaternion.identity;
     private Vector3 targetCameraPos;
 
     private Material initMaterial;
@@ -608,9 +614,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         {
             HPBar.transform.parent.gameObject.SetActive(false);
             ShieldBar.transform.parent.gameObject.SetActive(false);
+            PlayerUI.Instance.OnSpawn();
         }
-
-        PlayerUI.Instance.OnSpawn();
     }
 
     public void StartShooting()
@@ -1150,8 +1155,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         {
             if (!IsDied)
             {
-                transform.position = Vector3.MoveTowards(transform.position, networkPos, 100f * Time.deltaTime);
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, networkRot, 180f * Time.deltaTime);
+                //Lag compensation
+                double timeToReachGoal = currentPacketTime - lastPacketTime;
+                currentTime += Time.deltaTime;
+
+                //Update remote player
+                transform.position = Vector3.Lerp(positionAtLastPacket, networkPos, (float)(currentTime / timeToReachGoal));
+                transform.rotation = Quaternion.Lerp(rotationAtLastPacket, networkRot, (float)(currentTime / timeToReachGoal));
             }
             else
             {
@@ -1617,6 +1627,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             //this.isFiring = (bool)stream.ReceiveNext();
             networkPos = (Vector3)stream.ReceiveNext();
             networkRot = (Quaternion)stream.ReceiveNext();
+
+            //Lag compensation
+            currentTime = 0.0f;
+            lastPacketTime = currentPacketTime;
+            currentPacketTime = info.SentServerTime;
+            positionAtLastPacket = transform.position;
+            rotationAtLastPacket = transform.rotation;
 
             this.m_durability = (float)stream.ReceiveNext();
             this.m_forceField = (float)stream.ReceiveNext();
