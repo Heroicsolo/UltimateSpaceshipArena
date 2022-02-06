@@ -102,7 +102,7 @@ public class Timer : IOnEventCallback
 	/// <param name="delta">Time.deltaTime</param>
 	public void Update(float delta)
 	{
-		if (!m_started) return;
+		if (!m_started || !PhotonNetwork.InRoom) return;
 
 		m_currentTime -= delta;
 
@@ -225,6 +225,8 @@ public class Timer : IOnEventCallback
 	/// <param name="param">Key is needed</param>
 	private void SendEvent(byte eventCode, object[] param)
 	{
+		if (!PhotonNetwork.InRoom) return;
+
 		foreach (var player in PhotonNetwork.PlayerList)
 		{
 			PhotonNetwork.RaiseEvent(eventCode, param,

@@ -303,28 +303,33 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         if (photonView.IsMine && !IsAI)
         {
-            if (PhotonNetwork.IsMasterClient)
+            //TODO: Uncomment when cooperative missions will be fixed
+            /*if (PhotonNetwork.IsMasterClient)
                 timer.Start(isMissionMode ? 30f : m_balance.lobbyLength);
 
             if (PhotonNetwork.IsMasterClient && !isMissionMode)
+                matchTimer.Start(m_balance.lobbyLength + m_balance.fightLength);*/
+            ////TODO
+
+            //TODO: Remove this when cooperative missions will be fixed
+            if (PhotonNetwork.IsMasterClient && !isMissionMode)
+                timer.Start(m_balance.lobbyLength);
+
+            if (PhotonNetwork.IsMasterClient && !isMissionMode)
                 matchTimer.Start(m_balance.lobbyLength + m_balance.fightLength);
+            ////TODO
 
             if (PlayerUiPrefab != null)
             {
                 GameObject _uiGo = Instantiate(PlayerUiPrefab);
                 PlayerUI.Instance.SetTarget(this);
-                //_uiGo.SendMessage("SetTarget", this, SendMessageOptions.RequireReceiver);
             }
             else
             {
                 Debug.LogWarning("<Color=Red><a>Missing</a></Color> PlayerUiPrefab reference on player Prefab.", this);
             }
         }
-        else if (PlayerUI.Instance != null && !isMissionBot)
-        {
-            //PlayerUI.Instance.AddEnemyToMiniMap(this, m_name, IsAI);
-        }
-        else if (PlayerUI.Instance != null)
+        else if (PlayerUI.Instance != null && isMissionBot)
         {
             PlayerUI.Instance.AddMissionBotToMiniMap(this);
         }
@@ -353,11 +358,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         m_initialized = true;
 
         StartCoroutine(ShootingCoroutine());
-
-        //#if UNITY_5_4_OR_NEWER
-        // Unity 5.4 has a new scene management. register a method to call CalledOnLevelWasLoaded.
-        //UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneLoaded;
-        //#endif
     }
 
 #if !UNITY_5_4_OR_NEWER
@@ -370,13 +370,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     void CalledOnLevelWasLoaded(int level)
     {
-        // check if we are outside the Arena and if it's the case, spawn around the center of the arena in a safe zone
-        //if (!Physics.Raycast(transform.position, -Vector3.up, 5f))
-        //{
-        //transform.position = ArenaController.instance.RandomSpawnPoint;
-        //initPos = transform.position;
-        //}
-
         ReconstructUI();
     }
 
@@ -406,7 +399,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     {
         while (!isNameGot)
         {
-            if (PlayerUI.Instance != null)
+            if (PlayerUI.Instance != null && m_initialized)
             {
                 if (photonView.IsMine && !IsAI)
                 {
@@ -719,6 +712,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         if (m_isDied) return;
 
         m_isDied = true;
+
+        m_speed = 0f;
 
         Pickup currPickup = m_currentAITarget != null ? m_currentAITarget.GetComponent<Pickup>() : null;
 
@@ -1248,6 +1243,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
                 movementDir = Vector3.zero;
 #endif
 
+        if (m_isDied) return;
+
         if (IsAI && PhotonNetwork.IsMasterClient && !PlayerUI.Instance.IsLobbyState)
         {
             ProccessMovement_AI();
@@ -1262,7 +1259,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         m_currRoll -= transform.InverseTransformDirection(movementDir).x * m_rollForce;
 
-        if (m_durability <= 0 && !m_isWon)
+        if (m_durability <= 0 && !m_isWon && !m_isLoss)
         {
             Die();
         }

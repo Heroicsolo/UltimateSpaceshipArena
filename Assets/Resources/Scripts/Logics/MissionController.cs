@@ -57,9 +57,12 @@ public class MissionController : MonoBehaviourPunCallbacks
     [PunRPC]
     public void FreeSpawnPointResponse_RPC(int spawnPointIdx)
     {
-        m_availableSpawnPoints.Add(spawnPoints[spawnPointIdx]);
+        if (!PhotonNetwork.IsMasterClient && PlayerController.LocalPlayer == null)
+        {
+            m_availableSpawnPoints.Add(spawnPoints[spawnPointIdx]);
 
-        SpawnPlayer();
+            SpawnPlayer();
+        }
     }
 
     [PunRPC]
@@ -111,6 +114,11 @@ public class MissionController : MonoBehaviourPunCallbacks
             if (!m_missionBots.Contains(player))
             {
                 m_missionBots.Add(player);
+
+                if (PlayerUI.Instance != null)
+                {
+                    PlayerUI.Instance.AddEnemyToMiniMap(player, player.Name, true);
+                }
             }
         }
         else
@@ -118,6 +126,11 @@ public class MissionController : MonoBehaviourPunCallbacks
             if (!m_roomPlayers.Contains(player))
             {
                 m_roomPlayers.Add(player);
+
+                if (PlayerUI.Instance != null)
+                {
+                    PlayerUI.Instance.OnLobbyPlayerAdded(player.Name, player.ShipIcon, false);
+                }
 
                 ScaleBots();
             }
@@ -211,7 +224,7 @@ public class MissionController : MonoBehaviourPunCallbacks
     {
         instance = this;
 
-        photonView.ViewID = 1;
+        //photonView.ViewID = 1;
 
         if (PlayerController.LocalPlayerInstance == null)
         {
@@ -233,6 +246,16 @@ public class MissionController : MonoBehaviourPunCallbacks
         }
 
         Launcher.instance.OnArenaLoaded();
+    }
+
+    public override void OnMasterClientSwitched(Player newMasterClient)
+    {
+        if (newMasterClient == this.photonView.Controller)
+        {
+            PlayerController.LocalPlayer.RunMatchTimer();
+        }
+
+        PlayerUI.Instance.OnMasterClientSwitched(newMasterClient == this.photonView.Controller);
     }
 
     void Update()
@@ -288,6 +311,7 @@ public class MissionController : MonoBehaviourPunCallbacks
 
     public override void OnLeftRoom()
     {
+        PhotonNetwork.IsMessageQueueRunning = false;
         SceneManager.LoadScene(0);
     }
 

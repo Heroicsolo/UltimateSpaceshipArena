@@ -173,7 +173,7 @@ public class PlayerUI : MonoBehaviour
 
     public void AddPlayerStatsSlot(PlayerController pc, int rating, int upgradesScore)
     {
-        if (m_battleStatsSlots.FindIndex(x => x.PlayerName == pc.Name) >= 0) return;
+        if (isMissionMode || m_battleStatsSlots.FindIndex(x => x.PlayerName == pc.Name) >= 0) return;
         GameObject slot = Instantiate(m_battleStatsItemPrefab, m_battleStatsItemsHolder);
         PlayerStatsSlot ps = slot.GetComponent<PlayerStatsSlot>();
         ps.SetData(pc, rating, upgradesScore);
@@ -361,7 +361,8 @@ public class PlayerUI : MonoBehaviour
 
     public void AddEnemyToMiniMap(PlayerController _enemy, string nickname, bool isAI)
     {
-        OnLobbyPlayerAdded(nickname, _enemy.ShipIcon, isAI);
+        if (!isMissionMode || (isMissionMode && !isAI))
+            OnLobbyPlayerAdded(nickname, _enemy.ShipIcon, isAI);
 
         if (enemies.Contains(_enemy)) return;
 
@@ -416,8 +417,17 @@ public class PlayerUI : MonoBehaviour
         {
             missionController = MissionController.instance;
             isMissionMode = true;
-            lobbyMissionButtons.SetActive(true);
-            lobbyArenaButtons.SetActive(false);
+
+            if (PhotonNetwork.IsMasterClient)
+            {
+                lobbyMissionButtons.SetActive(true);
+                lobbyArenaButtons.SetActive(false);
+            }
+            else
+            {
+                lobbyMissionButtons.SetActive(false);
+                lobbyArenaButtons.SetActive(true);
+            }
 
             mapSizeAmplifier = Mathf.Max(missionController.MapWidth, missionController.MapHeight) * 5f / 1000f;
 
@@ -436,7 +446,27 @@ public class PlayerUI : MonoBehaviour
             m_skillsButtons[i].SetData(target.Skills[i]);
         }
 
-        IsLobbyState = true;
+        //TODO: Remove this when cooperative missions will be fixed
+        IsLobbyState = !isMissionMode;
+
+        if (!isMissionMode)
+        {
+            lobbyScreen.SetActive(true);
+            matchTimerLabel.transform.parent.gameObject.SetActive(false);
+
+            target.timer.OnUpdated += OnLobbyTimerUpdated;
+            target.timer.OnFinished += OnLobbyTimerEnded;
+            target.matchTimer.OnUpdated += OnMatchTimerUpdated;
+
+            if (PhotonNetwork.IsMasterClient)
+                PlaySound(SoundType.GetReady, 20f);
+        }
+        else
+            OnLobbyTimerEnded();
+        ////TODO
+        
+        //TODO: Uncomment when cooperative missions will be fixed
+        /*IsLobbyState = true;
         lobbyScreen.SetActive(true);
         matchTimerLabel.transform.parent.gameObject.SetActive(false);
 
@@ -445,7 +475,7 @@ public class PlayerUI : MonoBehaviour
         target.matchTimer.OnUpdated += OnMatchTimerUpdated;
 
         if (PhotonNetwork.IsMasterClient)
-            PlaySound(SoundType.GetReady, 20f);
+            PlaySound(SoundType.GetReady, 20f);*/
 
         OnLobbyPlayerAdded(PhotonNetwork.NickName, target.ShipIcon, false);
         AddPlayerStatsSlot(target, Launcher.instance.CurrentRating, target.UpgradesScore);
@@ -475,6 +505,8 @@ public class PlayerUI : MonoBehaviour
 
     void OnLobbyTimerEnded()
     {
+        target.timer.Stop();
+
         IsLobbyState = false;
 
         lobbyScreen.SetActive(false);
@@ -595,6 +627,20 @@ public class PlayerUI : MonoBehaviour
         PlaySound(SoundType.Loss, 5f);
     }
 
+    public void OnMasterClientSwitched(bool imMaster = false)
+    {
+        if (imMaster && isMissionMode)
+        {
+            lobbyMissionButtons.SetActive(true);
+            lobbyArenaButtons.SetActive(false);
+        }
+        else
+        {
+            lobbyMissionButtons.SetActive(false);
+            lobbyArenaButtons.SetActive(true);
+        }
+    }
+
     public void OnRoomLeft()
     {
         target.timer.OnUpdated -= OnLobbyTimerUpdated;
@@ -701,8 +747,8 @@ public class PlayerUI : MonoBehaviour
 
         //if (PhotonNetwork.IsMasterClient)
         //{
-            //target.timer.Stop();
-            //target.matchTimer.Stop();
+        //target.timer.Stop();
+        //target.matchTimer.Stop();
         //}
 
         if (!isMissionMode)

@@ -262,6 +262,8 @@ public class ArenaController : MonoBehaviourPunCallbacks
         {
             PlayerController.LocalPlayer.RunMatchTimer();
         }
+
+        PlayerUI.Instance.OnMasterClientSwitched(newMasterClient == this.photonView.Controller);
     }
 
     public override void OnPlayerEnteredRoom(Player other)
@@ -317,6 +319,7 @@ public class ArenaController : MonoBehaviourPunCallbacks
     /// </summary>
     public override void OnLeftRoom()
     {
+        PhotonNetwork.IsMessageQueueRunning = false;
         SceneManager.LoadScene(0);
     }
 

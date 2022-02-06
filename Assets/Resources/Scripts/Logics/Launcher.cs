@@ -1131,7 +1131,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
                 Debug.LogError("SignInWithCredentialAsync encountered an error: " + task.Exception);
                 m_loginError = task.Exception.Message;
                 m_signingIn = false;
-                m_playGamesSignInSuccess = true;
+                m_playGamesSignInSuccess = false;
                 m_playGamesSignInEnded = true;
                 return;
             }
@@ -1148,7 +1148,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
             m_signInFailed = false;
             m_signedIn = true;
             m_signingIn = false;
-            m_playGamesSignInSuccess = false;
+            m_playGamesSignInSuccess = true;
             m_playGamesSignInEnded = true;
         });
     }
@@ -1344,10 +1344,11 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         {
             selectedMap = "Mission00";
             m_loadingScreen.SetActive(true);
-            m_loadingText.text = "FINDING A GAME...";
+            m_loadingText.text = "STARTING MISSION...";
             // #Critical we need at this point to attempt joining a Random Room. If it fails, we'll get notified in OnJoinRandomFailed() and we'll create one.
-            string sqlLobbyFilter = string.Format("C1 = '{0}'", selectedMap);
-            PhotonNetwork.JoinRandomRoom(null, 0, MatchmakingMode.FillRoom, sqlLobby, sqlLobbyFilter);
+            //string sqlLobbyFilter = string.Format("C1 = '{0}'", selectedMap);
+            //PhotonNetwork.JoinRandomRoom(null, 0, MatchmakingMode.FillRoom, sqlLobby, sqlLobbyFilter);
+            CreateRoom();
         }
     }
 
@@ -1377,7 +1378,6 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     {
         if (!PhotonNetwork.IsConnected)
             Connect();
-        isConnectedToMaster = false;
         isRoomLoading = false;
         m_homeScreen.SetActive(true);
         SelectHangarShip(SelectedShipPrefab != null ? SelectedShipPrefab.name : "Spaceship00");
@@ -1398,6 +1398,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
     public override void OnDisconnected(DisconnectCause cause)
     {
+        isConnectedToMaster = false;
         isRoomCreating = false;
         isRoomLoading = false;
         Debug.LogWarningFormat("OnDisconnected() was called by PUN with reason {0}", cause);
@@ -1442,6 +1443,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
     public void OnArenaLoaded()
     {
+        PhotonNetwork.IsMessageQueueRunning = true;
         m_loadingScreen.SetActive(false);
     }
 
