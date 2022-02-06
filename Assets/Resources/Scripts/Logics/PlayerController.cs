@@ -578,6 +578,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         m_forceField = 0;
         m_speed = 0f;
 
+        m_currentAITarget = null;
+        m_currentAIEnemy = null;
+        m_targetIsPlayer = false;
+        m_currAITargetChangeDelay = 0f;
+
         GetComponent<Collider>().enabled = true;
         charController.enabled = true;
 

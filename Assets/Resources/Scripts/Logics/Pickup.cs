@@ -49,11 +49,13 @@ public class Pickup : MonoBehaviourPunCallbacks
         {
             arenaController = ArenaController.instance;
             isMissionMode = false;
+            arenaController.RegisterPickup(this);
         }
         else if (MissionController.instance != null)
         {
             missionController = MissionController.instance;
             isMissionMode = true;
+            missionController.RegisterPickup(this);
         }
 
         m_roomPlayers = isMissionMode ? missionController.RoomPlayers : arenaController.RoomPlayers;

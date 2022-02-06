@@ -170,6 +170,12 @@ public class MissionController : MonoBehaviourPunCallbacks
         }
     }
 
+    public void RegisterPickup(Pickup pickup)
+    {
+        if (!m_roomPickups.Contains(pickup))
+            m_roomPickups.Add(pickup);
+    }
+
     void SpawnPickups()
     {
         if (PhotonNetwork.IsMasterClient)
@@ -180,18 +186,15 @@ public class MissionController : MonoBehaviourPunCallbacks
 
                 if (!pp)
                 {
-                    GameObject go = PhotonNetwork.InstantiateRoomObject(Random.value < 0.5f ? "PickupShield" : "PickupDurability", point.position, Quaternion.identity);
-                    m_roomPickups.Add(go.GetComponent<Pickup>());
+                    PhotonNetwork.InstantiateRoomObject(Random.value < 0.5f ? "PickupShield" : "PickupDurability", point.position, Quaternion.identity);
                 }
                 else
                 {
-                    GameObject go = PhotonNetwork.InstantiateRoomObject(pp.PickupPrefab.name, point.position, Quaternion.identity);
-                    m_roomPickups.Add(go.GetComponent<Pickup>());
+                    PhotonNetwork.InstantiateRoomObject(pp.PickupPrefab.name, point.position, Quaternion.identity);
                 }
             }
 
-            GameObject nexusGO = PhotonNetwork.InstantiateRoomObject("PickupNexus", nexusPosition.position, Quaternion.identity);
-            m_roomPickups.Add(nexusGO.GetComponent<Pickup>());
+            PhotonNetwork.InstantiateRoomObject("PickupNexus", nexusPosition.position, Quaternion.identity);
         }
     }
 

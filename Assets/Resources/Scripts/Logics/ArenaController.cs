@@ -128,6 +128,12 @@ public class ArenaController : MonoBehaviourPunCallbacks
         }
     }
 
+    public void RegisterPickup(Pickup pickup)
+    {
+        if (!m_roomPickups.Contains(pickup))
+            m_roomPickups.Add(pickup);
+    }
+
     public void AddRegisteredPlayersToLobbyUI()
     {
         foreach (var p in m_roomPlayers)
@@ -153,12 +159,10 @@ public class ArenaController : MonoBehaviourPunCallbacks
         {
             foreach (var point in pickupPoints)
             {
-                GameObject go = PhotonNetwork.InstantiateRoomObject(Random.value < 0.5f ? "PickupShield" : "PickupDurability", point.position, Quaternion.identity);
-                m_roomPickups.Add(go.GetComponent<Pickup>());
+                PhotonNetwork.InstantiateRoomObject(Random.value < 0.5f ? "PickupShield" : "PickupDurability", point.position, Quaternion.identity);
             }
 
-            GameObject nexusGO = PhotonNetwork.InstantiateRoomObject("PickupNexus", nexusPosition.position, Quaternion.identity);
-            m_roomPickups.Add(nexusGO.GetComponent<Pickup>());
+            PhotonNetwork.InstantiateRoomObject("PickupNexus", nexusPosition.position, Quaternion.identity);
         }
     }
 
