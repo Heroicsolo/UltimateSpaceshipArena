@@ -319,7 +319,7 @@ public class ArenaController : MonoBehaviourPunCallbacks
     /// </summary>
     public override void OnLeftRoom()
     {
-        PhotonNetwork.IsMessageQueueRunning = false;
+        //PhotonNetwork.IsMessageQueueRunning = false;
         SceneManager.LoadScene(0);
     }
 

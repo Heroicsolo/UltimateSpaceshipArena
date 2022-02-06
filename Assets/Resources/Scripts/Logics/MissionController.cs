@@ -311,7 +311,7 @@ public class MissionController : MonoBehaviourPunCallbacks
 
     public override void OnLeftRoom()
     {
-        PhotonNetwork.IsMessageQueueRunning = false;
+        //PhotonNetwork.IsMessageQueueRunning = false;
         SceneManager.LoadScene(0);
     }
 

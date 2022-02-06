@@ -1306,17 +1306,12 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         SaveProfile();
     }
 
-    /// <summary>
-    /// Start the connection process.
-    /// - If already connected, we attempt joining a random room
-    /// - if not yet connected, Connect this application instance to Photon Cloud Network
-    /// </summary>
     public void Connect()
     {
+        if (isConnecting) return;
         // #Critical, we must first and foremost connect to Photon Online Server.
         PhotonNetwork.NickName = m_userName;
         isConnecting = PhotonNetwork.ConnectUsingSettings();
-        PhotonNetwork.ConnectUsingSettings();
         PhotonNetwork.GameVersion = gameVersion;
         m_loginQueueLength++;
         if (m_loginQueueLength > 1)
@@ -1327,7 +1322,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
     public void FindRoom()
     {
-        if (PhotonNetwork.IsConnected && !PhotonNetwork.InRoom && isConnectedToMaster)
+        if (PhotonNetwork.IsConnectedAndReady && !PhotonNetwork.InRoom && isConnectedToMaster)
         {
             selectedMap = "Arena00";
             m_loadingScreen.SetActive(true);
@@ -1336,11 +1331,15 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
             string sqlLobbyFilter = string.Format("C0 BETWEEN {0} AND {1} AND C1 = '{2}'", Mathf.Max(0, m_arenaRating - Balance.matchmakingGap), m_arenaRating + Balance.matchmakingGap, selectedMap);
             PhotonNetwork.JoinRandomRoom(null, 0, MatchmakingMode.FillRoom, sqlLobby, sqlLobbyFilter);
         }
+        else
+        {
+            Connect();
+        }
     }
 
     public void FindMission()
     {
-        if (PhotonNetwork.IsConnected && !PhotonNetwork.InRoom && isConnectedToMaster)
+        if (PhotonNetwork.IsConnectedAndReady && !PhotonNetwork.InRoom && isConnectedToMaster)
         {
             selectedMap = "Mission00";
             m_loadingScreen.SetActive(true);
@@ -1350,13 +1349,16 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
             //PhotonNetwork.JoinRandomRoom(null, 0, MatchmakingMode.FillRoom, sqlLobby, sqlLobbyFilter);
             CreateRoom();
         }
+        else
+        {
+            Connect();
+        }
     }
 
 
     #endregion
 
     #region MonoBehaviourPunCallbacks Callbacks
-
 
     public override void OnConnectedToMaster()
     {
@@ -1374,10 +1376,17 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         isConnectedToMaster = true;
     }
 
+    public override void OnJoinedLobby()
+    {
+        Debug.Log("OnJoinedLobby() called by PUN. Now this client is in lobby");
+        isConnectedToMaster = true;
+    }
+
     public override void OnLeftRoom()
     {
-        if (!PhotonNetwork.IsConnected)
-            Connect();
+        //if (!PhotonNetwork.IsConnectedAndReady)
+            //Connect();
+        Debug.Log("OnLeftRoom() called by PUN. Now this client is not in a room.");
         isRoomLoading = false;
         m_homeScreen.SetActive(true);
         SelectHangarShip(SelectedShipPrefab != null ? SelectedShipPrefab.name : "Spaceship00");
@@ -1404,6 +1413,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         Debug.LogWarningFormat("OnDisconnected() was called by PUN with reason {0}", cause);
         m_loadingScreen?.SetActive(false);
         isConnecting = false;
+        //Connect();
     }
 
 
@@ -1432,7 +1442,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
     public override void OnJoinedRoom()
     {
-        if (PhotonNetwork.NetworkClientState == ClientState.Joining || isRoomLoading || !PhotonNetwork.IsMessageQueueRunning) return;
+        if (PhotonNetwork.NetworkClientState == ClientState.Joining || isRoomLoading) return;
         isRoomCreating = false;
         isRoomLoading = true;
         Debug.Log("OnJoinedRoom() called by PUN. Now this client is in a room.");
