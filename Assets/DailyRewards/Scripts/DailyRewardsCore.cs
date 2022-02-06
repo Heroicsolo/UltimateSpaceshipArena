@@ -7,6 +7,10 @@ using System;
 using System.Globalization;
 using UnityEngine;
 using System.Collections;
+using UnityEngine.Networking;
+using System.Threading.Tasks;
+using System.IO;
+using System.Net.Sockets;
 
 namespace NiobiumStudios
 {
@@ -27,70 +31,97 @@ namespace NiobiumStudios
         public OnInitialize onInitialize;
 
         public bool isInitialized = false;
-		private static T _instance;
+        private static T _instance;
+        private const string FMT = "O";
 
         // Initializes the current DateTime. If the player is using the World Clock initializes it
         public void InitializeDate()
         {
-	        now = DateTime.Now;
-	        isInitialized = true;
+            GetUtcTimeAsync().ContinueWith(task => { OnUtcTimeGot(); });
         }
 
-        public void RefreshTime ()
+        private void OnUtcTimeGot()
         {
-            now = DateTime.Now;
+            isInitialized = true;
         }
 
-		public static T instance
-		{
-			get
-			{
-				if (_instance == null)
-				{
-					_instance = FindObjectOfType<T>();
-					if (_instance == null)
-					{
-						GameObject obj = new GameObject();
-						obj.hideFlags = HideFlags.HideAndDontSave;
-						_instance = obj.AddComponent<T>();
-					}
-				}
-				
-				return _instance;
-			}
-		}
+        private async Task GetUtcTimeAsync()
+        {
+            try
+            {
+                var client = new TcpClient();
+                await client.ConnectAsync("time.nist.gov", 13);
+                using var streamReader = new StreamReader(client.GetStream());
+                var response = await streamReader.ReadToEndAsync();
+                var utcDateTimeString = response.Substring(7, 17);
+                now = DateTime.ParseExact(utcDateTimeString, "yy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                isErrorConnect = false;
+                onInitialize?.Invoke();
+            }
+            catch(Exception e)
+            {
+                now = DateTime.UtcNow;
+                isErrorConnect = true;
+                errorMessage = e.Message;
+                onInitialize?.Invoke(true, errorMessage);
+            }
+        }
+
+        public void RefreshTime()
+        {
+            GetUtcTimeAsync().ContinueWith(task => { OnUtcTimeGot(); });
+        }
+
+        public static T instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = FindObjectOfType<T>();
+                    if (_instance == null)
+                    {
+                        GameObject obj = new GameObject();
+                        obj.hideFlags = HideFlags.HideAndDontSave;
+                        _instance = obj.AddComponent<T>();
+                    }
+                }
+
+                return _instance;
+            }
+        }
 
         //Updates the current time
         public virtual void TickTime()
         {
             if (!isInitialized)
-				return;
+                return;
 
             now = now.AddSeconds(Time.unscaledDeltaTime);
         }
 
-        public string GetFormattedTime (TimeSpan span)
+        public string GetFormattedTime(TimeSpan span)
         {
             return string.Format("{0:D2}:{1:D2}:{2:D2}", span.Hours, span.Minutes, span.Seconds);
         }
 
         protected virtual void Awake()
         {
-			if (isSingleton)
-				DontDestroyOnLoad(this.gameObject);
-			
-			if (_instance == null)
-				_instance = this as T;
-			//else
-				//Destroy(gameObject);
+            if (isSingleton)
+                DontDestroyOnLoad(this.gameObject);
+
+            if (_instance == null)
+                _instance = this as T;
+            //else
+            //Destroy(gameObject);
         }
 
         protected virtual void OnApplicationPause(bool pauseStatus)
         {
-            if(!pauseStatus)
+            if (!pauseStatus)
             {
                 RefreshTime();
-            }                
+            }
         }
     }
 }

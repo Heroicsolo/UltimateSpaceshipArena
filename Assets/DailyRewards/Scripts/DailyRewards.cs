@@ -43,22 +43,6 @@ namespace NiobiumStudios
         private void InitializeTimer()
         {
             base.InitializeDate();
-
-            if (base.isErrorConnect) 
-			{
-                if (onInitialize != null)
-                    onInitialize(true, base.errorMessage);
-			}
-            else 
-			{
-                LoadDebugTime();
-                // We don't count seconds on Daily Rewards
-                //now = now.AddSeconds(-now.Second);
-                CheckRewards();
-
-                if(onInitialize!=null)
-                    onInitialize();
-			}
         }
 
         protected override void OnApplicationPause(bool pauseStatus)
@@ -90,7 +74,7 @@ namespace NiobiumStudios
             // We need to know if he can claim another reward or not
             if (!string.IsNullOrEmpty(lastClaimedTimeStr))
             {
-                lastRewardTime = DateTime.ParseExact(lastClaimedTimeStr, FMT, CultureInfo.InvariantCulture);
+                lastRewardTime = DateTime.ParseExact(lastClaimedTimeStr, "yy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
 
                 // if Debug time was added, we use it to check the difference
                 DateTime advancedTime = now.AddHours(debugTime.TotalHours);
@@ -154,7 +138,7 @@ namespace NiobiumStudios
                 // If debug time was added then we store it
                 //timerNoSeconds = timerNoSeconds.AddHours(debugTime.TotalHours);
 
-                string lastClaimedStr = now.AddHours(debugTime.TotalHours).ToString(FMT);
+                string lastClaimedStr = now.AddHours(debugTime.TotalHours).ToString("yy-MM-dd HH:mm:ss");
 
                 Launcher.instance.OnDailyRewardsChanged((int)debugTime.TotalHours, lastClaimedStr, availableReward);
             }
