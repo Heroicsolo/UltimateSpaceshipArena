@@ -13795,6 +13795,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 662e17200c3a96a4ea04fd2153255837, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  poolable: 0
   damageMin: 18
   damageMax: 20
   critChance: 0.05

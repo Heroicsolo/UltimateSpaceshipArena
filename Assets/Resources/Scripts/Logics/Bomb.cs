@@ -134,7 +134,7 @@ public class Bomb : MonoBehaviourPunCallbacks
             }
         }
 
-        Destroy(gameObject);
+        PhotonNetwork.Destroy(gameObject);
     }
 
     public void Activate()

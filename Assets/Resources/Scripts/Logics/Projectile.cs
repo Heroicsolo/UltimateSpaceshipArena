@@ -5,6 +5,7 @@ using Photon.Pun;
 
 public class Projectile : MonoBehaviourPunCallbacks
 {
+    public bool poolable = false;
     public int damageMin = 2;
     public int damageMax = 3;
     public float critChance = 0.05f;
@@ -55,6 +56,16 @@ public class Projectile : MonoBehaviourPunCallbacks
         }
 
         m_roomPlayers = isMissionMode ? missionController.RoomPlayers : arenaController.RoomPlayers;
+    }
+
+    public override void OnEnable()
+    {
+        timeToDeath = lifeTime;
+
+        if (explodeEffect)
+        {
+            explodeEffect.transform.parent = transform;
+        }
     }
 
     void FindNewGuidingTarget()
@@ -169,6 +180,10 @@ public class Projectile : MonoBehaviourPunCallbacks
             explodeEffect.transform.parent = null;
             explodeEffect.Play();
         }
-        Destroy(gameObject);
+
+        if (!poolable)
+            PhotonNetwork.Destroy(gameObject);
+        else
+            gameObject.SetActive(false);
     }
 }

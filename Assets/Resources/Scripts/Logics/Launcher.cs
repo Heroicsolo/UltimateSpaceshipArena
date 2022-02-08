@@ -1373,6 +1373,11 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         m_loginQueueLength--;
         mQueueValueRef.SetValueAsync(m_loginQueueLength);
 
+        //Some optimization
+        PhotonNetwork.UseRpcMonoBehaviourCache = true;
+        PhotonNetwork.NetworkingClient.LoadBalancingPeer.ReuseEventInstance = true;
+        //Some optimization
+
         isConnectedToMaster = true;
     }
 

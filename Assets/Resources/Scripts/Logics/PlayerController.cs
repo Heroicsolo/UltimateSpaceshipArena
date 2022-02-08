@@ -128,6 +128,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private Transform cameraTransform;
     private CharacterController charController;
 
+    private RoomObjectPool projectilesPool;
+
     private Vector3 movementDir;
     private Vector3 initPos;
 
@@ -235,6 +237,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     // Start is called before the first frame update
     void Start()
     {
+        projectilesPool = new RoomObjectPool();
+        projectilesPool.prefabName = ProjectilePrefab.name;
+
         if (photonView.IsMine && !IsAI)
         {
             LocalPlayerInstance = this.gameObject;
@@ -941,7 +946,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     {
         foreach (var shootPos in ShootPositions)
         {
-            GameObject proj = PhotonNetwork.Instantiate(ProjectilePrefab.name, shootPos.position, transform.rotation);
+            GameObject proj = projectilesPool.Spawn(shootPos.position, transform.rotation);
             Projectile p = proj.GetComponent<Projectile>();
             p.SetOwner(m_name, photonView.Owner.UserId);
             p.critChance += critBonus;
@@ -964,7 +969,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     {
         foreach (var shootPos in ShootPositions)
         {
-            GameObject projObj = PhotonNetwork.Instantiate(projectilePrefabName, shootPos.position, transform.rotation);
+            GameObject projObj = PhotonNetwork.InstantiateRoomObject(projectilePrefabName, shootPos.position, transform.rotation);
             Bomb bomb = projObj.GetComponent<Bomb>();
             Projectile proj = projObj.GetComponent<Projectile>();
             if (bomb)

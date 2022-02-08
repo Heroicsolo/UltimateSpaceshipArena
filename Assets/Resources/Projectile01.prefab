@@ -113,6 +113,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 662e17200c3a96a4ea04fd2153255837, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  poolable: 1
   damageMin: 2
   damageMax: 3
   critChance: 0.1
@@ -278,7 +279,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 198604625657555562, guid: ead29d285f812e245818fd67198af431, type: 3}
       propertyPath: stopAction
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 198604625657555562, guid: ead29d285f812e245818fd67198af431, type: 3}
       propertyPath: moveWithTransform
