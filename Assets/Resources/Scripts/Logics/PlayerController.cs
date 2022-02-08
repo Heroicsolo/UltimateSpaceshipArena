@@ -268,7 +268,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         m_roomPlayers = isMissionMode ? missionController.RoomPlayers : arenaController.RoomPlayers;
 
-        m_balance = Launcher.instance.Balance;
+        m_balance = BalanceProvider.Balance;
 
         charController = GetComponent<CharacterController>();
 

@@ -18,35 +18,6 @@ using UnityEngine.SocialPlatforms;
 using NiobiumStudios;
 
 [Serializable]
-public class BalanceInfo
-{
-    public int techWorks;
-    public int techWorksDelay;
-    public int version;
-    public float fightLength;
-    public int initArenaRating;
-    public float joinStageLength;
-    public float lobbyLength;
-    public float lossRatingMod;
-    public int matchmakingGap;
-    public int maxPlayersPerRoom;
-    public float nexusCaptureTime;
-    public float victoryRatingMod;
-    public float respawnTimeBase;
-    public float respawnTimeMax;
-    public float spectacleTime;
-    public int winnersCount;
-    public float shieldRegenDelay;
-    public int initCurrency;
-    public int currencyPerFightMin;
-    public int currencyPerWin;
-    public int currencyPlaceBonus;
-    public int currencyPerMissionMin;
-    public float missionTimeRewardModifier;
-    public int nameChangeCost;
-}
-
-[Serializable]
 public class ShipUpgradesInfo
 {
     public List<int> upgradeLevels;
@@ -82,7 +53,6 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     /// This client's version number. Users are separated from each other by gameVersion (which allows you to make breaking changes).
     /// </summary>
     const string gameVersion = "5";
-    const int clientVersion = 3;
     const string chatAppId = "e1f0448d-06a1-40c0-8653-93ffc1b0bee7";
     [SerializeField] private int initArenaRating = 1000;
     [SerializeField] private int maxChatMessagesCount = 20;
@@ -126,7 +96,6 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     [SerializeField] private Text changeNameCostLabel;
 
     private UpgradesInfo m_upgradesInfo;
-    private BalanceInfo m_balanceData;
     private Firebase.FirebaseApp app = null;
     private FirebaseAuth auth;
     private string m_userName = "Player";
@@ -186,7 +155,6 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     private DatabaseReference mDatabaseRef;
     private DatabaseReference mNicknamesDB;
     private DatabaseReference mQueueValueRef;
-    private DatabaseReference mBalanceDatabaseRef;
 
     private AudioSource audioSource;
 
@@ -205,8 +173,6 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
     public int CurrentRating => m_arenaRating;
     public GameObject SelectedShipPrefab { get { return m_selectedShip; } set { m_selectedShip = value; SelectHangarShip(m_selectedShip.name); } }
-
-    public BalanceInfo Balance { get { return m_balanceData; } }
 
     public int Currency { get { return m_currency; } set { m_currency = value; currencyLabel.text = m_currency.ToString(); } }
 
@@ -314,7 +280,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         mDatabaseRef = FirebaseDatabase.DefaultInstance.RootReference.Child("users");
         mNicknamesDB = FirebaseDatabase.DefaultInstance.RootReference.Child("nicknames");
         mQueueValueRef = FirebaseDatabase.DefaultInstance.RootReference.Child("queueLength");
-        mBalanceDatabaseRef = FirebaseDatabase.DefaultInstance.RootReference.Child("balance");
+        
+        BalanceProvider.Init();
 
         mNicknamesDB.GetValueAsync().ContinueWith(task =>
         {
@@ -335,26 +302,20 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
                     else if (task.IsCompleted)
                     {
                         GetLoginQueueLengthFromSnapshot(task.Result);
-
-                        mBalanceDatabaseRef.GetValueAsync().ContinueWith(task =>
-                        {
-                            if (task.IsFaulted)
-                            {
-
-                            }
-                            else if (task.IsCompleted)
-                            {
-                                RefreshBalance(task.Result);
-                                m_DB_loaded = true;
-                            }
-                        });
+                        m_DB_loaded = true;
                     }
                 });
             }
         });
 
         mQueueValueRef.ValueChanged += OnQueueLengthChanged;
-        mBalanceDatabaseRef.ValueChanged += HandleBalanceValueChanged;
+        
+        BalanceProvider.OnValueChanged += OnBalanceChanged;
+    }
+
+    void OnBalanceChanged()
+    {
+        changeNameCostLabel.text = BalanceProvider.Balance.nameChangeCost.ToString();
     }
 
     private void OnQueueLengthChanged(object sender, ValueChangedEventArgs args)
@@ -395,60 +356,17 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         LoadNicknamesFromSnapshot(args.Snapshot);
     }
 
-    private void RefreshBalance(DataSnapshot snapshot)
+    public void CloseGameDelayed(float delay = 3f, bool openAppStore = false)
     {
-        string restoredData = snapshot.GetRawJsonValue();
-
-        if (restoredData.Length < 2)
-        {
-            m_balanceData = new BalanceInfo();
-        }
-        else
-            m_balanceData = JsonUtility.FromJson<BalanceInfo>(restoredData);
-
-        m_loadedBalance = true;
+        StartCoroutine(CloseGameAfterDelay(delay, openAppStore));
     }
 
-    void HandleBalanceValueChanged(object sender, ValueChangedEventArgs args)
-    {
-        if (args.DatabaseError != null)
-        {
-            Debug.LogError(args.DatabaseError.Message);
-            return;
-        }
-
-        RefreshBalance(args.Snapshot);
-
-        changeNameCostLabel.text = Balance.nameChangeCost.ToString();
-
-        if (Balance.version > clientVersion)
-        {
-            MessageBox.instance.Show("Your game client version is old. Please, update it on Google Play.");
-            OpenAppStorePage();
-            CloseGameDelayed();
-        }
-        else if (Balance.techWorks != 0)
-        {
-            if (Balance.techWorksDelay < 1)
-            {
-                MessageBox.instance.Show("The game is currently under maintenance. We are sorry for the inconvenience.");
-            }
-            else
-            {
-                MessageBox.instance.Show(string.Format("The game will be under maintenance in {0} minutes. We are sorry for the inconvenience.", Balance.techWorksDelay));
-                CloseGameDelayed(Balance.techWorksDelay * 60f);
-            }
-        }
-    }
-
-    public void CloseGameDelayed(float delay = 3f)
-    {
-        StartCoroutine(CloseGameAfterDelay(delay));
-    }
-
-    private IEnumerator CloseGameAfterDelay(float delay = 3f)
+    private IEnumerator CloseGameAfterDelay(float delay = 3f, bool openAppStore = false)
     {
         yield return new WaitForSecondsRealtime(delay);
+
+        if (openAppStore)
+            OpenAppStorePage();
 
         Application.Quit();
     }
@@ -502,7 +420,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
         m_loadingText.text = "CONNECTING TO SERVER...";
 
-        yield return new WaitUntil(() => m_DB_loaded);
+        yield return new WaitUntil(() => m_DB_loaded && BalanceProvider.IsLoaded);
 
         m_loadingText.text = "CONNECTING TO GOOGLE PLAY...";
 
@@ -570,7 +488,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         m_inputProfileName.text = m_userName;
         changeNameBtn.gameObject.SetActive(!m_nameChanged);
         changeNameBtnPaid.gameObject.SetActive(m_nameChanged);
-        changeNameCostLabel.text = Balance.nameChangeCost.ToString();
+        changeNameCostLabel.text = BalanceProvider.Balance.nameChangeCost.ToString();
 
         m_justEntered = true;
 
@@ -655,7 +573,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
     public int OnMissionCompleted(float completionTime)
     {
-        int moneyGained = Balance.currencyPerMissionMin + Mathf.CeilToInt((180f / (10f + completionTime)) * Balance.missionTimeRewardModifier * 100);
+        int moneyGained = BalanceProvider.Balance.currencyPerMissionMin + Mathf.CeilToInt((180f / (10f + completionTime)) * BalanceProvider.Balance.missionTimeRewardModifier * 100);
         m_currency += moneyGained;
         SaveProfile();
         UnlockAchievement(GPGSIds.achievement_mission_is_possible);
@@ -670,22 +588,22 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
     public int OnFightLoss()
     {
-        m_currency += Balance.currencyPerFightMin;
-        m_arenaRating = Mathf.Max(0, m_arenaRating - Mathf.FloorToInt(0.1f * Balance.lossRatingMod * m_arenaRating));
+        m_currency += BalanceProvider.Balance.currencyPerFightMin;
+        m_arenaRating = Mathf.Max(0, m_arenaRating - Mathf.FloorToInt(0.1f * BalanceProvider.Balance.lossRatingMod * m_arenaRating));
         SaveProfile();
         AddScoreToLeaderBoard();
         UnlockAchievement(GPGSIds.achievement_first_steps_in_space);
         currencyLabel.text = m_currency.ToString();
         ratingLabel.text = m_arenaRating.ToString();
-        return Balance.currencyPerFightMin;
+        return BalanceProvider.Balance.currencyPerFightMin;
     }
 
     public int OnFightWon(int place = 1)
     {
-        int bonusForPlace = (Balance.winnersCount - place) * 100;
-        int moneyGained = Balance.currencyPerFightMin + Balance.currencyPerWin + Balance.currencyPlaceBonus * (Balance.winnersCount - place);
+        int bonusForPlace = (BalanceProvider.Balance.winnersCount - place) * 100;
+        int moneyGained = BalanceProvider.Balance.currencyPerFightMin + BalanceProvider.Balance.currencyPerWin + BalanceProvider.Balance.currencyPlaceBonus * (BalanceProvider.Balance.winnersCount - place);
         m_currency += moneyGained;
-        m_arenaRating = Mathf.Max(0, m_arenaRating + Mathf.CeilToInt((bonusForPlace + 200) * Balance.victoryRatingMod * 2000f / Mathf.Max(1000f, m_arenaRating)));
+        m_arenaRating = Mathf.Max(0, m_arenaRating + Mathf.CeilToInt((bonusForPlace + 200) * BalanceProvider.Balance.victoryRatingMod * 2000f / Mathf.Max(1000f, m_arenaRating)));
         SaveProfile();
         AddScoreToLeaderBoard();
         UnlockAchievement(GPGSIds.achievement_first_steps_in_space);
@@ -967,9 +885,9 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         if (m_email.Length < 2)
             m_email = notEmptyProfile ? snapshot.Child("email").Value.ToString() : "";
 
-        m_arenaRating = notEmptyProfile && snapshot.HasChild("arenaRating") ? int.Parse(snapshot.Child("arenaRating").Value.ToString()) : Balance.initArenaRating;
+        m_arenaRating = notEmptyProfile && snapshot.HasChild("arenaRating") ? int.Parse(snapshot.Child("arenaRating").Value.ToString()) : BalanceProvider.Balance.initArenaRating;
 
-        m_currency = notEmptyProfile && snapshot.HasChild("currency") ? int.Parse(snapshot.Child("currency").Value.ToString()) : Balance.initCurrency;
+        m_currency = notEmptyProfile && snapshot.HasChild("currency") ? int.Parse(snapshot.Child("currency").Value.ToString()) : BalanceProvider.Balance.initCurrency;
 
         m_lastDailyRewardDebugTime = notEmptyProfile && snapshot.HasChild("lastDailyRewardDebugTime") ? int.Parse(snapshot.Child("lastDailyRewardDebugTime").Value.ToString()) : 0;
         m_lastDailyRewardTime = notEmptyProfile && snapshot.HasChild("lastDailyRewardTime") ? snapshot.Child("lastDailyRewardTime").Value.ToString() : "";
@@ -1287,14 +1205,14 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
             return;
         }
 
-        if (m_currency < Balance.nameChangeCost)
+        if (m_currency < BalanceProvider.Balance.nameChangeCost)
         {
             MessageBox.instance.Show("Not enough money!");
             m_inputProfileName.text = m_userName;
             return;
         }
 
-        m_currency -= Balance.nameChangeCost;
+        m_currency -= BalanceProvider.Balance.nameChangeCost;
 
         m_userName = newName;
         PhotonNetwork.NickName = newName;
@@ -1328,7 +1246,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
             m_loadingScreen.SetActive(true);
             m_loadingText.text = "FINDING A GAME...";
             // #Critical we need at this point to attempt joining a Random Room. If it fails, we'll get notified in OnJoinRandomFailed() and we'll create one.
-            string sqlLobbyFilter = string.Format("C0 BETWEEN {0} AND {1} AND C1 = '{2}'", Mathf.Max(0, m_arenaRating - Balance.matchmakingGap), m_arenaRating + Balance.matchmakingGap, selectedMap);
+            string sqlLobbyFilter = string.Format("C0 BETWEEN {0} AND {1} AND C1 = '{2}'", Mathf.Max(0, m_arenaRating - BalanceProvider.Balance.matchmakingGap), m_arenaRating + BalanceProvider.Balance.matchmakingGap, selectedMap);
             PhotonNetwork.JoinRandomRoom(null, 0, MatchmakingMode.FillRoom, sqlLobby, sqlLobbyFilter);
         }
         else
@@ -1438,7 +1356,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         isRoomCreating = true;
 
         RoomOptions roomOptions = new RoomOptions();
-        roomOptions.MaxPlayers = (byte)Balance.maxPlayersPerRoom;
+        roomOptions.MaxPlayers = (byte)BalanceProvider.Balance.maxPlayersPerRoom;
         roomOptions.EmptyRoomTtl = 1000;
         roomOptions.CustomRoomProperties = new ExitGames.Client.Photon.Hashtable { { ELO_PROP_KEY, m_arenaRating }, { MAP_PROP_KEY, selectedMap } };
         roomOptions.CustomRoomPropertiesForLobby = new string[] { ELO_PROP_KEY, MAP_PROP_KEY };

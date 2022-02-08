@@ -17,7 +17,7 @@ public class ArenaController : MonoBehaviourPunCallbacks
 
     public Vector3 RandomSpawnPoint => spawnPoints.GetRandomElement().position;
     public string RandomBotName => botsPossibleNames.GetRandomElement();
-    public float RespawnTime => Launcher.instance.Balance.respawnTimeBase;
+    public float RespawnTime => BalanceProvider.Balance.respawnTimeBase;
 
     private List<PlayerController> m_roomPlayers = new List<PlayerController>();
     private List<Pickup> m_roomPickups = new List<Pickup>();
@@ -217,7 +217,7 @@ public class ArenaController : MonoBehaviourPunCallbacks
                 m_botsSpawnPoints.AddRange(spawnPoints);
                 m_botsSpawnPoints.Remove(point);
 
-                m_timeToJoin = Launcher.instance.Balance.joinStageLength;
+                m_timeToJoin = BalanceProvider.Balance.joinStageLength;
             }
 
             if (Launcher.instance.SelectedShipPrefab == null)
@@ -278,7 +278,7 @@ public class ArenaController : MonoBehaviourPunCallbacks
 
         SendPlayersNamesData();
 
-        if (m_roomPlayers.Count > Launcher.instance.Balance.maxPlayersPerRoom - 1) RemoveOneBot();
+        if (m_roomPlayers.Count > BalanceProvider.Balance.maxPlayersPerRoom - 1) RemoveOneBot();
 
         if (PhotonNetwork.IsMasterClient)
         {

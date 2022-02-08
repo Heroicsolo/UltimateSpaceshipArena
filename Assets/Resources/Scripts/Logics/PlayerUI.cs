@@ -495,7 +495,7 @@ public class PlayerUI : MonoBehaviour
 
     void OnMatchTimerUpdated()
     {
-        if (target.MatchTimer < Launcher.instance.Balance.fightLength)
+        if (target.MatchTimer < BalanceProvider.Balance.fightLength)
         {
             OnLobbyTimerEnded();
         }

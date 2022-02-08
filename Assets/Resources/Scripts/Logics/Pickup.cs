@@ -43,7 +43,7 @@ public class Pickup : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        m_balance = Launcher.instance.Balance;
+        m_balance = BalanceProvider.Balance;
 
         if (ArenaController.instance != null)
         {
