@@ -12049,13 +12049,14 @@ GameObject:
   - component: {fileID: 358065028}
   - component: {fileID: 358065027}
   - component: {fileID: 358065026}
+  - component: {fileID: 358065029}
   m_Layer: 5
   m_Name: ChatHolder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &358065025
 RectTransform:
   m_ObjectHideFlags: 0
@@ -12130,6 +12131,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 358065024}
   m_CullTransparentMesh: 1
+--- !u!114 &358065029
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 358065024}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55490b94cbccc4c41a41dd08c7a00a01, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxChatMessagesCount: 20
+  chatContent: {fileID: 1033555416}
+  chatMessagePrefab: {fileID: 3861081527441703834, guid: 89cc60a5ed249b94abfa1d0bc8417782, type: 3}
+  chatMessageField: {fileID: 1769918732}
+  chatLoadingIndicator: {fileID: 639619058}
 --- !u!1 &368046057
 GameObject:
   m_ObjectHideFlags: 0
@@ -41297,8 +41315,8 @@ MonoBehaviour:
   m_OnEndEdit:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2034605825}
-        m_TargetAssemblyTypeName: Launcher, Assembly-CSharp
+      - m_Target: {fileID: 358065029}
+        m_TargetAssemblyTypeName: ChatManager, Assembly-CSharp
         m_MethodName: SendChatMessage
         m_Mode: 1
         m_Arguments:
@@ -52846,7 +52864,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   initArenaRating: 1000
-  maxChatMessagesCount: 20
   m_loginScreen: {fileID: 933570269}
   m_signupScreen: {fileID: 131648385}
   m_loadingScreen: {fileID: 754632489}
@@ -52865,10 +52882,6 @@ MonoBehaviour:
   m_homeScreen: {fileID: 119538361}
   buttonSound: {fileID: 8300000, guid: fbbc700d7a63c514981e7f186ee061da, type: 3}
   userIdLabel: {fileID: 856941852}
-  chatContent: {fileID: 1033555416}
-  chatMessagePrefab: {fileID: 3861081527441703834, guid: 89cc60a5ed249b94abfa1d0bc8417782, type: 3}
-  chatMessageField: {fileID: 1769918732}
-  chatLoadingIndicator: {fileID: 639619058}
   currencyLabel: {fileID: 2056832088}
   ratingLabel: {fileID: 436737593}
   availableShips:
@@ -52880,6 +52893,7 @@ MonoBehaviour:
   - {fileID: 1853464808}
   - {fileID: 2129750294}
   dailyRewardsScreen: {fileID: 6946256476883541726}
+  chatManager: {fileID: 358065029}
   changeNameBtn: {fileID: 2064206104}
   changeNameBtnPaid: {fileID: 117746112}
   changeNameCostLabel: {fileID: 796804576}

@@ -29,14 +29,7 @@ public class UpgradesInfo
     public List<ShipUpgradesInfo> shipUpgradeLevels;
 }
 
-[Serializable]
-public class ChatMessage
-{
-    public string nickname;
-    public string msg;
-}
-
-public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatClientListener
+public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 {
     public static Launcher instance;
 
@@ -55,8 +48,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     const string gameVersion = "5";
     const string chatAppId = "e1f0448d-06a1-40c0-8653-93ffc1b0bee7";
     [SerializeField] private int initArenaRating = 1000;
-    [SerializeField] private int maxChatMessagesCount = 20;
-
+    
     [Header("SignIn and SignUp UI")]
     [SerializeField] private GameObject m_loginScreen;
     [SerializeField] private GameObject m_signupScreen;
@@ -80,15 +72,12 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     [SerializeField] private GameObject m_homeScreen;
     [SerializeField] AudioClip buttonSound;
     [SerializeField] private TextMeshProUGUI userIdLabel;
-    [SerializeField] private Transform chatContent;
-    [SerializeField] private GameObject chatMessagePrefab;
-    [SerializeField] private TMP_InputField chatMessageField;
-    [SerializeField] private GameObject chatLoadingIndicator;
     [SerializeField] private TextMeshProUGUI currencyLabel;
     [SerializeField] private TextMeshProUGUI ratingLabel;
     [SerializeField] private List<PlayerController> availableShips;
     [SerializeField] private List<GameObject> hangarShips;
     [SerializeField] private GameObject dailyRewardsScreen;
+    [SerializeField] private ChatManager chatManager;
 
     [Header("Profile Screen")]
     [SerializeField] private Button changeNameBtn;
@@ -157,9 +146,6 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     private DatabaseReference mQueueValueRef;
 
     private AudioSource audioSource;
-
-    private ChatClient chatClient;
-    private List<GameObject> chatMessages = new List<GameObject>();
 
     private List<string> m_usedNicknamesList = new List<string>();
 
@@ -492,10 +478,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
         m_justEntered = true;
 
-        chatClient = new ChatClient(this);
-
-        chatClient.ChatRegion = "EU";
-        chatClient.Connect(PhotonNetwork.PhotonServerSettings.AppSettings.AppIdChat, PhotonNetwork.PhotonServerSettings.AppSettings.AppVersion, new Photon.Chat.AuthenticationValues(UserName));
+        chatManager.gameObject.SetActive(true);
 
         if (m_tutorialDone)
         {
@@ -553,8 +536,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
 
     public void OnMainScreenLoaded()
     {
-        if (chatClient.State == ChatState.Disconnected)
-            chatClient.Connect(PhotonNetwork.PhotonServerSettings.AppSettings.AppIdChat, PhotonNetwork.PhotonServerSettings.AppSettings.AppVersion, new Photon.Chat.AuthenticationValues(UserName));
+        chatManager.ReconnectIfNeeded();
         ratingLabel.text = m_arenaRating.ToString();
     }
 
@@ -842,11 +824,6 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
         mQueueValueRef.SetValueAsync(m_loginQueueLength);
 
         SignOut();
-
-        if (chatClient != null)
-        {
-            chatClient.Disconnect();
-        }
     }
 
     private void LoadNicknamesFromSnapshot(DataSnapshot snapshot)
@@ -1320,9 +1297,6 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
     {
         if (isConnectedToMaster && m_playersCountText)
         {
-            if (chatClient != null)
-                chatClient.Service();
-
             m_playersCountText.text = "Players online: " + PhotonNetwork.CountOfPlayers + "\nPlayers on arena: " + PhotonNetwork.CountOfPlayersInRooms;
         }
     }
@@ -1445,116 +1419,5 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks, IChatC
             m_signedIn = true;
             m_signingIn = false;
         });
-    }
-
-    public void SendChatMessage()
-    {
-        if (chatClient.CanChat && chatMessageField.text.Length > 0)
-        {
-            ChatMessage msg = new ChatMessage();
-            msg.nickname = m_userName;
-            msg.msg = chatMessageField.text;
-
-            string jsonStr = JsonUtility.ToJson(msg);
-
-            chatClient.PublishMessage("General", jsonStr);
-            chatMessageField.text = "";
-        }
-    }
-
-    public void SendHasEnteredTheGameMessage()
-    {
-        ChatMessage msg = new ChatMessage();
-        msg.nickname = "/online";
-        msg.msg = "";
-
-        string jsonStr = JsonUtility.ToJson(msg);
-
-        chatClient.PublishMessage("General", jsonStr);
-    }
-
-    public void DebugReturn(DebugLevel level, string message)
-    {
-
-    }
-
-    public void OnConnected()
-    {
-        chatClient.Subscribe("General");
-        chatClient.SetOnlineStatus(ChatUserStatus.Online);
-        if (m_justEntered)
-            SendHasEnteredTheGameMessage();
-        m_justEntered = false;
-        chatLoadingIndicator.SetActive(false);
-        chatMessageField.interactable = true;
-    }
-
-    public void OnDisconnected()
-    {
-        chatLoadingIndicator.SetActive(true);
-        chatMessageField.interactable = false;
-    }
-
-    public void OnChatStateChange(ChatState state)
-    {
-
-    }
-
-    public void OnGetMessages(string channelName, string[] senders, object[] messages)
-    {
-        for (int i = 0; i < senders.Length; i++)
-        {
-            GameObject chatMsgGO = Instantiate(chatMessagePrefab, chatContent);
-
-            ChatMessage msgObj = JsonUtility.FromJson<ChatMessage>(messages[i].ToString());
-
-            if (msgObj.nickname == "/online")
-            {
-                chatMsgGO.GetComponent<TextMeshProUGUI>().text = "<color=\"green\">" + senders[i] + "</color> has entered the game";
-            }
-            else
-            {
-                chatMsgGO.GetComponent<TextMeshProUGUI>().text = "<color=\"green\">" + msgObj.nickname + ": </color>" + msgObj.msg;
-            }
-
-            chatMessages.Add(chatMsgGO);
-
-            if (chatMessages.Count > maxChatMessagesCount)
-            {
-                GameObject firstChatMsg = chatMessages[0];
-                chatMessages.RemoveAt(0);
-                Destroy(firstChatMsg);
-            }
-        }
-    }
-
-    public void OnPrivateMessage(string sender, object message, string channelName)
-    {
-
-    }
-
-    public void OnSubscribed(string[] channels, bool[] results)
-    {
-
-    }
-
-    public void OnUnsubscribed(string[] channels)
-    {
-
-    }
-
-    public void OnStatusUpdate(string user, int status, bool gotMessage, object message)
-    {
-
-    }
-
-    public void OnUserSubscribed(string channel, string user)
-    {
-
-    }
-
-    public void OnUserUnsubscribed(string channel, string user)
-    {
-
     }
 }

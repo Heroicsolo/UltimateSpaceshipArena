@@ -5516,9 +5516,14 @@ MonoBehaviour:
   ShootPositions:
   - {fileID: 440382154438058265}
   BombLaunchPosition: {fileID: 2180226660458417659}
+  ShipIcon: {fileID: 21300000, guid: 9cb6751da9ee5b446890d6d12c508b2b, type: 3}
+  ShipTitle: Defender
   FloatingTextSpawnPosition: {fileID: 6016336048886456366}
   ImmortalityOrb: {fileID: 7482507792824328463}
   NameLabel: {fileID: 6387821603708998121}
+  HPBar: {fileID: 2135658150962462186}
+  ShieldBar: {fileID: 1059466487647420992}
+  BarsOffset: 17
   EngineFlames:
   - {fileID: 8431825338916327129}
   - {fileID: 8709311692596103179}
@@ -5534,9 +5539,6 @@ MonoBehaviour:
   DeathEffect: {fileID: 6011143635239583995}
   isAI: 1
   isMissionBot: 0
-  HPBar: {fileID: 2135658150962462186}
-  ShieldBar: {fileID: 1059466487647420992}
-  BarsOffset: 17
   AIEnemyFindingRadius: 300
   AIPickupsFindingRadius: 400
   AINexusFindingRadius: 600
@@ -5546,8 +5548,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 4a7c2be73870cb747a877de63d3cda01, type: 2}
   - {fileID: 11400000, guid: ab833239f36936b43905ddf8fc0597d6, type: 2}
   - {fileID: 11400000, guid: 7d1f20fa55de5de4aa8a3d8272b6e0e8, type: 2}
-  ShipIcon: {fileID: 21300000, guid: 9cb6751da9ee5b446890d6d12c508b2b, type: 3}
-  ShipTitle: Defender
   m_forceField: 0
   m_radarRadius: 40
   m_durabilityRegen: 0.05
