@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class MissionController : MonoBehaviourPunCallbacks
+public class MissionController : MonoBehaviourPunCallbacks, IRoomController
 {
     public static MissionController instance;
 
@@ -176,7 +176,7 @@ public class MissionController : MonoBehaviourPunCallbacks
             m_roomPickups.Add(pickup);
     }
 
-    void SpawnPickups()
+    public void SpawnPickups()
     {
         if (PhotonNetwork.IsMasterClient)
         {
@@ -198,7 +198,7 @@ public class MissionController : MonoBehaviourPunCallbacks
         }
     }
 
-    void SpawnBots()
+    public void SpawnBots()
     {
         if (PhotonNetwork.IsMasterClient)
         {
@@ -325,7 +325,7 @@ public class MissionController : MonoBehaviourPunCallbacks
         PhotonNetwork.LeaveRoom();
     }
 
-    void SendPlayersNamesData()
+    public void SendPlayersNamesData()
     {
         foreach (var p in m_roomPlayers)
         {

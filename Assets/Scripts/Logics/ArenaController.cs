@@ -5,7 +5,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.SceneManagement;
 
-public class ArenaController : MonoBehaviourPunCallbacks
+public class ArenaController : MonoBehaviourPunCallbacks, IRoomController
 {
     public static ArenaController instance;
 
@@ -153,7 +153,7 @@ public class ArenaController : MonoBehaviourPunCallbacks
         }
     }
 
-    void SpawnPickups()
+    public void SpawnPickups()
     {
         if (PhotonNetwork.IsMasterClient)
         {
@@ -166,7 +166,7 @@ public class ArenaController : MonoBehaviourPunCallbacks
         }
     }
 
-    void SpawnBots()
+    public void SpawnBots()
     {
         if (PhotonNetwork.IsMasterClient)
         {
@@ -252,7 +252,7 @@ public class ArenaController : MonoBehaviourPunCallbacks
         }
     }
 
-    void SendPlayersNamesData()
+    public void SendPlayersNamesData()
     {
         foreach (var p in m_roomPlayers)
         {
