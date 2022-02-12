@@ -8,8 +8,6 @@ using Firebase.Database;
 using TMPro;
 using System.Collections.Generic;
 using System;
-using Photon.Chat;
-using ExitGames.Client.Photon;
 using Google;
 using System.Threading.Tasks;
 using GooglePlayGames.BasicApi;
@@ -17,36 +15,12 @@ using GooglePlayGames;
 using UnityEngine.SocialPlatforms;
 using NiobiumStudios;
 
-[Serializable]
-public class ShipUpgradesInfo
-{
-    public List<int> upgradeLevels;
-}
-
-[Serializable]
-public class UpgradesInfo
-{
-    public List<ShipUpgradesInfo> shipUpgradeLevels;
-}
-
 public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 {
     public static Launcher instance;
 
     #region Private Serializable Fields
 
-
-    #endregion
-
-
-    #region Private Fields
-
-
-    /// <summary>
-    /// This client's version number. Users are separated from each other by gameVersion (which allows you to make breaking changes).
-    /// </summary>
-    const string gameVersion = "5";
-    const string chatAppId = "e1f0448d-06a1-40c0-8653-93ffc1b0bee7";
     [SerializeField] private int initArenaRating = 1000;
     
     [Header("SignIn and SignUp UI")]
@@ -84,48 +58,24 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     [SerializeField] private Button changeNameBtnPaid;
     [SerializeField] private Text changeNameCostLabel;
 
-    private UpgradesInfo m_upgradesInfo;
+    #endregion
+
+    #region Private Fields
+
+    /// <summary>
+    /// This client's version number. Users are separated from each other by gameVersion (which allows you to make breaking changes).
+    /// </summary>
+    const string gameVersion = "6";
+
     private Firebase.FirebaseApp app = null;
     private FirebaseAuth auth;
-    private string m_userName = "Player";
-    private string m_email = "";
-    private string m_password = "";
-    private string m_userId = "";
-    private string m_loginError = "";
-    private string authCode = "";
-    private string m_deviceId = "";
-    private int m_lastDailyRewardDebugTime;
-    private string m_lastDailyRewardTime;
-    private int m_lastDailyReward;
-    private string m_currNicknameIdx = "";
-
-    public int LastDailyRewardDebugTime => m_lastDailyRewardDebugTime;
-    public string LastDailyRewardTime => m_lastDailyRewardTime;
-    public int LastDailyReward => m_lastDailyReward;
-
-    private int m_currency = 1000;
-    private int m_arenaRating = 0;
-    private int m_loginQueueLength = 0;
-
-    private bool m_signingIn = false;
-    private bool m_signedIn = false;
-    private bool m_signInFailed = false;
-    private bool m_GP_initialized = false;
-    private bool m_playGamesSignInEnded = false;
-    private bool m_playGamesSignInSuccess = false;
+    
     private bool m_googlePlayConnected = false;
-    private bool m_loadedProfile = false;
     private bool m_closeGameOnError = false;
     private bool m_DB_loaded = false;
-    private bool m_credentialsSaved = false;
     private bool m_newProfile = false;
-    private bool m_tutorialDone = false;
-    private bool m_arenaTutorialDone = false;
-    private bool m_missionTutorialDone = false;
-    private int m_tutorialStep = 0;
     private bool m_loadedBalance = false;
 
-    private bool m_nameChanged = false;
     private bool m_justEntered = false;
 
     private bool isConnecting;
@@ -141,37 +91,30 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
     private GameObject m_selectedShip;
 
-    private DatabaseReference mDatabaseRef;
-    private DatabaseReference mNicknamesDB;
-    private DatabaseReference mQueueValueRef;
-
     private AudioSource audioSource;
 
-    private List<string> m_usedNicknamesList = new List<string>();
-
-    #endregion
-
-
-    #region MonoBehaviour CallBacks
-
-    public string UserID => m_userId;
-    public string UserName => m_userName;
-
-    public int CurrentRating => m_arenaRating;
-    public GameObject SelectedShipPrefab { get { return m_selectedShip; } set { m_selectedShip = value; SelectHangarShip(m_selectedShip.name); } }
-
-    public int Currency { get { return m_currency; } set { m_currency = value; currencyLabel.text = m_currency.ToString(); } }
-
-    public bool IsSoundOn { get { return isSoundOn; } set { isSoundOn = value; PlayerPrefs.SetInt("soundOn", isSoundOn ? 1 : 0); } }
-
-    public bool IsArenaTutorialDone => m_arenaTutorialDone;
-    public bool IsMissionTutorialDone => m_missionTutorialDone;
-
-    public const string ELO_PROP_KEY = "C0";
-    public const string MAP_PROP_KEY = "C1";
     private TypedLobby sqlLobby = new TypedLobby("customSqlLobby", LobbyType.SqlLobby);
     private LoadBalancingClient loadBalancingClient;
     private string selectedMap = "Arena00";
+
+    #endregion
+
+    #region Public Fields
+    
+    public Action<bool> OnApplicationPaused;
+    public Action OnApplicationExit;
+    
+    public GameObject SelectedShipPrefab { get { return m_selectedShip; } set { m_selectedShip = value; SelectHangarShip(m_selectedShip.name); } }
+
+    public bool IsSoundOn { get { return isSoundOn; } set { isSoundOn = value; PlayerPrefs.SetInt("soundOn", isSoundOn ? 1 : 0); } }
+
+    public bool CloseGameOnError => m_closeGameOnError;
+
+    public List<PlayerController> AvailableShips => availableShips;
+    
+    public const string ELO_PROP_KEY = "C0";
+    public const string MAP_PROP_KEY = "C1";
+    #endregion
 
     void SelectHangarShip(string shipName)
     {
@@ -189,6 +132,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         }
     }
 
+    #region MonoBehavior Callbacks
     /// <summary>
     /// MonoBehaviour method called on GameObject by Unity during early initialization phase.
     /// </summary>
@@ -199,8 +143,6 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
             instance = this;
             DontDestroyOnLoad(gameObject);
         }
-
-        m_deviceId = SystemInfo.deviceUniqueIdentifier;
 
         audioSource = GetComponentInChildren<AudioSource>();
 
@@ -215,6 +157,9 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         AudioListener.volume = IsSoundOn ? 1f : 0f;
 
         PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder().RequestServerAuthCode(false).Build();
+
+        AuthController.Init();
+        AuthController.OnLoginFailed += OnLoginFailed;
 
         PlayGamesPlatform.InitializeInstance(config);
         PlayGamesPlatform.Activate();
@@ -242,59 +187,44 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         isConnectedToMaster = false;
     }
 
-    public void PlayButtonSound()
+    private void OnApplicationPause(bool pause)
     {
-        audioSource.PlayOneShot(buttonSound);
+        OnApplicationPaused?.Invoke(pause);
     }
 
-    public void OnArenaTutorialDone()
+    private void OnApplicationQuit()
     {
-        m_arenaTutorialDone = true;
-        SaveProfile();
+        OnApplicationExit?.Invoke();
     }
 
-    public void OnMissionTutorialDone()
+    private void Update()
     {
-        m_missionTutorialDone = true;
-        SaveProfile();
+        if (isConnectedToMaster && m_playersCountText)
+        {
+            m_playersCountText.text = "Players online: " + PhotonNetwork.CountOfPlayers + "\nPlayers on arena: " + PhotonNetwork.CountOfPlayersInRooms;
+        }
     }
+
+    void Start()
+    {
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+        }
+        else
+            StartCoroutine(AwaitForProfile());
+    }
+
+    #endregion
 
     private void InitFirebase()
     {
         auth = FirebaseAuth.DefaultInstance;
 
-        mDatabaseRef = FirebaseDatabase.DefaultInstance.RootReference.Child("users");
-        mNicknamesDB = FirebaseDatabase.DefaultInstance.RootReference.Child("nicknames");
-        mQueueValueRef = FirebaseDatabase.DefaultInstance.RootReference.Child("queueLength");
-        
+        AccountManager.Init();
         BalanceProvider.Init();
 
-        mNicknamesDB.GetValueAsync().ContinueWith(task =>
-        {
-            if (task.IsFaulted)
-            {
-
-            }
-            else if (task.IsCompleted)
-            {
-                LoadNicknamesFromSnapshot(task.Result);
-
-                mQueueValueRef.GetValueAsync().ContinueWith(task =>
-                {
-                    if (task.IsFaulted)
-                    {
-
-                    }
-                    else if (task.IsCompleted)
-                    {
-                        GetLoginQueueLengthFromSnapshot(task.Result);
-                        m_DB_loaded = true;
-                    }
-                });
-            }
-        });
-
-        mQueueValueRef.ValueChanged += OnQueueLengthChanged;
+        AccountManager.OnQueueChanged += OnQueueLengthChanged;
         
         BalanceProvider.OnValueChanged += OnBalanceChanged;
     }
@@ -304,47 +234,19 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         changeNameCostLabel.text = BalanceProvider.Balance.nameChangeCost.ToString();
     }
 
-    private void OnQueueLengthChanged(object sender, ValueChangedEventArgs args)
+    private void OnQueueLengthChanged(int queueLength)
     {
-        if (args.DatabaseError != null)
-        {
-            Debug.LogError(args.DatabaseError.Message);
-            return;
-        }
-
-        if (args == null || args.Snapshot == null || args.Snapshot.Value == null)
-        {
-            return;
-        }
-
-        m_loginQueueLength = int.Parse(args.Snapshot.Value.ToString());
-        m_loginQueueText.text = "Your position in queue: " + m_loginQueueLength.ToString();
-    }
-
-    private void GetLoginQueueLengthFromSnapshot(DataSnapshot snapshot)
-    {
-        m_loginQueueLength = int.Parse(snapshot.Value.ToString());
-    }
-
-    private void CheckUsedNicknames(object sender, ValueChangedEventArgs args)
-    {
-        if (args.DatabaseError != null)
-        {
-            Debug.LogError(args.DatabaseError.Message);
-            return;
-        }
-
-        if (args == null || args.Snapshot == null || args.Snapshot.Value == null)
-        {
-            return;
-        }
-
-        LoadNicknamesFromSnapshot(args.Snapshot);
+        m_loginQueueText.text = "Your position in queue: " + queueLength.ToString();
     }
 
     public void CloseGameDelayed(float delay = 3f, bool openAppStore = false)
     {
         StartCoroutine(CloseGameAfterDelay(delay, openAppStore));
+    }
+
+    public void OnCurrencyChanged()
+    {
+        currencyLabel.text = AccountManager.Currency.ToString();
     }
 
     private IEnumerator CloseGameAfterDelay(float delay = 3f, bool openAppStore = false)
@@ -357,49 +259,6 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         Application.Quit();
     }
 
-    /// <summary>
-    /// MonoBehaviour method called on GameObject by Unity during initialization phase.
-    /// </summary>
-    void Start()
-    {
-        if (instance != null && instance != this)
-        {
-            Destroy(gameObject);
-        }
-        else
-            StartCoroutine(AwaitForProfile());
-    }
-
-    private void SignInViaPlayGames()
-    {
-#if UNITY_ANDROID && !UNITY_EDITOR
-        SignInWithPlayGamesOnFirebase(authCode);
-#else
-        m_playGamesSignInEnded = true;
-        m_playGamesSignInSuccess = false;
-#endif
-    }
-
-    private void InitGP()
-    {
-#if UNITY_ANDROID && !UNITY_EDITOR
-        Social.localUser.Authenticate((bool success) => {
-            if( success )
-            {
-                authCode = PlayGamesPlatform.Instance.GetServerAuthCode();
-                m_GP_initialized = true;
-                (Social.Active as PlayGamesPlatform).LoadAchievements(InitAchievements);
-            }
-            else
-            {
-                m_GP_initialized = false;
-            }
-        });
-#else
-        m_GP_initialized = true;
-#endif
-    }
-
     private IEnumerator AwaitForProfile(bool skipSignIn = false)
     {
         m_loadingScreen.SetActive(true);
@@ -410,48 +269,34 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
         m_loadingText.text = "CONNECTING TO GOOGLE PLAY...";
 
-        InitGP();
+        AuthController.InitGP();
 
-        yield return new WaitUntil(() => m_GP_initialized);
+        yield return new WaitUntil(() => AuthController.GooglePlayConnected);
 
         if (!skipSignIn)
         {
             m_loadingText.text = "SIGNING IN...";
 
-            bool emailSigningIn = TrySignIn();
+            AuthController.SignIn();
 
-            if (!emailSigningIn)
-            {
-                SignInViaPlayGames();
-
-                yield return new WaitUntil(() => m_playGamesSignInEnded);
-
-                if (!m_playGamesSignInSuccess)
-                {
-                    OpenLoginScreen();
-                }
-            }
-
-            yield return new WaitUntil(() => m_signedIn);
-
-            SaveCredentials(false, m_signupScreen.activeSelf, m_playGamesSignInSuccess);
+            yield return new WaitUntil(() => AuthController.IsAuthorized);
 
             m_signupScreen.SetActive(false);
 
             CloseLoginScreen();
 
-            yield return new WaitUntil(() => m_credentialsSaved);
+            yield return new WaitUntil(() => AuthController.CredentialsSaved);
         }
 
         m_loadingText.text = "LOADING PROFILE...";
 
-        LoadProfile(m_newProfile);
+        AccountManager.LoadProfile(m_newProfile);
 
-        yield return new WaitUntil(() => m_loadedProfile);
+        yield return new WaitUntil(() => AccountManager.IsLoaded);
 
-        if (m_signedIn)
+        if (AuthController.IsAuthorized)
         {
-            SetOnline();
+            AccountManager.SetOnline();
         }
 
         m_loadingText.text = "CONNECTING TO MASTER SERVER...";
@@ -462,31 +307,27 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
         GetProfileData();
 
-        mNicknamesDB.Child(m_userId).SetValueAsync(m_userName);
+        userIdLabel.text = "User ID: " + AuthController.UserID;
 
-        mNicknamesDB.ValueChanged += CheckUsedNicknames;
+        ratingLabel.text = AccountManager.CurrentRating.ToString();
+        currencyLabel.text = AccountManager.Currency.ToString();
 
-        userIdLabel.text = "User ID: " + UserID;
-
-        ratingLabel.text = m_arenaRating.ToString();
-        currencyLabel.text = m_currency.ToString();
-
-        m_inputProfileName.text = m_userName;
-        changeNameBtn.gameObject.SetActive(!m_nameChanged);
-        changeNameBtnPaid.gameObject.SetActive(m_nameChanged);
+        m_inputProfileName.text = AccountManager.UserName;
+        changeNameBtn.gameObject.SetActive(!AccountManager.IsNameChanged);
+        changeNameBtnPaid.gameObject.SetActive(AccountManager.IsNameChanged);
         changeNameCostLabel.text = BalanceProvider.Balance.nameChangeCost.ToString();
 
         m_justEntered = true;
 
         chatManager.gameObject.SetActive(true);
 
-        if (m_tutorialDone)
+        if (AccountManager.IsFirstTutorialDone)
         {
             OpenDailyRewards();
         }
         else
         {
-            TutorialController.instance.ShowFirstTutorial(m_tutorialStep, OpenDailyRewards);
+            TutorialController.instance.ShowFirstTutorial(AccountManager.FirstTutorialStep, OpenDailyRewards);
         }
     }
 
@@ -503,18 +344,56 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
         if (myReward.unit == "Credits")
         {
-            m_currency += myReward.reward;
+            AccountManager.Currency += myReward.reward;
         }
 
-        currencyLabel.text = m_currency.ToString();
+        currencyLabel.text = AccountManager.Currency.ToString();
 
-        SaveProfile();
+        AccountManager.SaveProfile();
     }
 
-    #endregion
-
-
     #region Public Methods
+
+    public void OnArenaLoaded()
+    {
+        PhotonNetwork.IsMessageQueueRunning = true;
+        m_loadingScreen.SetActive(false);
+    }
+
+    public void OpenLeaderboard()
+    {
+        if (Social.localUser.authenticated)
+            Social.Active.ShowLeaderboardUI();
+    }
+
+    public void OpenLoginScreen()
+    {
+        m_loadingGears.SetActive(false);
+        m_signupScreen.SetActive(false);
+        m_loginScreen.SetActive(true);
+        m_inputName.text = "Player";
+    }
+
+    public void CloseLoginScreen()
+    {
+        m_loadingGears.SetActive(true);
+        m_loginScreen.SetActive(false);
+    }
+
+    public void PlayButtonSound()
+    {
+        audioSource.PlayOneShot(buttonSound);
+    }
+
+    public void OnArenaTutorialDone()
+    {
+        AccountManager.OnArenaTutorialDone();
+    }
+
+    public void OnMissionTutorialDone()
+    {
+        AccountManager.OnMissionTutorialDone();
+    }
 
     public void OpenAppStorePage()
     {
@@ -530,14 +409,14 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     {
         if (Social.localUser.authenticated)
         {
-            Social.ReportScore(m_arenaRating, GPGSIds.leaderboard_arena, (bool success) => { });
+            Social.ReportScore(AccountManager.CurrentRating, GPGSIds.leaderboard_arena, (bool success) => { });
         }
     }
 
     public void OnMainScreenLoaded()
     {
         chatManager.ReconnectIfNeeded();
-        ratingLabel.text = m_arenaRating.ToString();
+        ratingLabel.text = AccountManager.CurrentRating.ToString();
     }
 
     public void OnShipSelectorOpened()
@@ -550,16 +429,16 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     {
         m_loadingScreen.SetActive(false);
 
-        SaveProfile();
+        AccountManager.SaveProfile();
     }
 
     public int OnMissionCompleted(float completionTime)
     {
         int moneyGained = BalanceProvider.Balance.currencyPerMissionMin + Mathf.CeilToInt((180f / (10f + completionTime)) * BalanceProvider.Balance.missionTimeRewardModifier * 100);
-        m_currency += moneyGained;
-        SaveProfile();
+        AccountManager.Currency += moneyGained;
+        AccountManager.SaveProfile();
         UnlockAchievement(GPGSIds.achievement_mission_is_possible);
-        currencyLabel.text = m_currency.ToString();
+        currencyLabel.text = AccountManager.Currency.ToString();
         return moneyGained;
     }
 
@@ -570,13 +449,13 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
     public int OnFightLoss()
     {
-        m_currency += BalanceProvider.Balance.currencyPerFightMin;
-        m_arenaRating = Mathf.Max(0, m_arenaRating - Mathf.FloorToInt(0.1f * BalanceProvider.Balance.lossRatingMod * m_arenaRating));
-        SaveProfile();
+        AccountManager.Currency += BalanceProvider.Balance.currencyPerFightMin;
+        AccountManager.CurrentRating = Mathf.Max(0, AccountManager.CurrentRating - Mathf.FloorToInt(0.1f * BalanceProvider.Balance.lossRatingMod * AccountManager.CurrentRating));
+        AccountManager.SaveProfile();
         AddScoreToLeaderBoard();
         UnlockAchievement(GPGSIds.achievement_first_steps_in_space);
-        currencyLabel.text = m_currency.ToString();
-        ratingLabel.text = m_arenaRating.ToString();
+        currencyLabel.text = AccountManager.Currency.ToString();
+        ratingLabel.text = AccountManager.CurrentRating.ToString();
         return BalanceProvider.Balance.currencyPerFightMin;
     }
 
@@ -584,20 +463,14 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     {
         int bonusForPlace = (BalanceProvider.Balance.winnersCount - place) * 100;
         int moneyGained = BalanceProvider.Balance.currencyPerFightMin + BalanceProvider.Balance.currencyPerWin + BalanceProvider.Balance.currencyPlaceBonus * (BalanceProvider.Balance.winnersCount - place);
-        m_currency += moneyGained;
-        m_arenaRating = Mathf.Max(0, m_arenaRating + Mathf.CeilToInt((bonusForPlace + 200) * BalanceProvider.Balance.victoryRatingMod * 2000f / Mathf.Max(1000f, m_arenaRating)));
-        SaveProfile();
+        AccountManager.Currency += moneyGained;
+        AccountManager.CurrentRating = Mathf.Max(0, AccountManager.CurrentRating + Mathf.CeilToInt((bonusForPlace + 200) * BalanceProvider.Balance.victoryRatingMod * 2000f / Mathf.Max(1000f, AccountManager.CurrentRating)));
+        AccountManager.SaveProfile();
         AddScoreToLeaderBoard();
         UnlockAchievement(GPGSIds.achievement_first_steps_in_space);
-        currencyLabel.text = m_currency.ToString();
-        ratingLabel.text = m_arenaRating.ToString();
+        currencyLabel.text = AccountManager.Currency.ToString();
+        ratingLabel.text = AccountManager.CurrentRating.ToString();
         return moneyGained;
-    }
-
-    public void SetOnline()
-    {
-        mDatabaseRef.Child(m_userId).Child("online").SetValueAsync(true);
-        mDatabaseRef.Child(m_userId).Child("deviceId").SetValueAsync(m_deviceId);
     }
 
     public bool IsAchievementUnlocked(string id)
@@ -635,286 +508,27 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         m_achievementsDesc = new List<IAchievementDescription>(achievementsDesc);
     }
 
-    public void SaveCredentials(bool onlyLocal = false, bool isNewAccount = false, bool isPlayGames = false)
-    {
-        if (!isPlayGames)
-        {
-            PlayerPrefs.SetString("email", m_email);
-            PlayerPrefs.SetString("pass", m_password);
-        }
-
-        if (isNewAccount)
-            m_userName = m_inputName.text;
-
-        if (onlyLocal) { m_credentialsSaved = true; return; }
-
-        mDatabaseRef.Child(m_userId).Child("email").SetValueAsync(m_email).ContinueWith(task =>
-        {
-            if (isNewAccount)
-            {
-                mNicknamesDB.Child(m_userId).SetValueAsync(m_userName).ContinueWith(task =>
-                {
-                    m_credentialsSaved = true;
-                });
-            }
-            else
-                m_credentialsSaved = true;
-        });
-    }
-
     public int GetShipNumber(PlayerController ship)
     {
         return availableShips.FindIndex(x => x.ID == ship.ID);
     }
 
-    public int GetUpgradeLevel(PlayerController ship, UpgradeData upgrade)
-    {
-        CheckUpgradesInfo();
-
-        int shipIdx = GetShipNumber(ship);
-        int upgradeIdx = ship.GetUpgradeNumber(upgrade);
-
-        return m_upgradesInfo.shipUpgradeLevels[shipIdx].upgradeLevels[upgradeIdx];
-    }
-
-    public int GetUpgradeLevel(int shipNumber, int upgradeNumber)
-    {
-        CheckUpgradesInfo();
-
-        return m_upgradesInfo.shipUpgradeLevels[shipNumber].upgradeLevels[upgradeNumber];
-    }
-
-    public void IncreaseUpgradeLevel(PlayerController ship, UpgradeData upgrade)
-    {
-        CheckUpgradesInfo();
-
-        int shipIdx = GetShipNumber(ship);
-        int upgradeIdx = ship.GetUpgradeNumber(upgrade);
-
-        m_upgradesInfo.shipUpgradeLevels[shipIdx].upgradeLevels[upgradeIdx] += 1;
-
-        SaveProfile();
-    }
-
-    public void SetUpgradeLevel(PlayerController ship, UpgradeData upgrade, int level)
-    {
-        CheckUpgradesInfo();
-
-        int shipIdx = GetShipNumber(ship);
-        int upgradeIdx = ship.GetUpgradeNumber(upgrade);
-
-        m_upgradesInfo.shipUpgradeLevels[shipIdx].upgradeLevels[upgradeIdx] = level;
-
-        SaveProfile();
-    }
-
-    public void SetUpgradeLevel(int shipNumber, int upgradeNumber, int level)
-    {
-        CheckUpgradesInfo();
-
-        m_upgradesInfo.shipUpgradeLevels[shipNumber].upgradeLevels[upgradeNumber] = level;
-
-        SaveProfile();
-    }
-
-    void CheckUpgradesInfo()
-    {
-        if (m_upgradesInfo.shipUpgradeLevels == null || m_upgradesInfo.shipUpgradeLevels.Count == 0)
-        {
-            m_upgradesInfo.shipUpgradeLevels = new List<ShipUpgradesInfo>();
-
-            for (int i = 0; i < availableShips.Count; i++)
-            {
-                ShipUpgradesInfo sui = new ShipUpgradesInfo();
-                sui.upgradeLevels = new List<int>();
-
-                for (int u = 0; u < availableShips[i].Upgrades.Count; u++)
-                {
-                    sui.upgradeLevels.Add(0);
-                }
-
-                m_upgradesInfo.shipUpgradeLevels.Add(sui);
-            }
-        }
-    }
-
     public void OnDailyRewardsChanged(int lastDailyRewardDebugTime, string lastDailyRewardTime, int lastDailyReward)
     {
-        m_lastDailyRewardDebugTime = lastDailyRewardDebugTime;
-        m_lastDailyRewardTime = lastDailyRewardTime;
-        m_lastDailyReward = lastDailyReward;
-
-        SaveProfile();
-    }
-
-    public void SaveProfile()
-    {
-        if (!m_signedIn || !m_loadedProfile) return;
-
-        DatabaseReference userTable = mDatabaseRef.Child(m_userId);
-
-        userTable.Child("username").SetValueAsync(m_userName);
-        userTable.Child("nameChanged").SetValueAsync(m_nameChanged);
-        userTable.Child("email").SetValueAsync(m_email);
-        userTable.Child("arenaRating").SetValueAsync(m_arenaRating);
-        userTable.Child("currency").SetValueAsync(m_currency);
-
-        userTable.Child("lastDailyRewardDebugTime").SetValueAsync(m_lastDailyRewardDebugTime);
-        userTable.Child("lastDailyRewardTime").SetValueAsync(m_lastDailyRewardTime);
-        userTable.Child("lastDailyReward").SetValueAsync(m_lastDailyReward);
-
-        userTable.Child("tutorialDone").SetValueAsync(m_tutorialDone);
-        userTable.Child("arenaTutorialDone").SetValueAsync(m_arenaTutorialDone);
-        userTable.Child("missionTutorialDone").SetValueAsync(m_missionTutorialDone);
-
-        CheckUpgradesInfo();
-
-        string saveData = JsonUtility.ToJson(m_upgradesInfo);
-
-        userTable.Child("UpgradesInfo").SetRawJsonValueAsync(saveData);
-    }
-
-    public void SaveTutorialStep()
-    {
-        mDatabaseRef.Child(m_userId).Child("tutorialStep").SetValueAsync(TutorialController.instance.TutorialStep);
+        AccountManager.OnDailyRewardsChanged(lastDailyRewardDebugTime, lastDailyRewardTime, lastDailyReward);
     }
 
     public void OnTutorialDone()
     {
-        m_tutorialDone = true;
-        SaveProfile();
+        AccountManager.OnFirstTutorialDone();
     }
 
-    public void LoadProfile(bool defaultProfile = false)
-    {
-        if (!defaultProfile && mDatabaseRef.Child(m_userId) != null)
-        {
-            mDatabaseRef.Child(m_userId).GetValueAsync().ContinueWith(task =>
-            {
-                if (task.IsFaulted)
-                {
+    
 
-                }
-                else if (task.IsCompleted)
-                {
-                    LoadProfileFromSnapshot(task.Result);
-                }
-            });
-        }
-        else
-            LoadProfileFromSnapshot(null);
-    }
-
-    private void OnApplicationPause(bool pause)
-    {
-        if (m_closeGameOnError || mDatabaseRef == null || !m_signedIn) return;
-
-        if (pause)
-            mDatabaseRef.Child(m_userId).Child("online").SetValueAsync(false);
-        else
-            mDatabaseRef.Child(m_userId).Child("online").SetValueAsync(true);
-    }
-
-    private void OnApplicationQuit()
-    {
-        if (!m_closeGameOnError && m_signedIn)
-            mDatabaseRef.Child(m_userId).Child("online").SetValueAsync(false);
-
-        m_loginQueueLength--;
-        mQueueValueRef.SetValueAsync(m_loginQueueLength);
-
-        SignOut();
-    }
-
-    private void LoadNicknamesFromSnapshot(DataSnapshot snapshot)
-    {
-        m_usedNicknamesList.Clear();
-
-        foreach (var nicknameData in snapshot.Children)
-        {
-            string name = nicknameData.Value.ToString();
-
-            m_usedNicknamesList.Add(name);
-        }
-    }
-
-    private void LoadProfileFromSnapshot(DataSnapshot snapshot)
-    {
-        bool notEmptyProfile = snapshot != null && snapshot.ChildrenCount > 1;
-
-        bool isOnline = notEmptyProfile ? bool.Parse(snapshot.Child("online").Value.ToString()) : false;
-
-        string deviceId = notEmptyProfile && snapshot.HasChild("deviceId") ? snapshot.Child("deviceId").Value.ToString() : m_deviceId;
-
-        if (isOnline && m_deviceId != deviceId)
-        {
-            m_loginError = "Someone is already logged in your account. Game will be closed.";
-            m_closeGameOnError = true;
-            m_signInFailed = true;
-
-            return;
-        }
-
-        m_userName = notEmptyProfile && snapshot.HasChild("username") ? snapshot.Child("username").Value.ToString() : m_userName;
-
-        m_nameChanged = notEmptyProfile && snapshot.HasChild("nameChanged") ? bool.Parse(snapshot.Child("nameChanged").Value.ToString()) : false;
-
-        if (m_email.Length < 2)
-            m_email = notEmptyProfile ? snapshot.Child("email").Value.ToString() : "";
-
-        m_arenaRating = notEmptyProfile && snapshot.HasChild("arenaRating") ? int.Parse(snapshot.Child("arenaRating").Value.ToString()) : BalanceProvider.Balance.initArenaRating;
-
-        m_currency = notEmptyProfile && snapshot.HasChild("currency") ? int.Parse(snapshot.Child("currency").Value.ToString()) : BalanceProvider.Balance.initCurrency;
-
-        m_lastDailyRewardDebugTime = notEmptyProfile && snapshot.HasChild("lastDailyRewardDebugTime") ? int.Parse(snapshot.Child("lastDailyRewardDebugTime").Value.ToString()) : 0;
-        m_lastDailyRewardTime = notEmptyProfile && snapshot.HasChild("lastDailyRewardTime") ? snapshot.Child("lastDailyRewardTime").Value.ToString() : "";
-        m_lastDailyReward = notEmptyProfile && snapshot.HasChild("lastDailyReward") ? int.Parse(snapshot.Child("lastDailyReward").Value.ToString()) : 0;
-
-        m_tutorialDone = notEmptyProfile && snapshot.HasChild("tutorialDone") ? bool.Parse(snapshot.Child("tutorialDone").Value.ToString()) : false;
-        m_arenaTutorialDone = notEmptyProfile && snapshot.HasChild("arenaTutorialDone") ? bool.Parse(snapshot.Child("arenaTutorialDone").Value.ToString()) : false;
-        m_missionTutorialDone = notEmptyProfile && snapshot.HasChild("missionTutorialDone") ? bool.Parse(snapshot.Child("missionTutorialDone").Value.ToString()) : false;
-        m_tutorialStep = notEmptyProfile && snapshot.HasChild("tutorialStep") ? int.Parse(snapshot.Child("tutorialStep").Value.ToString()) : 0;
-
-        string restoredData = "";
-
-        if (notEmptyProfile)
-            restoredData = snapshot.Child("UpgradesInfo").GetRawJsonValue();
-
-        if (restoredData == null || restoredData.Length < 2)
-            m_upgradesInfo = new UpgradesInfo();
-        else
-            m_upgradesInfo = JsonUtility.FromJson<UpgradesInfo>(restoredData);
-
-        m_loadedProfile = true;
-    }
-
-    public bool TrySignIn()
-    {
-        m_email = PlayerPrefs.GetString("email", "");
-        m_password = PlayerPrefs.GetString("pass", "");
-
-        string googleToken = PlayerPrefs.GetString("googleId", "");
-
-        if (googleToken.Length > 2)
-        {
-            m_signingIn = true;
-            SignInWithGoogleOnFirebase(googleToken);
-            return true;
-        }
-        else if (m_email.Length > 2)
-        {
-            StartCoroutine(WaitForLoginFail());
-            m_signingIn = true;
-            SignIn(m_email, m_password);
-            return true;
-        }
-
-        return false;
-    }
-
+    #region Auth Handlers
     public void SignUp()
     {
-        if (m_signingIn) return;
+        if (AuthController.IsSigningIn) return;
 
         if (m_inputName.text.Length < 2)
         {
@@ -934,33 +548,27 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
             return;
         }
 
-        if (m_usedNicknamesList.Contains(m_inputName.text))
+        if (AccountManager.IsNicknameUsed(m_inputName.text))
         {
             MessageBox.instance.Show("This nickname is already taken!");
             return;
         }
 
-        m_signingIn = true;
-
-        StartCoroutine(WaitForLoginFail());
-
-        CreateAccount(m_inputSignUpEmail.text, m_inputSignUpPass.text);
+        AuthController.WaitForLoginFail();
+        AuthController.CreateAccount(m_inputSignUpEmail.text, m_inputSignUpPass.text);
     }
 
     public void SignIn()
     {
-        if (m_signingIn) return;
+        if (AuthController.IsSigningIn) return;
 
-        m_signingIn = true;
-
-        StartCoroutine(WaitForLoginFail());
-
-        SignIn(m_inputEmail.text, m_inputPass.text);
+        AuthController.WaitForLoginFail();
+        AuthController.SignIn(m_inputEmail.text, m_inputPass.text);
     }
 
     public void SignUpWithGoogle()
     {
-        if (m_signingIn) return;
+        if (AuthController.IsSigningIn) return;
 
         if (m_inputName.text.Length < 2)
         {
@@ -980,156 +588,22 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
             return;
         }
 
-        if (m_usedNicknamesList.Contains(m_inputName.text))
+        if (AccountManager.IsNicknameUsed(m_inputName.text))
         {
             MessageBox.instance.Show("This nickname is already taken!");
             return;
         }
 
-        m_signingIn = true;
-
-        StartCoroutine(WaitForLoginFail());
-
-        SignInWithGoogle();
+        AuthController.WaitForLoginFail();
+        AuthController.SignInWithGoogle();
     }
-
-    public void SignInWithGoogle()
-    {
-        GoogleSignIn.DefaultInstance?.SignIn().ContinueWith(OnGoogleAuthFinished);
-    }
-
-    void OnGoogleAuthFinished(Task<GoogleSignInUser> task)
-    {
-        if (task.IsCompleted)
-            SignInWithGoogleOnFirebase(task.Result.IdToken);
-    }
-
-    private void SignInWithPlayGamesOnFirebase(string idToken)
-    {
-        Firebase.Auth.FirebaseAuth auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
-        Firebase.Auth.Credential credential =
-            Firebase.Auth.PlayGamesAuthProvider.GetCredential(idToken);
-
-        auth.SignInWithCredentialAsync(credential).ContinueWith(task =>
-        {
-            if (task.IsCanceled)
-            {
-                Debug.LogError("SignInWithCredentialAsync was canceled.");
-                m_loginError = "Logging in was canceled.";
-                m_signingIn = false;
-                m_playGamesSignInSuccess = false;
-                m_playGamesSignInEnded = true;
-                return;
-            }
-            if (task.IsFaulted)
-            {
-                Debug.LogError("SignInWithCredentialAsync encountered an error: " + task.Exception);
-                m_loginError = task.Exception.Message;
-                m_signingIn = false;
-                m_playGamesSignInSuccess = false;
-                m_playGamesSignInEnded = true;
-                return;
-            }
-
-            Firebase.Auth.FirebaseUser newUser = task.Result;
-            Debug.LogFormat("User signed in successfully: {0} ({1})",
-                newUser.DisplayName, newUser.UserId);
-
-            m_email = newUser.Email;
-            m_userId = newUser.UserId;
-            m_userName = "Player" + m_usedNicknamesList.Count.ToString();
-            m_password = "";
-
-            m_signInFailed = false;
-            m_signedIn = true;
-            m_signingIn = false;
-            m_playGamesSignInSuccess = true;
-            m_playGamesSignInEnded = true;
-        });
-    }
-
-    private void SignInWithGoogleOnFirebase(string idToken)
-    {
-        Credential credential = GoogleAuthProvider.GetCredential(idToken, null);
-
-        auth.SignInWithCredentialAsync(credential).ContinueWith(task =>
-        {
-            if (task.IsCanceled)
-            {
-                Debug.LogError("SignInWithGoogleOnFirebase was canceled.");
-                m_loginError = "Logging in was canceled.";
-                m_signInFailed = true;
-                m_signingIn = false;
-                return;
-            }
-            if (task.IsFaulted)
-            {
-                Debug.LogError("SignInWithGoogleOnFirebase encountered an error: " + task.Exception);
-                m_loginError = task.Exception.Message;
-                m_signInFailed = true;
-                m_signingIn = false;
-                return;
-            }
-
-            FirebaseUser newUser = task.Result;
-            Debug.LogFormat("User signed in successfully: {0} ({1})", newUser.DisplayName, newUser.UserId);
-
-            m_email = newUser.Email;
-            m_userId = newUser.UserId;
-            m_password = "";
-
-            m_signInFailed = false;
-            m_signedIn = true;
-            m_signingIn = false;
-
-            PlayerPrefs.SetString("googleId", idToken);
-        });
-    }
-
-    public void SignIn(string email, string password)
-    {
-        auth.SignInWithEmailAndPasswordAsync(email, password).ContinueWith(task =>
-        {
-            if (task.IsCanceled)
-            {
-                Debug.LogError("SignInWithEmailAndPasswordAsync was canceled.");
-                m_loginError = "Logging in was canceled.";
-                m_signInFailed = true;
-                m_signingIn = false;
-                return;
-            }
-            if (task.IsFaulted)
-            {
-                Debug.LogError("SignInWithEmailAndPasswordAsync encountered an error: " + task.Exception);
-                m_loginError = task.Exception.Message;
-                m_signInFailed = true;
-                m_signingIn = false;
-                return;
-            }
-
-            FirebaseUser newUser = task.Result;
-            Debug.LogFormat("User signed in successfully: {0} ({1})", newUser.DisplayName, newUser.UserId);
-
-            m_email = email;
-            m_userId = newUser.UserId;
-            m_password = password;
-
-            m_signInFailed = false;
-            m_signedIn = true;
-            m_signingIn = false;
-        });
-    }
-
-    public void SignOut()
-    {
-        auth.SignOut();
-    }
+    #endregion
 
     public void TryChangeName()
     {
         string newName = m_inputProfileName.text;
 
-        if (newName.Equals(m_userName))
+        if (newName.Equals(AccountManager.UserName))
         {
             return;
         }
@@ -1137,33 +611,28 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         if (newName.Length < 2)
         {
             MessageBox.instance.Show("Your nickname is too short!");
-            m_inputProfileName.text = m_userName;
+            m_inputProfileName.text = AccountManager.UserName;
             return;
         }
 
-        if (m_usedNicknamesList.Contains(newName))
+        if (AccountManager.IsNicknameUsed(newName))
         {
             MessageBox.instance.Show("This nickname is already taken!");
-            m_inputProfileName.text = m_userName;
+            m_inputProfileName.text = AccountManager.UserName;
             return;
         }
 
-        m_userName = newName;
+        AccountManager.SetUserName(newName);
         PhotonNetwork.NickName = newName;
-        m_nameChanged = true;
         changeNameBtn.gameObject.SetActive(false);
         changeNameBtnPaid.gameObject.SetActive(true);
-
-        mNicknamesDB.Child(UserID).SetValueAsync(m_userName);
-
-        SaveProfile();
     }
 
     public void ChangeNamePaid()
     {
         string newName = m_inputProfileName.text;
 
-        if (newName.Equals(m_userName))
+        if (newName.Equals(AccountManager.UserName))
         {
             return;
         }
@@ -1171,48 +640,43 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         if (newName.Length < 2)
         {
             MessageBox.instance.Show("Your nickname is too short!");
-            m_inputProfileName.text = m_userName;
+            m_inputProfileName.text = AccountManager.UserName;
             return;
         }
 
-        if (m_usedNicknamesList.Contains(newName))
+        if (AccountManager.IsNicknameUsed(newName))
         {
             MessageBox.instance.Show("This nickname is already taken!");
-            m_inputProfileName.text = m_userName;
+            m_inputProfileName.text = AccountManager.UserName;
             return;
         }
 
-        if (m_currency < BalanceProvider.Balance.nameChangeCost)
+        if (AccountManager.Currency < BalanceProvider.Balance.nameChangeCost)
         {
             MessageBox.instance.Show("Not enough money!");
-            m_inputProfileName.text = m_userName;
+            m_inputProfileName.text = AccountManager.UserName;
             return;
         }
 
-        m_currency -= BalanceProvider.Balance.nameChangeCost;
+        AccountManager.Currency -= BalanceProvider.Balance.nameChangeCost;
 
-        m_userName = newName;
+        AccountManager.SetUserName(newName);
         PhotonNetwork.NickName = newName;
-        m_nameChanged = true;
+
         changeNameBtn.gameObject.SetActive(false);
-
-        mNicknamesDB.Child(UserID).SetValueAsync(m_userName);
-
-        SaveProfile();
     }
 
     public void Connect()
     {
         if (isConnecting) return;
         // #Critical, we must first and foremost connect to Photon Online Server.
-        PhotonNetwork.NickName = m_userName;
+        PhotonNetwork.NickName = AccountManager.UserName;
         isConnecting = PhotonNetwork.ConnectUsingSettings();
         PhotonNetwork.GameVersion = gameVersion;
-        m_loginQueueLength++;
-        if (m_loginQueueLength > 1)
+        AccountManager.IncreaseLoginQueueLength();
+        if (AccountManager.LoginQueueLength > 1)
             m_loginQueueText.gameObject.SetActive(true);
-        m_loginQueueText.text = "Your position in queue: " + m_loginQueueLength.ToString();
-        mQueueValueRef.SetValueAsync(m_loginQueueLength);
+        m_loginQueueText.text = "Your position in queue: " + AccountManager.LoginQueueLength.ToString();
     }
 
     public void FindRoom()
@@ -1223,7 +687,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
             m_loadingScreen.SetActive(true);
             m_loadingText.text = "FINDING A GAME...";
             // #Critical we need at this point to attempt joining a Random Room. If it fails, we'll get notified in OnJoinRandomFailed() and we'll create one.
-            string sqlLobbyFilter = string.Format("C0 BETWEEN {0} AND {1} AND C1 = '{2}'", Mathf.Max(0, m_arenaRating - BalanceProvider.Balance.matchmakingGap), m_arenaRating + BalanceProvider.Balance.matchmakingGap, selectedMap);
+            string sqlLobbyFilter = string.Format("C0 BETWEEN {0} AND {1} AND C1 = '{2}'", Mathf.Max(0, AccountManager.CurrentRating - BalanceProvider.Balance.matchmakingGap), AccountManager.CurrentRating + BalanceProvider.Balance.matchmakingGap, selectedMap);
             PhotonNetwork.JoinRandomRoom(null, 0, MatchmakingMode.FillRoom, sqlLobby, sqlLobbyFilter);
         }
         else
@@ -1265,8 +729,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         }
 
         m_loginQueueText.gameObject.SetActive(false);
-        m_loginQueueLength--;
-        mQueueValueRef.SetValueAsync(m_loginQueueLength);
+        
+        AccountManager.ReduceLoginQueueLength();
 
         //Some optimization
         PhotonNetwork.UseRpcMonoBehaviourCache = true;
@@ -1293,15 +757,6 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         OnMainScreenLoaded();
     }
 
-    private void Update()
-    {
-        if (isConnectedToMaster && m_playersCountText)
-        {
-            m_playersCountText.text = "Players online: " + PhotonNetwork.CountOfPlayers + "\nPlayers on arena: " + PhotonNetwork.CountOfPlayersInRooms;
-        }
-    }
-
-
     public override void OnDisconnected(DisconnectCause cause)
     {
         isConnectedToMaster = false;
@@ -1313,9 +768,6 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         //Connect();
     }
 
-
-    #endregion
-
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
         if (isRoomCreating || PhotonNetwork.NetworkClientState == ClientState.Joining || isRoomLoading) return;
@@ -1323,18 +775,6 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         Debug.Log("OnJoinRandomFailed() was called by PUN. No random room available, so we create one.\nCalling: PhotonNetwork.CreateRoom");
 
         CreateRoom();
-    }
-
-    private void CreateRoom()
-    {
-        isRoomCreating = true;
-
-        RoomOptions roomOptions = new RoomOptions();
-        roomOptions.MaxPlayers = (byte)BalanceProvider.Balance.maxPlayersPerRoom;
-        roomOptions.EmptyRoomTtl = 1000;
-        roomOptions.CustomRoomProperties = new ExitGames.Client.Photon.Hashtable { { ELO_PROP_KEY, m_arenaRating }, { MAP_PROP_KEY, selectedMap } };
-        roomOptions.CustomRoomPropertiesForLobby = new string[] { ELO_PROP_KEY, MAP_PROP_KEY };
-        PhotonNetwork.CreateRoom(null, roomOptions, sqlLobby);
     }
 
     public override void OnJoinedRoom()
@@ -1348,76 +788,23 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         PhotonNetwork.LoadLevel(selectedMap);
     }
 
-    public void OnArenaLoaded()
+    #endregion
+
+    private void CreateRoom()
     {
-        PhotonNetwork.IsMessageQueueRunning = true;
-        m_loadingScreen.SetActive(false);
+        isRoomCreating = true;
+
+        RoomOptions roomOptions = new RoomOptions();
+        roomOptions.MaxPlayers = (byte)BalanceProvider.Balance.maxPlayersPerRoom;
+        roomOptions.EmptyRoomTtl = 1000;
+        roomOptions.CustomRoomProperties = new ExitGames.Client.Photon.Hashtable { { ELO_PROP_KEY, AccountManager.CurrentRating }, { MAP_PROP_KEY, selectedMap } };
+        roomOptions.CustomRoomPropertiesForLobby = new string[] { ELO_PROP_KEY, MAP_PROP_KEY };
+        PhotonNetwork.CreateRoom(null, roomOptions, sqlLobby);
     }
 
-    public void OpenLeaderboard()
+    private void OnLoginFailed()
     {
-        if (Social.localUser.authenticated)
-            Social.Active.ShowLeaderboardUI();
-    }
-
-    public void OpenLoginScreen()
-    {
-        m_signingIn = false;
-        m_loadingGears.SetActive(false);
-        m_signupScreen.SetActive(false);
-        m_loginScreen.SetActive(true);
-        m_inputName.text = "Player";
-    }
-
-    public void CloseLoginScreen()
-    {
-        m_loadingGears.SetActive(true);
-        m_loginScreen.SetActive(false);
-    }
-
-    private IEnumerator WaitForLoginFail()
-    {
-        yield return new WaitUntil(() => m_signInFailed);
-
-        MessageBox.instance.Show(m_loginError);
-
         if (m_closeGameOnError)
             StartCoroutine(CloseGameAfterDelay());
-    }
-
-    public void CreateAccount(string email, string password)
-    {
-        auth.CreateUserWithEmailAndPasswordAsync(email, password).ContinueWith(task =>
-        {
-            if (task.IsCanceled)
-            {
-                Debug.LogError("CreateUserWithEmailAndPasswordAsync was canceled.");
-                m_loginError = "Account creation was canceled.";
-                m_signInFailed = true;
-                m_signingIn = false;
-                return;
-            }
-            if (task.IsFaulted)
-            {
-                Debug.LogError("CreateUserWithEmailAndPasswordAsync encountered an error: " + task.Exception);
-                m_loginError = "Account with this email already exists";
-                m_signInFailed = true;
-                m_signingIn = false;
-                return;
-            }
-
-            // Firebase user has been created.
-            FirebaseUser newUser = task.Result;
-            Debug.LogFormat("Firebase user created successfully: {0} ({1})", newUser.DisplayName, newUser.UserId);
-
-            m_email = email;
-            m_password = password;
-            m_userId = newUser.UserId;
-
-            m_newProfile = true;
-            m_signInFailed = false;
-            m_signedIn = true;
-            m_signingIn = false;
-        });
     }
 }
