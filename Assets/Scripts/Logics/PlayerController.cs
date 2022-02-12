@@ -590,7 +590,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     {
         foreach (var upgrade in m_upgrades)
         {
-            int upgradeLevel = Launcher.instance.GetUpgradeLevel(this, upgrade);
+            int upgradeLevel = AccountManager.GetUpgradeLevel(this, upgrade);
 
             if (upgradeLevel > 0)
             {
@@ -967,9 +967,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         if (!isMissionMode)
         {
-            int oldRating = Launcher.instance.CurrentRating;
+            int oldRating = AccountManager.CurrentRating;
             int moneyGained = Launcher.instance.OnFightLoss();
-            int newRating = Launcher.instance.CurrentRating;
+            int newRating = AccountManager.CurrentRating;
 
             PlayerUI.Instance.OnLoss(oldRating, newRating - oldRating, place, moneyGained);
         }
@@ -989,9 +989,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         if (!isMissionMode)
         {
-            int oldRating = Launcher.instance.CurrentRating;
+            int oldRating = AccountManager.CurrentRating;
             int moneyGained = Launcher.instance.OnFightWon(place);
-            int newRating = Launcher.instance.CurrentRating;
+            int newRating = AccountManager.CurrentRating;
 
             PlayerUI.Instance.OnWin(oldRating, newRating - oldRating, place, moneyGained);
         }
@@ -1007,7 +1007,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     public void SendRatingAndUpgrades()
     {
         if (!isMissionMode)
-            photonView.RPC("SendRatingAndUpgrades_RPC", RpcTarget.All, Name, Launcher.instance.CurrentRating, m_upgradesScore);
+            photonView.RPC("SendRatingAndUpgrades_RPC", RpcTarget.All, Name, AccountManager.CurrentRating, m_upgradesScore);
     }
 
     [PunRPC]
@@ -1319,7 +1319,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
                 if (photonView.IsMine && !IsAI)
                 {
                     PlayerUI.Instance.OnLobbyPlayerAdded(m_name, ShipIcon, false);
-                    PlayerUI.Instance.AddPlayerStatsSlot(this, Launcher.instance.CurrentRating, m_upgradesScore);
+                    PlayerUI.Instance.AddPlayerStatsSlot(this, AccountManager.CurrentRating, m_upgradesScore);
                 }
 
                 if (!isMissionMode)

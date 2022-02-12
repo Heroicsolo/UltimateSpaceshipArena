@@ -60,15 +60,15 @@ namespace NiobiumStudios
 
         private void LoadDebugTime ()
         {
-            int debugHours = Launcher.instance.LastDailyRewardDebugTime;
+            int debugHours = AccountManager.LastDailyRewardDebugTime;
             debugTime = new TimeSpan(debugHours, 0, 0);
         }
 
         // Check if the player have unclaimed prizes
         public void CheckRewards()
         {
-            string lastClaimedTimeStr = Launcher.instance.LastDailyRewardTime;
-            lastReward = Launcher.instance.LastDailyReward;
+            string lastClaimedTimeStr = AccountManager.LastDailyRewardTime;
+            lastReward = AccountManager.LastDailyReward;
 
             // It is not the first time the user claimed.
             // We need to know if he can claim another reward or not

@@ -237,7 +237,7 @@ public static class AuthController
     public static void OnSecondLoginRegistered()
     {
         m_loginError = "Someone is already logged in your account. Game will be closed.";
-        m_closeGameOnError = true;
+        Launcher.instance.CloseGameOnError = true;
         m_signInFailed = true;
     }
 
@@ -323,6 +323,8 @@ public static class AuthController
 
     public static async void SignIn()
     {
+        m_signedIn = false;
+
         bool emailSigningIn = TrySignIn();
 
         if (!emailSigningIn)
@@ -339,6 +341,11 @@ public static class AuthController
                 m_signingIn = false;
                 Launcher.instance.OpenLoginScreen();
             }
+        }
+
+        while (!m_signedIn)
+        {
+            await Task.Yield();
         }
 
         IsAuthorized = true;

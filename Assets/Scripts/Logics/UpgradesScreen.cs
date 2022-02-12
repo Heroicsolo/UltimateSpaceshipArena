@@ -49,7 +49,7 @@ public class UpgradesScreen : MonoBehaviour
             {
                 GameObject slot = Instantiate(upgradeSlotPrefab, upgradesHolder);
                 UpgradeSlot us = slot.GetComponent<UpgradeSlot>();
-                int upgradeLevel = Launcher.instance.GetUpgradeLevel(pc, upgrade);
+                int upgradeLevel = AccountManager.GetUpgradeLevel(pc, upgrade);
                 us.SetData(upgrade, upgradeLevel, this, pc);
                 upgradeSlots.Add(us);
 

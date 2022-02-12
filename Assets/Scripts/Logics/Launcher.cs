@@ -67,16 +67,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     /// </summary>
     const string gameVersion = "6";
 
-    private Firebase.FirebaseApp app = null;
-    private FirebaseAuth auth;
-    
-    private bool m_googlePlayConnected = false;
     private bool m_closeGameOnError = false;
-    private bool m_DB_loaded = false;
     private bool m_newProfile = false;
-    private bool m_loadedBalance = false;
-
-    private bool m_justEntered = false;
 
     private bool isConnecting;
     private bool isConnectedToMaster;
@@ -108,7 +100,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
     public bool IsSoundOn { get { return isSoundOn; } set { isSoundOn = value; PlayerPrefs.SetInt("soundOn", isSoundOn ? 1 : 0); } }
 
-    public bool CloseGameOnError => m_closeGameOnError;
+    public bool CloseGameOnError { get { return m_closeGameOnError; } set { m_closeGameOnError = value; } }
 
     public List<PlayerController> AvailableShips => availableShips;
     
@@ -171,8 +163,6 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
             {
                 // Create and hold a reference to your FirebaseApp,
                 // where app is a Firebase.FirebaseApp property of your application class.
-                app = Firebase.FirebaseApp.DefaultInstance;
-
                 InitFirebase();
                 // Set a flag here to indicate whether Firebase is ready to use by your app.
             }
@@ -219,8 +209,6 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
     private void InitFirebase()
     {
-        auth = FirebaseAuth.DefaultInstance;
-
         AccountManager.Init();
         BalanceProvider.Init();
 
@@ -265,7 +253,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
         m_loadingText.text = "CONNECTING TO SERVER...";
 
-        yield return new WaitUntil(() => m_DB_loaded && BalanceProvider.IsLoaded);
+        yield return new WaitUntil(() => AccountManager.IsNicknamesListLoaded && BalanceProvider.IsLoaded);
 
         m_loadingText.text = "CONNECTING TO GOOGLE PLAY...";
 
@@ -316,8 +304,6 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         changeNameBtn.gameObject.SetActive(!AccountManager.IsNameChanged);
         changeNameBtnPaid.gameObject.SetActive(AccountManager.IsNameChanged);
         changeNameCostLabel.text = BalanceProvider.Balance.nameChangeCost.ToString();
-
-        m_justEntered = true;
 
         chatManager.gameObject.SetActive(true);
 

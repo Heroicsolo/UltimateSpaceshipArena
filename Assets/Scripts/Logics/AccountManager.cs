@@ -50,6 +50,7 @@ public static class AccountManager
 
     public static Action<int> OnQueueChanged;
     public static bool IsLoaded = false;
+    public static bool IsNicknamesListLoaded = false;
 
     public static string UserName => m_userName;
     public static int CurrentRating { get { return m_arenaRating; } set { m_arenaRating = value; } }
@@ -98,6 +99,8 @@ public static class AccountManager
 
             m_usedNicknamesList.Add(name);
         }
+
+        IsNicknamesListLoaded = true;
     }
 
     private static void CheckUsedNicknames(object sender, ValueChangedEventArgs args)

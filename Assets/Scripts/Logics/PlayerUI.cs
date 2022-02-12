@@ -478,7 +478,7 @@ public class PlayerUI : MonoBehaviour
             PlaySound(SoundType.GetReady, 20f);*/
 
         OnLobbyPlayerAdded(PhotonNetwork.NickName, target.ShipIcon, false);
-        AddPlayerStatsSlot(target, Launcher.instance.CurrentRating, target.UpgradesScore);
+        AddPlayerStatsSlot(target, AccountManager.CurrentRating, target.UpgradesScore);
 
         if (isMissionMode)
         {
@@ -524,12 +524,12 @@ public class PlayerUI : MonoBehaviour
         {
             target.OnMissionStarted();
 
-            if (!Launcher.instance.IsMissionTutorialDone)
+            if (!AccountManager.IsMissionTutorialDone)
                 TutorialController.instance.ShowCustomTutorialUnit("Capture the Nexus on the right side of this area and kill all drones on the way!", minimapNexus.GetComponent<RectTransform>(), OnMissionTutorialDone);
         }
         else
         {
-            if (!Launcher.instance.IsArenaTutorialDone)
+            if (!AccountManager.IsArenaTutorialDone)
                 TutorialController.instance.ShowCustomTutorialUnit("Move to the Nexus on Arena center and try to capture it!", minimapNexus.GetComponent<RectTransform>(), OnArenaTutorialDone);
         }
 

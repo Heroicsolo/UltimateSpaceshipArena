@@ -29,7 +29,7 @@ public class UpgradeSlot : MonoBehaviour
         icon.sprite = data.icon;
         title.text = data.title;
         currentCost = data.cost + Mathf.CeilToInt(level * data.cost * 0.5f);
-        if (currentCost > Launcher.instance.Currency) costLabel.color = Color.red;
+        if (currentCost > AccountManager.Currency) costLabel.color = Color.red;
         Refresh();
     }
 
@@ -37,7 +37,7 @@ public class UpgradeSlot : MonoBehaviour
     {
         costLabel.text = currentCost.ToString();
         levelLabel.text = "lvl " + currentLevel.ToString();
-        if (currentCost > Launcher.instance.Currency) costLabel.color = Color.red;
+        if (currentCost > AccountManager.Currency) costLabel.color = Color.red;
     }
 
     public void ShowDesc()
@@ -47,15 +47,15 @@ public class UpgradeSlot : MonoBehaviour
 
     public void TryUpgrade()
     {
-        if (currentCost > Launcher.instance.Currency) return;
+        if (currentCost > AccountManager.Currency) return;
 
-        Launcher.instance.Currency -= currentCost;
+        AccountManager.Currency -= currentCost;
 
         currentLevel++;
         currentCost = data.cost + Mathf.CeilToInt(currentLevel * data.cost * 0.5f);
         Refresh();
         upgradesScreen.Refresh();
 
-        Launcher.instance.IncreaseUpgradeLevel(pc, data);
+        AccountManager.IncreaseUpgradeLevel(pc, data);
     }
 }

@@ -28,7 +28,7 @@ public class ChatManager : MonoBehaviourPunCallbacks, IChatClientListener
 
     void Start()
     {
-        m_justEntered = false;
+        m_justEntered = true;
 
         chatClient = new ChatClient(this);
 

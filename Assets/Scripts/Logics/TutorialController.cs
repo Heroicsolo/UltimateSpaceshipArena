@@ -150,7 +150,7 @@ public class TutorialController : MonoBehaviour
         {
             firstTutorialStep++;
 
-            Launcher.instance.SaveTutorialStep();
+            AccountManager.SaveTutorialStep();
 
             if (firstTutorialStep > firstTutorial.Count - 1)
             {
