@@ -14,6 +14,7 @@ using GooglePlayGames.BasicApi;
 using GooglePlayGames;
 using UnityEngine.SocialPlatforms;
 using NiobiumStudios;
+using GameAnalyticsSDK;
 
 public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 {
@@ -136,6 +137,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         audioSource = GetComponentInChildren<AudioSource>();
 
         Input.multiTouchEnabled = true;
+
+        GameAnalytics.Initialize();
 
         // #Critical
         // this makes sure we can use PhotonNetwork.LoadLevel() on the master client and all clients in the same room sync their level automatically
@@ -328,6 +331,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         if (myReward.unit == "Credits")
         {
             AccountManager.Currency += myReward.reward;
+            GameAnalytics.NewResourceEvent(GAResourceFlowType.Source, "credits", myReward.reward, "DailyRewards", "DailyReward_" + day.ToString());
         }
 
         currencyLabel.text = AccountManager.Currency.ToString();
@@ -417,8 +421,10 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
     public int OnMissionCompleted(float completionTime)
     {
+        GameAnalytics.NewProgressionEvent(GAProgressionStatus.Complete, "Mission", PlayerController.LocalPlayer.Score);
         int moneyGained = BalanceProvider.Balance.currencyPerMissionMin + Mathf.CeilToInt((180f / (10f + completionTime)) * BalanceProvider.Balance.missionTimeRewardModifier * 100);
         AccountManager.Currency += moneyGained;
+        GameAnalytics.NewResourceEvent(GAResourceFlowType.Source, "credits", moneyGained, "MissionRewards", "MissionReward");
         AccountManager.SaveProfile();
         UnlockAchievement(GPGSIds.achievement_mission_is_possible);
         currencyLabel.text = AccountManager.Currency.ToString();
@@ -427,12 +433,14 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
     public void OnMissionFailed()
     {
-
+        GameAnalytics.NewProgressionEvent(GAProgressionStatus.Fail, "Mission", PlayerController.LocalPlayer.Score);
     }
 
     public int OnFightLoss()
     {
+        GameAnalytics.NewProgressionEvent(GAProgressionStatus.Fail, "Arena", PlayerController.LocalPlayer.Score);
         AccountManager.Currency += BalanceProvider.Balance.currencyPerFightMin;
+        GameAnalytics.NewResourceEvent(GAResourceFlowType.Source, "credits", BalanceProvider.Balance.currencyPerFightMin, "ArenaRewards", "FightLoss");
         AccountManager.CurrentRating = Mathf.Max(0, AccountManager.CurrentRating - Mathf.FloorToInt(0.1f * BalanceProvider.Balance.lossRatingMod * AccountManager.CurrentRating));
         AccountManager.SaveProfile();
         AddScoreToLeaderBoard();
@@ -444,9 +452,11 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
     public int OnFightWon(int place = 1)
     {
+        GameAnalytics.NewProgressionEvent(GAProgressionStatus.Complete, "Arena", PlayerController.LocalPlayer.Score);
         int bonusForPlace = (BalanceProvider.Balance.winnersCount - place) * 100;
         int moneyGained = BalanceProvider.Balance.currencyPerFightMin + BalanceProvider.Balance.currencyPerWin + BalanceProvider.Balance.currencyPlaceBonus * (BalanceProvider.Balance.winnersCount - place);
         AccountManager.Currency += moneyGained;
+        GameAnalytics.NewResourceEvent(GAResourceFlowType.Source, "credits", moneyGained, "ArenaRewards", "FightWon");
         AccountManager.CurrentRating = Mathf.Max(0, AccountManager.CurrentRating + Mathf.CeilToInt((bonusForPlace + 200) * BalanceProvider.Balance.victoryRatingMod * 2000f / Mathf.Max(1000f, AccountManager.CurrentRating)));
         AccountManager.SaveProfile();
         AddScoreToLeaderBoard();
@@ -503,6 +513,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
     public void OnTutorialDone()
     {
+        GameAnalytics.NewDesignEvent("tutorial_complete");
         AccountManager.OnFirstTutorialDone();
     }
 
@@ -605,6 +616,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
             return;
         }
 
+        GameAnalytics.NewDesignEvent("name_changed_free");
         AccountManager.SetUserName(newName);
         PhotonNetwork.NickName = newName;
         changeNameBtn.gameObject.SetActive(false);
@@ -642,7 +654,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         }
 
         AccountManager.Currency -= BalanceProvider.Balance.nameChangeCost;
-
+        GameAnalytics.NewDesignEvent("name_changed_paid");
+        GameAnalytics.NewResourceEvent(GAResourceFlowType.Sink, "credits", BalanceProvider.Balance.nameChangeCost, "AccountServices", "NameChange");
         AccountManager.SetUserName(newName);
         PhotonNetwork.NickName = newName;
 
@@ -667,6 +680,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         if (PhotonNetwork.IsConnectedAndReady && !PhotonNetwork.InRoom && isConnectedToMaster)
         {
             selectedMap = "Arena00";
+            GameAnalytics.NewProgressionEvent(GAProgressionStatus.Start, "Arena", selectedMap);
             m_loadingScreen.SetActive(true);
             m_loadingText.text = "FINDING A GAME...";
             // #Critical we need at this point to attempt joining a Random Room. If it fails, we'll get notified in OnJoinRandomFailed() and we'll create one.
@@ -684,6 +698,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         if (PhotonNetwork.IsConnectedAndReady && !PhotonNetwork.InRoom && isConnectedToMaster)
         {
             selectedMap = "Mission00";
+            GameAnalytics.NewProgressionEvent(GAProgressionStatus.Start, "Mission", selectedMap);
             m_loadingScreen.SetActive(true);
             m_loadingText.text = "STARTING MISSION...";
             // #Critical we need at this point to attempt joining a Random Room. If it fails, we'll get notified in OnJoinRandomFailed() and we'll create one.

@@ -1,3 +1,4 @@
+using GameAnalyticsSDK;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -50,6 +51,7 @@ public class UpgradeSlot : MonoBehaviour
         if (currentCost > AccountManager.Currency) return;
 
         AccountManager.Currency -= currentCost;
+        GameAnalytics.NewResourceEvent(GAResourceFlowType.Sink, "credits", currentCost, "ShipUpgrades", "ShipUpgrade_" + data.id);
 
         currentLevel++;
         currentCost = data.cost + Mathf.CeilToInt(currentLevel * data.cost * 0.5f);

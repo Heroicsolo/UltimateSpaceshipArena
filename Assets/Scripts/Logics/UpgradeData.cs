@@ -5,6 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "New UpgradeData", menuName = "Upgrade Data", order = 51)]
 public class UpgradeData : ScriptableObject
 {
+    [SerializeField] public string id;
     [SerializeField] public string title;
     [SerializeField] public string desc;
     [SerializeField] public Sprite icon;

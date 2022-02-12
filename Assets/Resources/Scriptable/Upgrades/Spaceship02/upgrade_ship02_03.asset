@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0740ff4ffb7b7a14180f735a0353f03a, type: 3}
   m_Name: upgrade_ship02_03
   m_EditorClassIdentifier: 
+  id: enhanced_repair
   title: Enhanced Repair
   desc: Each time repair will restore 40% more durability
   icon: {fileID: 21300000, guid: c16180dcfa7ce714baf66b19c6244390, type: 3}

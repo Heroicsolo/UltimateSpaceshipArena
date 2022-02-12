@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0740ff4ffb7b7a14180f735a0353f03a, type: 3}
   m_Name: upgrade_ship00_03
   m_EditorClassIdentifier: 
+  id: confident_offensive
   title: Confident Offensive
   desc: Fly speed and max energy shield charge increased by 20%
   icon: {fileID: 21300000, guid: df7529001be5f2b459f96ffb2ac2be43, type: 3}

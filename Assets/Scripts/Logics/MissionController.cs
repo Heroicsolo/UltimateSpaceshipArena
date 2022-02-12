@@ -144,6 +144,7 @@ public class MissionController : MonoBehaviourPunCallbacks, IRoomController
             if (m_missionBots.Contains(player))
             {
                 m_missionBots.Remove(player);
+                PlayerController.LocalPlayer.KillsCount++;
             }
         }
         else
