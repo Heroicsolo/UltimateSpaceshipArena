@@ -20,9 +20,6 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     public static Launcher instance;
 
     #region Private Serializable Fields
-
-    [SerializeField] private int initArenaRating = 1000;
-    
     [Header("SignIn and SignUp UI")]
     [SerializeField] private GameObject m_loginScreen;
     [SerializeField] private GameObject m_signupScreen;

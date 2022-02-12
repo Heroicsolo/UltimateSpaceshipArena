@@ -186,9 +186,14 @@ MonoBehaviour:
   - {fileID: 5758942790406504222}
   - {fileID: 7399408029813995702}
   BombLaunchPosition: {fileID: 3705567810215598646}
+  ShipIcon: {fileID: 21300000, guid: 32a42bc5fbfe4d8479b76bf314d3b5af, type: 3}
+  ShipTitle: Drone
   FloatingTextSpawnPosition: {fileID: 606853974519858472}
   ImmortalityOrb: {fileID: 1900988176852242735}
   NameLabel: {fileID: 8186621526043632540}
+  HPBar: {fileID: 8427018906572113634}
+  ShieldBar: {fileID: 3449344697821147479}
+  BarsOffset: 22
   EngineFlames: []
   repairEffect: {fileID: 8861877638916713715}
   fieldEffect: {fileID: 579447019121523654}
@@ -201,9 +206,6 @@ MonoBehaviour:
   DeathEffect: {fileID: 7275128885303935947}
   isAI: 1
   isMissionBot: 1
-  HPBar: {fileID: 8427018906572113634}
-  ShieldBar: {fileID: 3449344697821147479}
-  BarsOffset: 22
   AIEnemyFindingRadius: 150
   AIPickupsFindingRadius: 100
   AINexusFindingRadius: 0
@@ -213,8 +215,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 4a7c2be73870cb747a877de63d3cda01, type: 2}
   - {fileID: 11400000, guid: 7d1f20fa55de5de4aa8a3d8272b6e0e8, type: 2}
   - {fileID: 11400000, guid: 71a8ba5cff484fe4593e7cd48c86da60, type: 2}
-  ShipIcon: {fileID: 21300000, guid: 32a42bc5fbfe4d8479b76bf314d3b5af, type: 3}
-  ShipTitle: Drone
   m_forceField: 0
   m_radarRadius: 40
   m_durabilityRegen: 0
