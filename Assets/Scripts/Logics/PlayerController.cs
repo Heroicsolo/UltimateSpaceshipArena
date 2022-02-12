@@ -5,6 +5,7 @@ using Photon.Pun;
 using UnityEngine.UI;
 using TMPro;
 using System.Linq;
+using GameAnalyticsSDK;
 
 public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 {
@@ -950,7 +951,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             int place = Mathf.Min(m_balance.maxPlayersPerRoom, sortedPlayers.FindIndex(x => x == this) + 1);
 
             if (Name == byPlayer)
+            {
+                GameAnalytics.NewDesignEvent("nexus_captured_by_player");
                 OnWin();
+            }
             else
                 OnLoss(place + 1);
         }
