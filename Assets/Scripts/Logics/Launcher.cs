@@ -74,10 +74,6 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     private bool isRoomCreating = false;
     private bool isRoomLoading = false;
 
-    private List<IAchievement> m_achievementsState;
-    private List<IAchievementDescription> m_achievementsDesc;
-    private bool m_achievementsLoaded = false;
-
     private bool isSoundOn = true;
 
     private GameObject m_selectedShip;
@@ -428,7 +424,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         AccountManager.Currency += moneyGained;
         GameAnalytics.NewResourceEvent(GAResourceFlowType.Source, "credits", moneyGained, "MissionRewards", "MissionReward");
         AccountManager.SaveProfile();
-        UnlockAchievement(GPGSIds.achievement_mission_is_possible);
+        AccountManager.UnlockAchievement(GPGSIds.achievement_mission_is_possible);
         currencyLabel.text = AccountManager.Currency.ToString();
         return moneyGained;
     }
@@ -446,7 +442,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         AccountManager.CurrentRating = Mathf.Max(0, AccountManager.CurrentRating - Mathf.FloorToInt(0.1f * BalanceProvider.Balance.lossRatingMod * AccountManager.CurrentRating));
         AccountManager.SaveProfile();
         AddScoreToLeaderBoard();
-        UnlockAchievement(GPGSIds.achievement_first_steps_in_space);
+        AccountManager.UnlockAchievement(GPGSIds.achievement_first_steps_in_space);
         currencyLabel.text = AccountManager.Currency.ToString();
         ratingLabel.text = AccountManager.CurrentRating.ToString();
         return BalanceProvider.Balance.currencyPerFightMin;
@@ -462,45 +458,10 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         AccountManager.CurrentRating = Mathf.Max(0, AccountManager.CurrentRating + Mathf.CeilToInt((bonusForPlace + 200) * BalanceProvider.Balance.victoryRatingMod * 2000f / Mathf.Max(1000f, AccountManager.CurrentRating)));
         AccountManager.SaveProfile();
         AddScoreToLeaderBoard();
-        UnlockAchievement(GPGSIds.achievement_first_steps_in_space);
+        AccountManager.UnlockAchievement(GPGSIds.achievement_first_steps_in_space);
         currencyLabel.text = AccountManager.Currency.ToString();
         ratingLabel.text = AccountManager.CurrentRating.ToString();
         return moneyGained;
-    }
-
-    public bool IsAchievementUnlocked(string id)
-    {
-        foreach (var a in m_achievementsState)
-        {
-            if (a.id == id && a.completed) return true;
-        }
-
-        return false;
-    }
-
-    public void UnlockAchievement(string id)
-    {
-        if (Social.localUser.authenticated && !IsAchievementUnlocked(id))
-            (Social.Active as PlayGamesPlatform).UnlockAchievement(id, achievementUpdated);
-    }
-
-    private void achievementUpdated(bool updated)
-    {
-        (Social.Active as PlayGamesPlatform).LoadAchievements(InitAchievements);
-    }
-
-    private void InitAchievements(IAchievement[] achievements)
-    {
-        m_achievementsState = new List<IAchievement>(achievements);
-
-        m_achievementsLoaded = true;
-
-        (Social.Active as PlayGamesPlatform).LoadAchievementDescriptions(InitAchievementsDesc);
-    }
-
-    private void InitAchievementsDesc(IAchievementDescription[] achievementsDesc)
-    {
-        m_achievementsDesc = new List<IAchievementDescription>(achievementsDesc);
     }
 
     public int GetShipNumber(PlayerController ship)

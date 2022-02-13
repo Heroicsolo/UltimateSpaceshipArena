@@ -52,7 +52,7 @@ public static class AuthController
             {
                 authCode = PlayGamesPlatform.Instance.GetServerAuthCode();
                 m_GP_initialized = true;
-                (Social.Active as PlayGamesPlatform).LoadAchievements(InitAchievements);
+                (Social.Active as PlayGamesPlatform).LoadAchievements(AccountManager.InitAchievements);
             }
             else
             {

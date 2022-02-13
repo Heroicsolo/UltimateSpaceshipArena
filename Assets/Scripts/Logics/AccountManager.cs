@@ -3,6 +3,9 @@ using Firebase.Database;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using GooglePlayGames.BasicApi;
+using GooglePlayGames;
+using UnityEngine.SocialPlatforms;
 using UnityEngine;
 
 [Serializable]
@@ -30,6 +33,10 @@ public static class AccountManager
     private static string m_lastDailyRewardTime;
     private static int m_lastDailyReward;
     private static string m_currNicknameIdx = "";
+
+    private static List<IAchievement> m_achievementsState;
+    private static List<IAchievementDescription> m_achievementsDesc;
+    private static bool m_achievementsLoaded = false;
 
     public static int LastDailyRewardDebugTime => m_lastDailyRewardDebugTime;
     public static string LastDailyRewardTime => m_lastDailyRewardTime;
@@ -184,6 +191,41 @@ public static class AccountManager
             m_upgradesInfo = JsonUtility.FromJson<UpgradesInfo>(restoredData);
 
         IsLoaded = true;
+    }
+
+    public static bool IsAchievementUnlocked(string id)
+    {
+        foreach (var a in m_achievementsState)
+        {
+            if (a.id == id && a.completed) return true;
+        }
+
+        return false;
+    }
+
+    public static void UnlockAchievement(string id)
+    {
+        if (Social.localUser.authenticated && !IsAchievementUnlocked(id))
+            (Social.Active as PlayGamesPlatform).UnlockAchievement(id, achievementUpdated);
+    }
+
+    private static void achievementUpdated(bool updated)
+    {
+        (Social.Active as PlayGamesPlatform).LoadAchievements(InitAchievements);
+    }
+
+    public static void InitAchievements(IAchievement[] achievements)
+    {
+        m_achievementsState = new List<IAchievement>(achievements);
+
+        m_achievementsLoaded = true;
+
+        (Social.Active as PlayGamesPlatform).LoadAchievementDescriptions(InitAchievementsDesc);
+    }
+
+    private static void InitAchievementsDesc(IAchievementDescription[] achievementsDesc)
+    {
+        m_achievementsDesc = new List<IAchievementDescription>(achievementsDesc);
     }
 
     public static void ReduceLoginQueueLength()
