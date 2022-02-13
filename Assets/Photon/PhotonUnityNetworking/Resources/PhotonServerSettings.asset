@@ -64,6 +64,7 @@ MonoBehaviour:
   - FreeSpawnPointResponse_RPC
   - OnMasterChanged_RPC
   - OnNameSet_RPC
+  - LaunchTurretProjectile_RPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

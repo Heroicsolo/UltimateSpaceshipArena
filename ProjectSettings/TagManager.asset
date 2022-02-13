@@ -10,6 +10,7 @@ TagManager:
   - Enemy
   - Bomb
   - Pickup
+  - Turret
   layers:
   - Default
   - TransparentFX

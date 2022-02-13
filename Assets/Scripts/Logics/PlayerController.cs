@@ -1710,7 +1710,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
             PlayerController owner = isMissionMode ? missionController.GetPlayerByName(proj.ownerName) : arenaController.GetPlayerByName(proj.ownerName);
 
-            if (isMissionMode && owner.IsAI && IsAI) return;
+            if (isMissionMode && owner != null && owner.IsAI && IsAI) return;
 
             if (proj.ownerName != m_name)
             {

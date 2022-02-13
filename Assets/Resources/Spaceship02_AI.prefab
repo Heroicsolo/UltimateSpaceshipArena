@@ -5541,7 +5541,7 @@ MonoBehaviour:
   isMissionBot: 0
   AIEnemyFindingRadius: 300
   AIPickupsFindingRadius: 400
-  AINexusFindingRadius: 600
+  AINexusFindingRadius: 400
   AIDurabilityPercentToRetreat: 0.3
   m_upgrades: []
   m_skills:

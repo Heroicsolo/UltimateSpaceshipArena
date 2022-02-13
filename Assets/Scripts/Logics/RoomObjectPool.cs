@@ -14,6 +14,8 @@ public class RoomObjectPool
         {
             if (!p.activeSelf)
             {
+                p.transform.position = position;
+                p.transform.rotation = rotation;
                 p.SetActive(true);
                 return p;
             }

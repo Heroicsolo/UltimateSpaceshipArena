@@ -114,6 +114,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   poolable: 1
+  turretProjectile: 0
   damageMin: 3
   damageMax: 4
   critChance: 0.05

@@ -6,6 +6,7 @@ using Photon.Pun;
 public class Projectile : MonoBehaviourPunCallbacks
 {
     public bool poolable = false;
+    public bool turretProjectile = false;
     public int damageMin = 2;
     public int damageMax = 3;
     public float critChance = 0.05f;
@@ -61,6 +62,10 @@ public class Projectile : MonoBehaviourPunCallbacks
     public override void OnEnable()
     {
         timeToDeath = lifeTime;
+
+        target = null;
+        targetSelected = false;
+        timeToChangeTarget = 0f;
 
         if (explodeEffect)
         {
@@ -153,18 +158,24 @@ public class Projectile : MonoBehaviourPunCallbacks
 
             Explode();
         }
+        else if (other.CompareTag("Turret") && !turretProjectile)
+        {
+            Explode();
+        }
     }
 
-    public void SetOwner(string ownerName, string ownerID)
+    public void SetOwner(string _ownerName, string _ownerID)
     {
-        photonView.RPC("SetOwner_RPC", RpcTarget.All, ownerName, ownerID);
+        this.ownerID = _ownerID;
+        this.ownerName = _ownerName;
+        photonView.RPC("SetOwner_RPC", RpcTarget.All, _ownerName, _ownerID);
     }
 
     [PunRPC]
-    void SetOwner_RPC(string ownerName, string ownerID)
+    void SetOwner_RPC(string _ownerName, string _ownerID)
     {
-        this.ownerID = ownerID;
-        this.ownerName = ownerName;
+        this.ownerID = _ownerID;
+        this.ownerName = _ownerName;
     }
 
     public void Explode()
@@ -180,6 +191,11 @@ public class Projectile : MonoBehaviourPunCallbacks
             explodeEffect.transform.parent = null;
             explodeEffect.Play();
         }
+
+        timeToDeath = lifeTime;
+        target = null;
+        targetSelected = false;
+        timeToChangeTarget = 0f;
 
         if (!poolable)
             PhotonNetwork.Destroy(gameObject);
