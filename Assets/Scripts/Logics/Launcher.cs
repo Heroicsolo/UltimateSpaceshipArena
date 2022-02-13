@@ -15,6 +15,7 @@ using GooglePlayGames;
 using UnityEngine.SocialPlatforms;
 using NiobiumStudios;
 using GameAnalyticsSDK;
+using Facebook.Unity;
 
 public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 {
@@ -139,6 +140,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         Input.multiTouchEnabled = true;
 
         GameAnalytics.Initialize();
+        FB.Init();
 
         // #Critical
         // this makes sure we can use PhotonNetwork.LoadLevel() on the master client and all clients in the same room sync their level automatically
