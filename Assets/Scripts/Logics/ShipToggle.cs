@@ -37,4 +37,32 @@ public class ShipToggle : MonoBehaviour
         m_skillIcon2.sprite = m_shipData.Skills[1].icon;
         m_skillIcon3.sprite = m_shipData.Skills[2].icon;
     }
+
+    private void Refresh()
+    {
+        List<UpgradeData> upgradesList = m_shipData.Upgrades;
+
+        Animator buttonAnimator = GetComponentInChildren<Animator>(true);
+        buttonAnimator.enabled = false;
+
+        foreach (var upgrade in upgradesList)
+        {
+            bool isMaxLvl = false;
+            if (AccountManager.IsUpgradeAvailable(m_shipData, upgrade, out isMaxLvl))
+            {
+                buttonAnimator.enabled = true;
+                break;
+            }
+        }
+    }
+
+    private void OnEnable()
+    {
+        Refresh();
+    }
+
+    private void Start()
+    {
+        Refresh();
+    }
 }

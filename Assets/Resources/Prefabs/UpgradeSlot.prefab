@@ -30,7 +30,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 3722920466088188236}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -159,16 +159,16 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3722920464737462118}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 3722920466088188236}
-  m_RootOrder: 3
+  m_Father: {fileID: 3722920465398044999}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 92, y: -29}
+  m_AnchoredPosition: {x: 69.70001, y: 0.099975586}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3722920464737462139
@@ -524,7 +524,8 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 3722920464737462117}
   m_Father: {fileID: 3722920466088188236}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -660,7 +661,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 3722920466088188236}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -776,6 +777,7 @@ GameObject:
   - component: {fileID: 3722920465815585496}
   - component: {fileID: 3722920465815585497}
   - component: {fileID: 3722920465815585498}
+  - component: {fileID: 5467275708669455195}
   m_Layer: 5
   m_Name: ButtonUpgrade
   m_TagString: Untagged
@@ -897,6 +899,25 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!95 &5467275708669455195
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3722920465815585476}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 0f77f3ef7b2fcc2479106ca68d82be7b, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &3722920466088188237
 GameObject:
   m_ObjectHideFlags: 0
@@ -930,7 +951,6 @@ RectTransform:
   - {fileID: 3722920465083753072}
   - {fileID: 3722920465815585499}
   - {fileID: 3722920465398044999}
-  - {fileID: 3722920464737462117}
   - {fileID: 3722920464559293614}
   - {fileID: 3722920465783887223}
   m_Father: {fileID: 0}
@@ -995,3 +1015,5 @@ MonoBehaviour:
   title: {fileID: 3722920464559293613}
   costLabel: {fileID: 3722920465398044998}
   levelLabel: {fileID: 3722920465783887222}
+  buttonLabel: {fileID: 3722920465005011203}
+  buttonAnimator: {fileID: 5467275708669455195}

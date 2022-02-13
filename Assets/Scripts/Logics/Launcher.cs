@@ -50,6 +50,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     [SerializeField] private List<PlayerController> availableShips;
     [SerializeField] private List<GameObject> hangarShips;
     [SerializeField] private GameObject dailyRewardsScreen;
+    [SerializeField] private GameObject m_shipsSelector;
     [SerializeField] private ChatManager chatManager;
 
     [Header("Profile Screen")]
@@ -73,6 +74,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     private bool isConnectedToMaster;
     private bool isRoomCreating = false;
     private bool isRoomLoading = false;
+    private bool isFightCompleted = false;
 
     private bool isSoundOn = true;
 
@@ -233,6 +235,16 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     public void OnCurrencyChanged()
     {
         currencyLabel.text = AccountManager.Currency.ToString();
+    }
+
+    public void ShowShipsSelector()
+    {
+        m_shipsSelector.SetActive(true);
+    }
+
+    public void HideShipsSelector()
+    {
+        m_shipsSelector.SetActive(false);
     }
 
     private IEnumerator CloseGameAfterDelay(float delay = 3f, bool openAppStore = false)
@@ -402,6 +414,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     {
         chatManager.ReconnectIfNeeded();
         ratingLabel.text = AccountManager.CurrentRating.ToString();
+        if (isFightCompleted)
+            ShowShipsSelector();
     }
 
     public void OnShipSelectorOpened()
@@ -419,6 +433,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
     public int OnMissionCompleted(float completionTime)
     {
+        isFightCompleted = true;
         GameAnalytics.NewProgressionEvent(GAProgressionStatus.Complete, "Mission", PlayerController.LocalPlayer.Score);
         int moneyGained = BalanceProvider.Balance.currencyPerMissionMin + Mathf.CeilToInt((180f / (10f + completionTime)) * BalanceProvider.Balance.missionTimeRewardModifier * 100);
         AccountManager.Currency += moneyGained;
@@ -431,11 +446,13 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
     public void OnMissionFailed()
     {
+        isFightCompleted = true;
         GameAnalytics.NewProgressionEvent(GAProgressionStatus.Fail, "Mission", PlayerController.LocalPlayer.Score);
     }
 
     public int OnFightLoss()
     {
+        isFightCompleted = true;
         GameAnalytics.NewProgressionEvent(GAProgressionStatus.Fail, "Arena", PlayerController.LocalPlayer.Score);
         AccountManager.Currency += BalanceProvider.Balance.currencyPerFightMin;
         GameAnalytics.NewResourceEvent(GAResourceFlowType.Source, "credits", BalanceProvider.Balance.currencyPerFightMin, "ArenaRewards", "FightLoss");
@@ -450,6 +467,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
     public int OnFightWon(int place = 1)
     {
+        isFightCompleted = true;
         GameAnalytics.NewProgressionEvent(GAProgressionStatus.Complete, "Arena", PlayerController.LocalPlayer.Score);
         int bonusForPlace = (BalanceProvider.Balance.winnersCount - place) * 100;
         int moneyGained = BalanceProvider.Balance.currencyPerFightMin + BalanceProvider.Balance.currencyPerWin + BalanceProvider.Balance.currencyPlaceBonus * (BalanceProvider.Balance.winnersCount - place);
@@ -743,6 +761,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         if (PhotonNetwork.NetworkClientState == ClientState.Joining || isRoomLoading) return;
         isRoomCreating = false;
         isRoomLoading = true;
+        isFightCompleted = false;
         Debug.Log("OnJoinedRoom() called by PUN. Now this client is in a room.");
         HideHangarShips();
         m_homeScreen.SetActive(false);

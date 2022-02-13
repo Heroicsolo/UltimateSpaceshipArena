@@ -94,4 +94,14 @@ public class UpgradesScreen : MonoBehaviour
     {
         SetData(playerController, true);
     }
+
+    private void OnDisable()
+    {
+        Launcher.instance.ShowShipsSelector();
+    }
+
+    private void OnEnable()
+    {
+        Launcher.instance.HideShipsSelector();
+    }
 }

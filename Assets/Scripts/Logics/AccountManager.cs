@@ -250,6 +250,22 @@ public static class AccountManager
         return m_upgradesInfo.shipUpgradeLevels[shipIdx].upgradeLevels[upgradeIdx];
     }
 
+    public static bool IsUpgradeAvailable(PlayerController ship, UpgradeData upgrade, out bool isMaxLevel)
+    {
+        CheckUpgradesInfo();
+
+        int shipIdx = Launcher.instance.GetShipNumber(ship);
+        int upgradeIdx = ship.GetUpgradeNumber(upgrade);
+
+        int currLvl = m_upgradesInfo.shipUpgradeLevels[shipIdx].upgradeLevels[upgradeIdx];
+
+        int currentCost = upgrade.cost + Mathf.CeilToInt(currLvl * upgrade.cost * 0.5f);
+
+        isMaxLevel = currLvl >= upgrade.maxUpgradeLevels;
+
+        return currLvl < upgrade.maxUpgradeLevels && Currency >= currentCost;
+    }
+
     public static int GetUpgradeLevel(int shipNumber, int upgradeNumber)
     {
         CheckUpgradesInfo();
