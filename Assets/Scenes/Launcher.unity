@@ -12160,6 +12160,7 @@ GameObject:
   - component: {fileID: 368046061}
   - component: {fileID: 368046060}
   - component: {fileID: 368046059}
+  - component: {fileID: 368046062}
   m_Layer: 5
   m_Name: ButtonMissions
   m_TagString: Untagged
@@ -12294,6 +12295,25 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 368046057}
   m_CullTransparentMesh: 1
+--- !u!95 &368046062
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 368046057}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 0f77f3ef7b2fcc2479106ca68d82be7b, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &376791892
 GameObject:
   m_ObjectHideFlags: 0
@@ -22609,6 +22629,7 @@ GameObject:
   - component: {fileID: 1079351757}
   - component: {fileID: 1079351756}
   - component: {fileID: 1079351755}
+  - component: {fileID: 1079351758}
   m_Layer: 5
   m_Name: ButtonShips
   m_TagString: Untagged
@@ -22743,6 +22764,25 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1079351753}
   m_CullTransparentMesh: 1
+--- !u!95 &1079351758
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1079351753}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 0f77f3ef7b2fcc2479106ca68d82be7b, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &1092101720
 GameObject:
   m_ObjectHideFlags: 0
@@ -52599,6 +52639,7 @@ GameObject:
   - component: {fileID: 2001592186}
   - component: {fileID: 2001592185}
   - component: {fileID: 2001592184}
+  - component: {fileID: 2001592187}
   m_Layer: 5
   m_Name: ButtonArena
   m_TagString: Untagged
@@ -52733,6 +52774,25 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2001592182}
   m_CullTransparentMesh: 1
+--- !u!95 &2001592187
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2001592182}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 0f77f3ef7b2fcc2479106ca68d82be7b, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &2007079840
 GameObject:
   m_ObjectHideFlags: 0
@@ -52950,6 +53010,9 @@ MonoBehaviour:
   - {fileID: 2129750294}
   dailyRewardsScreen: {fileID: 6946256476883541726}
   m_shipsSelector: {fileID: 1528247112}
+  m_shipsButton: {fileID: 1079351753}
+  m_arenaButton: {fileID: 2001592182}
+  m_missionButton: {fileID: 368046057}
   chatManager: {fileID: 358065029}
   changeNameBtn: {fileID: 2064206104}
   changeNameBtnPaid: {fileID: 117746112}

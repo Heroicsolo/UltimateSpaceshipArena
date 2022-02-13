@@ -93,6 +93,7 @@ public class UpgradesScreen : MonoBehaviour
     public void Refresh()
     {
         SetData(playerController, true);
+        Launcher.instance.RefreshTopButtons();
     }
 
     private void OnDisable()

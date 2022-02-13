@@ -51,6 +51,9 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     [SerializeField] private List<GameObject> hangarShips;
     [SerializeField] private GameObject dailyRewardsScreen;
     [SerializeField] private GameObject m_shipsSelector;
+    [SerializeField] private GameObject m_shipsButton;
+    [SerializeField] private GameObject m_arenaButton;
+    [SerializeField] private GameObject m_missionButton;
     [SerializeField] private ChatManager chatManager;
 
     [Header("Profile Screen")]
@@ -247,6 +250,29 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         m_shipsSelector.SetActive(false);
     }
 
+    public void RefreshTopButtons()
+    {
+        bool anyUpgradeAvailable = false;
+
+        foreach (var ship in availableShips)
+        {
+            foreach (var upgrade in ship.Upgrades)
+            {
+                bool isMaxLvl = false;
+                if (AccountManager.IsUpgradeAvailable(ship, upgrade, out isMaxLvl))
+                {
+                    anyUpgradeAvailable = true;
+                    break;
+                }
+            }
+        }
+
+        m_arenaButton.GetComponent<Animator>().enabled = !AccountManager.IsArenaTutorialDone;
+        m_missionButton.GetComponent<Animator>().enabled = AccountManager.IsArenaTutorialDone && !AccountManager.IsMissionTutorialDone;
+
+        m_shipsButton.GetComponent<Animator>().enabled = anyUpgradeAvailable;
+    }
+
     private IEnumerator CloseGameAfterDelay(float delay = 3f, bool openAppStore = false)
     {
         yield return new WaitForSecondsRealtime(delay);
@@ -316,6 +342,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         changeNameCostLabel.text = BalanceProvider.Balance.nameChangeCost.ToString();
 
         chatManager.gameObject.SetActive(true);
+
+        RefreshTopButtons();
 
         if (AccountManager.IsFirstTutorialDone)
         {
@@ -414,6 +442,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     {
         chatManager.ReconnectIfNeeded();
         ratingLabel.text = AccountManager.CurrentRating.ToString();
+        RefreshTopButtons();
         if (isFightCompleted)
             ShowShipsSelector();
     }
