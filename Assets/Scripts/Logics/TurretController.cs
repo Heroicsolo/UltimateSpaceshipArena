@@ -2,6 +2,7 @@ using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TurretController : MonoBehaviourPunCallbacks
 {
@@ -17,12 +18,26 @@ public class TurretController : MonoBehaviourPunCallbacks
     [SerializeField] List<Transform> shootPositions;
     [SerializeField] Transform headTransform;
     [SerializeField] MeshRenderer heatingIndicator;
+    [Header("Base Params")]
+    [SerializeField] int durability = 300;
+    [SerializeField] int shield = 100;
+    [SerializeField] private float m_shieldRegen = 0f;
     [Header("Audio")]
     [SerializeField] private AudioClip shootSound;
+    [Header("UI/FX")]
+    [SerializeField] private Image HPBar;
+    [SerializeField] private Image ShieldBar;
+    [SerializeField] private GameObject DamageTextPrefab;
+    [SerializeField] private Transform FloatingTextSpawnPosition;
+    [SerializeField] private GameObject InfoTextPrefab;
+    [SerializeField] private GameObject DeathEffect;
 
     private PlayerController currentTarget;
     private float currHeating = 0f;
     private float timeAfterPrevShot = 0f;
+    private float currentDurability = 300f;
+    private float currentShield = 0f;
+    private float m_currShieldRegenDelay = 0f;
     private bool isCooling = false;
     private bool isReadyToShoot = false;
     private bool isMissionMode = false;
@@ -72,6 +87,9 @@ public class TurretController : MonoBehaviourPunCallbacks
     // Update is called once per frame
     void Update()
     {
+        HPBar.fillAmount = currentDurability / durability;
+        ShieldBar.fillAmount = currentShield / shield;
+
         RefreshHeatingIndicator();
 
         if (!PhotonNetwork.IsMasterClient)
@@ -86,6 +104,21 @@ public class TurretController : MonoBehaviourPunCallbacks
         }
 
         FindTarget();
+
+        if (m_currShieldRegenDelay > 0f)
+        {
+            m_currShieldRegenDelay -= Time.deltaTime;
+
+            if (m_currShieldRegenDelay <= 0f)
+            {
+                m_currShieldRegenDelay = 0f;
+            }
+        }
+
+        if (currentShield < shield && m_shieldRegen > 0f && m_currShieldRegenDelay <= 0f)
+        {
+            currentShield = Mathf.Min(shield, currentShield + shield * m_shieldRegen * Time.deltaTime);
+        }
 
         if (currentTarget != null)
         {
@@ -185,6 +218,110 @@ public class TurretController : MonoBehaviourPunCallbacks
         }
     }
 
+    void SpawnDamageText(int amount, bool isCrit = false)
+    {
+        photonView.RPC("SpawnDamageText_RPC", RpcTarget.All, amount, isCrit);
+    }
+
+    [PunRPC]
+    void SpawnDamageText_RPC(int amount, bool isCrit = false)
+    {
+        GameObject txt = Instantiate(DamageTextPrefab, FloatingTextSpawnPosition.position, Quaternion.identity);
+        txt.GetComponent<FloatingText>().SetText(amount.ToString() + (isCrit ? "!" : ""));
+    }
+
+    void SpawnInfoText(string info)
+    {
+        photonView.RPC("SpawnInfoText_RPC", RpcTarget.All, info);
+    }
+
+    [PunRPC]
+    void SpawnInfoText_RPC(string info)
+    {
+        GameObject txt = Instantiate(InfoTextPrefab, FloatingTextSpawnPosition.position, Quaternion.identity);
+        txt.GetComponent<FloatingText>().SetText(info);
+    }
+
+    public void GetDamage(int amount, int damageToShield, bool ignoreShield = false, bool isCrit = false, float critModifier = 2f, string owner = "")
+    {
+        int actualDamage = amount;
+
+        if (isCrit)
+        {
+            actualDamage = Mathf.CeilToInt(actualDamage * critModifier);
+        }
+
+        if (damageToShield > 0)
+        {
+            int damageToField = Mathf.Min((int)currentShield, damageToShield);
+
+            currentShield -= damageToField;
+        }
+
+        if (!ignoreShield)
+        {
+            int damageToField = Mathf.Min((int)currentShield, actualDamage);
+
+            currentShield -= damageToField;
+
+            actualDamage -= damageToField;
+        }
+
+        if (actualDamage > 0)
+        {
+            currentDurability -= actualDamage;
+
+            SpawnDamageText(actualDamage, isCrit);
+        }
+        else
+        {
+            SpawnInfoText("Absorbed");
+        }
+
+        m_currShieldRegenDelay = BalanceProvider.Balance.shieldRegenDelay;
+
+        if (currentDurability <= 0f)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        photonView.RPC("DestroyOnNetwork", RpcTarget.All);
+    }
+
+    [PunRPC]
+    public void DestroyOnNetwork()
+    {
+        if (DeathEffect)
+        {
+            DeathEffect.transform.parent = null;
+            DeathEffect.SetActive(true);
+        }
+
+        PhotonNetwork.Destroy(gameObject);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Projectile"))
+        {
+            Projectile proj = other.GetComponent<Projectile>();
+
+            if (!proj.turretProjectile)
+            {
+                int actualDamage = Random.Range(proj.damageMin, proj.damageMax + 1);
+
+                bool isCrit = Random.value <= proj.critChance;
+
+                GetDamage(actualDamage, 0, proj.ignoreField, isCrit, proj.critDamageModifier, proj.ownerName);
+
+                proj.Explode();
+            }
+        }
+    }
+
     public void LaunchProjectile()
     {
         int launchPosIdx = Random.Range(0, shootPositions.Count);
@@ -203,7 +340,7 @@ public class TurretController : MonoBehaviourPunCallbacks
         GameObject proj = projectilesPool.Spawn(shootPositions[launchPosIdx].position, headTransform.rotation);
         Projectile p = proj.GetComponent<Projectile>();
         p.SetOwner("", "Turret");
-        
+
         if (audioSource && shootSound)
             audioSource.PlayOneShot(shootSound, 0.6f);
     }
@@ -214,6 +351,7 @@ public class TurretController : MonoBehaviourPunCallbacks
         {
             stream.SendNext(isCooling);
             stream.SendNext(currHeating);
+            stream.SendNext(currentDurability);
             stream.SendNext(headTransform.rotation);
         }
         else
@@ -226,6 +364,7 @@ public class TurretController : MonoBehaviourPunCallbacks
 
             this.isCooling = (bool)stream.ReceiveNext();
             this.currHeating = (float)stream.ReceiveNext();
+            this.currentDurability = (int)stream.ReceiveNext();
             this.networkRot = (Quaternion)stream.ReceiveNext();
         }
     }

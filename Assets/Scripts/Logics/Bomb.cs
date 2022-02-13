@@ -88,7 +88,7 @@ public class Bomb : MonoBehaviourPunCallbacks
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("ForceField") || other.CompareTag("Obstacle") || other.CompareTag("Projectile") || other.CompareTag("Bomb"))
+        if (other.CompareTag("ForceField") || other.CompareTag("Obstacle") || other.CompareTag("Projectile") || other.CompareTag("Bomb") || other.CompareTag("Turret"))
         {
             Explode();
         }
@@ -121,16 +121,29 @@ public class Bomb : MonoBehaviourPunCallbacks
             Destroy(explosionObject, 2f);
         }
 
-        if (m_roomPlayers != null && m_roomPlayers.Count > 0)
+        if (PhotonNetwork.IsMasterClient)
         {
-            foreach (var p in m_roomPlayers)
+            RaycastHit[] hits;
+            hits = Physics.SphereCastAll(transform.position, explosionRadius, Vector3.up, 1f, 1 << 6);
+            
+            foreach (var hit in hits)
             {
-                if (p.transform.Distance(transform) < explosionRadius)
-                {
-                    bool isCrit = Random.value <= critChance;
+                PlayerController p = hit.transform.GetComponent<PlayerController>();
 
-                    p.GetDamage(Random.Range(damageMin, damageMax + 1), damageToShield, ignoreField, isCrit, critDamageModifier, ownerName);
-                }
+                bool isCrit = Random.value <= critChance;
+
+                p.GetDamage(Random.Range(damageMin, damageMax + 1), damageToShield, ignoreField, isCrit, critDamageModifier, ownerName);
+            }
+
+            hits = Physics.SphereCastAll(transform.position, explosionRadius, Vector3.up, 1f, 1 << 7);
+
+            foreach (var hit in hits)
+            {
+                TurretController t = hit.transform.GetComponent<TurretController>();
+
+                bool isCrit = Random.value <= critChance;
+
+                t.GetDamage(Random.Range(damageMin, damageMax + 1), damageToShield, ignoreField, isCrit, critDamageModifier, ownerName);
             }
         }
 
