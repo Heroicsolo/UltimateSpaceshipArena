@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
-public class Bomb : MonoBehaviourPunCallbacks
+public class Bomb : SyncTransform
 {
     public int damageMin = 20;
     public int damageMax = 22;
@@ -58,7 +58,7 @@ public class Bomb : MonoBehaviourPunCallbacks
     // Update is called once per frame
     void Update()
     {
-        if (photonView.IsMine)
+        if (PhotonNetwork.IsMasterClient)
         {
             if (timeToDeath > 0f && timeToEnable <= 0f)
             {
@@ -88,6 +88,8 @@ public class Bomb : MonoBehaviourPunCallbacks
 
     void OnTriggerEnter(Collider other)
     {
+        if (!PhotonNetwork.IsMasterClient) return;
+
         if (other.CompareTag("ForceField") || other.CompareTag("Obstacle") || other.CompareTag("Projectile") || other.CompareTag("Bomb") || other.CompareTag("Turret"))
         {
             Explode();

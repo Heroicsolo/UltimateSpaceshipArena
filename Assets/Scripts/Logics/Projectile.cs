@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
-public class Projectile : MonoBehaviourPunCallbacks
+public class Projectile : SyncTransform
 {
     public bool poolable = false;
     public bool turretProjectile = false;
@@ -110,7 +110,7 @@ public class Projectile : MonoBehaviourPunCallbacks
             if (selectedTurrets.Count > 1)
                 selectedTurrets.Sort((a, b) => a.transform.Distance(transform).CompareTo(b.transform.Distance(transform)));
 
-            if (selectedPlayers[0] == null || (selectedTurrets[0].transform.Distance(transform) < selectedPlayers[0].transform.Distance(transform)))
+            if (selectedPlayers.Count < 1 || selectedPlayers[0] == null || (selectedTurrets[0].transform.Distance(transform) < selectedPlayers[0].transform.Distance(transform)))
             {
                 target = selectedTurrets[0].transform;
 
@@ -124,7 +124,7 @@ public class Projectile : MonoBehaviourPunCallbacks
     // Update is called once per frame
     void Update()
     {
-        if (photonView.IsMine)
+        if (PhotonNetwork.IsMasterClient)
         {
             timeToDeath -= Time.deltaTime;
 
@@ -171,6 +171,8 @@ public class Projectile : MonoBehaviourPunCallbacks
 
     void OnTriggerEnter(Collider other)
     {
+        if (!PhotonNetwork.IsMasterClient) return;
+
         if (other.CompareTag("Obstacle"))
         {
             Explode();

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TurretController : MonoBehaviourPunCallbacks
+public class TurretController : MonoBehaviourPunCallbacks, IPunObservable
 {
     [Header("Shooting Params")]
     [SerializeField] float angularSpeed = 90f;

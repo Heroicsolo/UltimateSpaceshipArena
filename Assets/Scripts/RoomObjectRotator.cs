@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RoomObjectRotator : MonoBehaviourPunCallbacks
+public class RoomObjectRotator : SyncTransform
 {
     [SerializeField] Vector3 rotationDirection;
     [SerializeField] float rotationSpeed;
