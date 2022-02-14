@@ -366,16 +366,16 @@ public class TurretController : MonoBehaviourPunCallbacks
         }
         else
         {
+            this.isCooling = (bool)stream.ReceiveNext();
+            this.currHeating = (float)stream.ReceiveNext();
+            this.currentDurability = (int)stream.ReceiveNext();
+            this.networkRot = (Quaternion)stream.ReceiveNext();
+
             //Lag compensation
             currentTime = 0.0f;
             lastPacketTime = currentPacketTime;
             currentPacketTime = info.SentServerTime;
             rotationAtLastPacket = transform.rotation;
-
-            this.isCooling = (bool)stream.ReceiveNext();
-            this.currHeating = (float)stream.ReceiveNext();
-            this.currentDurability = (int)stream.ReceiveNext();
-            this.networkRot = (Quaternion)stream.ReceiveNext();
         }
     }
 }

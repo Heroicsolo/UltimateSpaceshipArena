@@ -364,7 +364,7 @@ Transform:
   m_GameObject: {fileID: 3121226319578077292}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 20, y: 20, z: 20}
+  m_LocalScale: {x: 15, y: 15, z: 15}
   m_Children:
   - {fileID: 3121226319577908298}
   - {fileID: 3121226319577908296}
@@ -475,10 +475,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   angularSpeed: 80
   fireRate: 4
-  heatingPerShot: 0.05
+  heatingPerShot: 0.067
   coolingDelay: 1
   coolingPerSecond: 0.2
-  attackDistance: 180
+  attackDistance: 160
   attackStartAngle: 45
   projectilePrefab: {fileID: 6987788691464400540, guid: e985765ecc9520343a1d052f7fbf43a9, type: 3}
   shootPositions:

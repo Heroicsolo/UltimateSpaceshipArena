@@ -13797,8 +13797,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   poolable: 1
   turretProjectile: 1
-  damageMin: 6
-  damageMax: 8
+  damageMin: 4
+  damageMax: 5
   critChance: 0.05
   critDamageModifier: 2
   speed: 80
@@ -13809,7 +13809,7 @@ MonoBehaviour:
   dynamicGuidingInterval: 2
   guidingForce: 0.65
   guidingAngle: 45
-  guidingMaxDist: 200
+  guidingMaxDist: 160
   ownerID: 
   ownerName: 
   target: {fileID: 0}

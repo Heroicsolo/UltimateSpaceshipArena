@@ -179,7 +179,7 @@ public class Projectile : MonoBehaviourPunCallbacks
         {
             PlayerController pc = other.transform.parent.GetComponent<PlayerController>();
 
-            if (pc.Name == ownerName) return;
+            if (pc && pc.Name == ownerName) return;
 
             Explode();
         }
