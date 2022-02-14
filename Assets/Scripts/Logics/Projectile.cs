@@ -177,9 +177,9 @@ public class Projectile : MonoBehaviourPunCallbacks
         }
         else if (other.CompareTag("ForceField"))
         {
-            PhotonView view = other.transform.parent.GetComponent<PhotonView>();
+            PlayerController pc = other.transform.parent.GetComponent<PlayerController>();
 
-            if (view && view.IsMine) return;
+            if (pc.Name == ownerName) return;
 
             Explode();
         }
