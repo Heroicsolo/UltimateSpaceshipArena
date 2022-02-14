@@ -29,6 +29,7 @@ public class Bomb : SyncTransform
     private bool isMissionMode = false;
     private List<PlayerController> m_roomPlayers;
 
+    [SerializeField] private ParticleSystem hazardEffect;
     [SerializeField] private GameObject explosionObject;
     [SerializeField] private GameObject activationObject;
 
@@ -123,6 +124,11 @@ public class Bomb : SyncTransform
             Destroy(explosionObject, 2f);
         }
 
+        if (hazardEffect)
+        {
+            hazardEffect.Stop();
+        }
+
         if (PhotonNetwork.IsMasterClient)
         {
             RaycastHit[] hits;
@@ -163,6 +169,10 @@ public class Bomb : SyncTransform
         if (activationObject)
         {
             activationObject.SetActive(true);
+        }
+        if (hazardEffect)
+        {
+            hazardEffect.Play();
         }
         isActivated = true;
     }

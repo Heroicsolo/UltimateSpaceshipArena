@@ -1121,6 +1121,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     #region Skills
 
+    public void UseSkill(int idx)
+    {
+        UseSkill(m_skills[idx]);
+    }
+
     public void UseSkill(SkillData skill)
     {
         if (m_isDied) return;

@@ -819,6 +819,26 @@ public class PlayerUI : MonoBehaviour
             return;
         }
 
+        #if UNITY_EDITOR
+        if (!target.IsDied)
+        {
+            if (Input.GetKeyUp(KeyCode.Q))
+            {
+                target.UseSkill(0);
+            }
+
+            if (Input.GetKeyUp(KeyCode.E))
+            {
+                target.UseSkill(1);
+            }
+
+            if (Input.GetKeyUp(KeyCode.C))
+            {
+                target.UseSkill(2);
+            }
+        }
+        #endif
+
         List<SoundType> soundTypes = new List<SoundType>(soundsCDs.Keys);
         foreach (var soundType in soundTypes)
         {
