@@ -25,6 +25,7 @@ public class MissionController : MonoBehaviourPunCallbacks, IRoomController
 
     private List<PlayerController> m_roomPlayers = new List<PlayerController>();
     private List<PlayerController> m_missionBots = new List<PlayerController>();
+    private List<TurretController> m_roomTurrets = new List<TurretController>();
     private List<Pickup> m_roomPickups = new List<Pickup>();
     private List<Transform> m_availableSpawnPoints = new List<Transform>();
     private List<string> m_connectedPlayersNames = new List<string>();
@@ -44,6 +45,7 @@ public class MissionController : MonoBehaviourPunCallbacks, IRoomController
     public Transform NexusTransform => nexusPosition;
     public Vector3 NexusPosition => nexusPosition.position;
     public List<PlayerController> RoomPlayers => m_roomPlayers;
+    public List<TurretController> RoomTurrets => m_roomTurrets;
     public List<PlayerController> MissionBots => m_missionBots;
     public List<Pickup> RoomPickups => m_roomPickups;
 
@@ -247,6 +249,8 @@ public class MissionController : MonoBehaviourPunCallbacks, IRoomController
 
             SpawnPickups();
             SpawnBots();
+
+            m_roomTurrets = new List<TurretController>(FindObjectsOfType<TurretController>());
         }
 
         Launcher.instance.OnArenaLoaded();

@@ -20,6 +20,7 @@ public class ArenaController : MonoBehaviourPunCallbacks, IRoomController
     public float RespawnTime => BalanceProvider.Balance.respawnTimeBase;
 
     private List<PlayerController> m_roomPlayers = new List<PlayerController>();
+    private List<TurretController> m_roomTurrets = new List<TurretController>();
     private List<Pickup> m_roomPickups = new List<Pickup>();
     private List<Transform> m_botsSpawnPoints = new List<Transform>();
     private Dictionary<string, int> m_playersRatings = new Dictionary<string, int>();
@@ -27,6 +28,7 @@ public class ArenaController : MonoBehaviourPunCallbacks, IRoomController
     private float m_timeToJoin = 0f;
 
     public List<PlayerController> RoomPlayers => m_roomPlayers;
+    public List<TurretController> RoomTurrets => m_roomTurrets;
     public List<Pickup> RoomPickups => m_roomPickups;
 
     public bool TryPassMasterClient()
@@ -227,6 +229,8 @@ public class ArenaController : MonoBehaviourPunCallbacks, IRoomController
 
             SpawnPickups();
             SpawnBots();
+
+            m_roomTurrets = new List<TurretController>(FindObjectsOfType<TurretController>());
 
             if (PhotonNetwork.IsMasterClient)
                 AddRegisteredPlayersToLobbyUI();

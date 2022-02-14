@@ -19,6 +19,7 @@ public class TurretController : MonoBehaviourPunCallbacks
     [SerializeField] Transform headTransform;
     [SerializeField] MeshRenderer heatingIndicator;
     [Header("Base Params")]
+    [SerializeField] bool immortal = false;
     [SerializeField] int durability = 300;
     [SerializeField] int shield = 100;
     [SerializeField] private float m_shieldRegen = 0f;
@@ -56,6 +57,8 @@ public class TurretController : MonoBehaviourPunCallbacks
 
     private List<PlayerController> m_roomPlayers;
 
+    public float DurabilityPercent => currentDurability / durability;
+
 
     void Awake()
     {
@@ -69,6 +72,11 @@ public class TurretController : MonoBehaviourPunCallbacks
 
         projectilesPool = new RoomObjectPool();
         projectilesPool.prefabName = projectilePrefab.name;
+
+        if (immortal)
+        {
+            HPBar.transform.parent.gameObject.SetActive(false);
+        }
 
         if (ArenaController.instance != null)
         {
@@ -244,6 +252,8 @@ public class TurretController : MonoBehaviourPunCallbacks
 
     public void GetDamage(int amount, int damageToShield, bool ignoreShield = false, bool isCrit = false, float critModifier = 2f, string owner = "")
     {
+        if (immortal) return;
+
         int actualDamage = amount;
 
         if (isCrit)

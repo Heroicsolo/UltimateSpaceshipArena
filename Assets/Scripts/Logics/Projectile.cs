@@ -37,6 +37,7 @@ public class Projectile : MonoBehaviourPunCallbacks
     private ArenaController arenaController;
     private bool isMissionMode = false;
     private List<PlayerController> m_roomPlayers;
+    private List<TurretController> m_roomTurrets;
 
     [SerializeField] private ParticleSystem explodeEffect;
 
@@ -57,6 +58,7 @@ public class Projectile : MonoBehaviourPunCallbacks
         }
 
         m_roomPlayers = isMissionMode ? missionController.RoomPlayers : arenaController.RoomPlayers;
+        m_roomTurrets = isMissionMode ? missionController.RoomTurrets : arenaController.RoomTurrets;
     }
 
     public override void OnEnable()
@@ -77,6 +79,8 @@ public class Projectile : MonoBehaviourPunCallbacks
     {
         List<PlayerController> selectedPlayers = new List<PlayerController>();
 
+        List<TurretController> selectedTurrets = new List<TurretController>();
+
         foreach (var player in m_roomPlayers)
         {
             if (player.Name != ownerName && player.transform.Distance(transform) < guidingMaxDist && player.DurabilityPercent > 0f && !player.InStealth)
@@ -93,6 +97,27 @@ public class Projectile : MonoBehaviourPunCallbacks
             timeToChangeTarget = dynamicGuidingInterval;
 
             targetSelected = true;
+        }
+
+        foreach (var turret in m_roomTurrets)
+        {
+            if (turret != null && turret.transform.Distance(transform) < guidingMaxDist && turret.DurabilityPercent > 0f)
+                selectedTurrets.Add(turret);
+        }
+
+        if (selectedTurrets.Count > 0)
+        {
+            if (selectedTurrets.Count > 1)
+                selectedTurrets.Sort((a, b) => a.transform.Distance(transform).CompareTo(b.transform.Distance(transform)));
+
+            if (selectedPlayers[0] == null || (selectedTurrets[0].transform.Distance(transform) < selectedPlayers[0].transform.Distance(transform)))
+            {
+                target = selectedTurrets[0].transform;
+
+                timeToChangeTarget = dynamicGuidingInterval;
+
+                targetSelected = true;
+            }
         }
     }
 
