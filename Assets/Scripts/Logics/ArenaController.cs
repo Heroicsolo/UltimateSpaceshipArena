@@ -11,6 +11,7 @@ public class ArenaController : MonoBehaviourPunCallbacks, IRoomController
 
     [SerializeField] private List<Transform> spawnPoints;
     [SerializeField] private List<Transform> pickupPoints;
+    [SerializeField] private List<TurretController> m_roomTurrets;
     [SerializeField] private List<GameObject> botsPrefabs;
     [SerializeField] private List<string> botsPossibleNames;
     [SerializeField] Transform nexusPosition;
@@ -20,7 +21,6 @@ public class ArenaController : MonoBehaviourPunCallbacks, IRoomController
     public float RespawnTime => BalanceProvider.Balance.respawnTimeBase;
 
     private List<PlayerController> m_roomPlayers = new List<PlayerController>();
-    private List<TurretController> m_roomTurrets = new List<TurretController>();
     private List<Pickup> m_roomPickups = new List<Pickup>();
     private List<Transform> m_botsSpawnPoints = new List<Transform>();
     private Dictionary<string, int> m_playersRatings = new Dictionary<string, int>();
@@ -229,8 +229,6 @@ public class ArenaController : MonoBehaviourPunCallbacks, IRoomController
 
             SpawnPickups();
             SpawnBots();
-
-            m_roomTurrets = new List<TurretController>(FindObjectsOfType<TurretController>());
 
             if (PhotonNetwork.IsMasterClient)
                 AddRegisteredPlayersToLobbyUI();

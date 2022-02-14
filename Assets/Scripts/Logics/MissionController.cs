@@ -13,6 +13,7 @@ public class MissionController : MonoBehaviourPunCallbacks, IRoomController
     [SerializeField] private List<Transform> botsSpawnPoints;
     [SerializeField] private List<GameObject> botsPrefabs;
     [SerializeField] private List<Transform> pickupPoints;
+    [SerializeField] private List<TurretController> m_roomTurrets;
     [SerializeField] private Transform leftBound;
     [SerializeField] private Transform rightBound;
     [SerializeField] private Transform topBound;
@@ -25,7 +26,6 @@ public class MissionController : MonoBehaviourPunCallbacks, IRoomController
 
     private List<PlayerController> m_roomPlayers = new List<PlayerController>();
     private List<PlayerController> m_missionBots = new List<PlayerController>();
-    private List<TurretController> m_roomTurrets = new List<TurretController>();
     private List<Pickup> m_roomPickups = new List<Pickup>();
     private List<Transform> m_availableSpawnPoints = new List<Transform>();
     private List<string> m_connectedPlayersNames = new List<string>();
@@ -249,8 +249,6 @@ public class MissionController : MonoBehaviourPunCallbacks, IRoomController
 
             SpawnPickups();
             SpawnBots();
-
-            m_roomTurrets = new List<TurretController>(FindObjectsOfType<TurretController>());
         }
 
         Launcher.instance.OnArenaLoaded();

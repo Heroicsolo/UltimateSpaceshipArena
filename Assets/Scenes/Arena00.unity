@@ -318,6 +318,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8b57fb4a98ad48f4b8e8cfc8a270da30, type: 3}
+--- !u!114 &200847450 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8693354538801697167, guid: 8b57fb4a98ad48f4b8e8cfc8a270da30, type: 3}
+  m_PrefabInstance: {fileID: 200847449}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57f60864fa104314ab9ab513bc3331a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &340779767
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2802,6 +2813,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 85a93ab89267c11469a046f3613e5963, type: 3}
+--- !u!114 &1166095567 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6220389087183610060, guid: 85a93ab89267c11469a046f3613e5963, type: 3}
+  m_PrefabInstance: {fileID: 1166095566}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57f60864fa104314ab9ab513bc3331a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1173922793
 GameObject:
   m_ObjectHideFlags: 0
@@ -3483,6 +3505,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8b57fb4a98ad48f4b8e8cfc8a270da30, type: 3}
+--- !u!114 &1420436323 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8693354538801697167, guid: 8b57fb4a98ad48f4b8e8cfc8a270da30, type: 3}
+  m_PrefabInstance: {fileID: 1420436322}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57f60864fa104314ab9ab513bc3331a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1442570741
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4719,6 +4752,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 85a93ab89267c11469a046f3613e5963, type: 3}
+--- !u!114 &2367855802977116852 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6220389087183610060, guid: 85a93ab89267c11469a046f3613e5963, type: 3}
+  m_PrefabInstance: {fileID: 2367855802977116851}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57f60864fa104314ab9ab513bc3331a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &2759699408316072173
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4795,6 +4839,10 @@ PrefabInstance:
       value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 2759699408816925235, guid: a9beeeb5739c4e14585bcb07e23b13b7, type: 3}
+      propertyPath: m_roomTurrets.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2759699408816925235, guid: a9beeeb5739c4e14585bcb07e23b13b7, type: 3}
       propertyPath: botsPrefabs.Array.data[0]
       value: 
       objectReference: {fileID: 6972756198996731791, guid: ba3bc2728db5fd340af9fc41d28c12e6, type: 3}
@@ -4858,6 +4906,22 @@ PrefabInstance:
       propertyPath: pickupPoints.Array.data[8]
       value: 
       objectReference: {fileID: 399780484}
+    - target: {fileID: 2759699408816925235, guid: a9beeeb5739c4e14585bcb07e23b13b7, type: 3}
+      propertyPath: m_roomTurrets.Array.data[0]
+      value: 
+      objectReference: {fileID: 2367855802977116852}
+    - target: {fileID: 2759699408816925235, guid: a9beeeb5739c4e14585bcb07e23b13b7, type: 3}
+      propertyPath: m_roomTurrets.Array.data[1]
+      value: 
+      objectReference: {fileID: 200847450}
+    - target: {fileID: 2759699408816925235, guid: a9beeeb5739c4e14585bcb07e23b13b7, type: 3}
+      propertyPath: m_roomTurrets.Array.data[2]
+      value: 
+      objectReference: {fileID: 1166095567}
+    - target: {fileID: 2759699408816925235, guid: a9beeeb5739c4e14585bcb07e23b13b7, type: 3}
+      propertyPath: m_roomTurrets.Array.data[3]
+      value: 
+      objectReference: {fileID: 1420436323}
     - target: {fileID: 2759699408816925235, guid: a9beeeb5739c4e14585bcb07e23b13b7, type: 3}
       propertyPath: botsPossibleNames.Array.size
       value: 12
