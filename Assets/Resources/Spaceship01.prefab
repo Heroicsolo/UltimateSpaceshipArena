@@ -5520,7 +5520,7 @@ MonoBehaviour:
   TurretTransform: {fileID: 4848783365807361085}
   ShipIcon: {fileID: 21300000, guid: 780d1de04c33b5a4fb7f21c95e9128fc, type: 3}
   ShipTitle: Rogue
-  cameraOffsetY: 90
+  cameraOffsetY: 110
   FloatingTextSpawnPosition: {fileID: 6016336048886456366}
   ImmortalityOrb: {fileID: 7482507792824328463}
   NameLabel: {fileID: 6387821603708998121}

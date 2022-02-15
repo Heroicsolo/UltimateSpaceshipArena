@@ -5519,7 +5519,7 @@ MonoBehaviour:
   TurretTransform: {fileID: 732919761694345748}
   ShipIcon: {fileID: 21300000, guid: 9cb6751da9ee5b446890d6d12c508b2b, type: 3}
   ShipTitle: Defender
-  cameraOffsetY: 90
+  cameraOffsetY: 110
   FloatingTextSpawnPosition: {fileID: 6016336048886456366}
   ImmortalityOrb: {fileID: 7482507792824328463}
   NameLabel: {fileID: 6387821603708998121}
