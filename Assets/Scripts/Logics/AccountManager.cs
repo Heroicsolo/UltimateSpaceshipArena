@@ -388,6 +388,7 @@ public static class AccountManager
         userTable.Child("tutorialDone").SetValueAsync(m_tutorialDone);
         userTable.Child("arenaTutorialDone").SetValueAsync(m_arenaTutorialDone);
         userTable.Child("missionTutorialDone").SetValueAsync(m_missionTutorialDone);
+        userTable.Child("controlTutorialDone").SetValueAsync(m_controlTutorialDone);
 
         CheckUpgradesInfo();
 
