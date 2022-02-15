@@ -31,6 +31,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     public Sprite ShipIcon;
     public string ShipTitle = "Spaceship";
     [SerializeField]
+    private float cameraOffsetY = 90f;
+    [SerializeField]
     private Transform FloatingTextSpawnPosition;
     [SerializeField]
     private GameObject ImmortalityOrb;
@@ -1550,17 +1552,17 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
                 if (targetCameraPos != null && m_nexusUsed)
                 {
                     if (!isMissionMode || (isMissionMode && missionController.IsObjectiveDone))
-                        cameraTransform.position = Vector3.Lerp(cameraTransform.position, targetCameraPos + Vector3.up * 90f, Time.deltaTime * 8f);
+                        cameraTransform.position = Vector3.Lerp(cameraTransform.position, targetCameraPos + Vector3.up * cameraOffsetY, Time.deltaTime * 8f);
                     else
-                        cameraTransform.position = Vector3.Lerp(cameraTransform.position, transform.position + Vector3.up * 90f, Time.deltaTime * 8f);
+                        cameraTransform.position = Vector3.Lerp(cameraTransform.position, transform.position + Vector3.up * cameraOffsetY, Time.deltaTime * 8f);
                 }
                 else
-                    cameraTransform.position = Vector3.Lerp(cameraTransform.position, transform.position + Vector3.up * 90f, Time.deltaTime * 8f);
+                    cameraTransform.position = Vector3.Lerp(cameraTransform.position, transform.position + Vector3.up * cameraOffsetY, Time.deltaTime * 8f);
             }
             else if (m_lastEnemy != null && !meshRenderer.gameObject.activeSelf)
-                cameraTransform.position = Vector3.Lerp(cameraTransform.position, m_lastEnemy.position + Vector3.up * 90f, Time.deltaTime * 8f);
+                cameraTransform.position = Vector3.Lerp(cameraTransform.position, m_lastEnemy.position + Vector3.up * cameraOffsetY, Time.deltaTime * 8f);
             else if (m_isDied && meshRenderer.gameObject.activeSelf)
-                cameraTransform.position = Vector3.Lerp(cameraTransform.position, transform.position + Vector3.up * 90f, Time.deltaTime * 8f);
+                cameraTransform.position = Vector3.Lerp(cameraTransform.position, transform.position + Vector3.up * cameraOffsetY, Time.deltaTime * 8f);
         }
 
 #if UNITY_STANDALONE || UNITY_EDITOR
