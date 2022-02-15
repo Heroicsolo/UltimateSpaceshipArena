@@ -26,6 +26,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private List<Transform> ShootPositions;
     [SerializeField]
     private Transform BombLaunchPosition;
+    [SerializeField]
+    private Transform TurretTransform;
 
     [Header("UI/FX")]
     public Sprite ShipIcon;
@@ -129,6 +131,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private bool missionStarted = false;
 
     private Joystick joystick;
+    private Joystick weaponJoystick;
 
     private Transform cameraTransform;
     private CharacterController charController;
@@ -139,12 +142,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private Vector3 initPos;
     private Vector3 networkPos;
     private Quaternion networkRot;
+    private Quaternion networkWeaponRot;
     //Lag compensation
     private float currentTime = 0;
     private double currentPacketTime = 0;
     private double lastPacketTime = 0;
     private Vector3 positionAtLastPacket = Vector3.zero;
     private Quaternion rotationAtLastPacket = Quaternion.identity;
+    private Quaternion weaponRotationAtLastPacket = Quaternion.identity;
     private Vector3 targetCameraPos;
 
     private Material initMaterial;
@@ -667,6 +672,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     void ProccessShooting_AI()
     {
+        if (TurretTransform != null && m_currentAITarget != null)
+        {
+            Vector3 weaponDir = (m_currentAITarget.position - TurretTransform.position).normalized;
+            weaponDir.y = 0f;
+            Quaternion targetRot = Quaternion.LookRotation(weaponDir, Vector3.up);
+            TurretTransform.rotation = Quaternion.RotateTowards(TurretTransform.rotation, targetRot, 180f * Time.deltaTime);
+        }
+
         List<PlayerController> playersList = new List<PlayerController>(m_roomPlayers);
 
         List<PlayerController> selectedPlayers = new List<PlayerController>();
@@ -1076,7 +1089,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     {
         foreach (var shootPos in ShootPositions)
         {
-            GameObject proj = projectilesPool.Spawn(shootPos.position, transform.rotation);
+            GameObject proj = projectilesPool.Spawn(shootPos.position, shootPos.rotation);
             Projectile p = proj.GetComponent<Projectile>();
             p.SetOwner(m_name, photonView.Owner.UserId);
             p.critChance += critBonus;
@@ -1505,12 +1518,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
                 //Update remote player
                 transform.position = Vector3.Lerp(positionAtLastPacket, networkPos, (float)(currentTime / timeToReachGoal));
                 transform.rotation = Quaternion.Lerp(rotationAtLastPacket, networkRot, (float)(currentTime / timeToReachGoal));
+                TurretTransform.rotation = Quaternion.Lerp(weaponRotationAtLastPacket, networkWeaponRot, (float)(currentTime / timeToReachGoal));
             }
             else
             {
                 transform.position = networkPos;
                 transform.rotation = networkRot;
+                TurretTransform.rotation = networkWeaponRot;
             }
+
             return;
         }
 
@@ -1570,9 +1586,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         Vector3 newDir = Vector3.zero;
         if (!m_isDied && !m_isWon && !IsAI)
         {
-            movementDir = new Vector3(joystick.Horizontal, 0f, joystick.Vertical);
+            newDir = new Vector3(joystick.Horizontal, 0f, joystick.Vertical);
 
-            if (movementDir.magnitude == 0f)
+            if (newDir.magnitude == 0f)
             {
                 if (Input.GetKey(KeyCode.W))
                 {
@@ -1590,9 +1606,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
                 {
                     newDir += Vector3.right;
                 }
-                newDir.Normalize();
-                movementDir = Vector3.Lerp(movementDir, newDir, 6f * Time.deltaTime);
             }
+
+            newDir.Normalize();
+            movementDir = Vector3.Lerp(movementDir, newDir, 6f * Time.deltaTime);
         }
 #else
             if (!m_isDied && !m_isWon && !IsAI)
@@ -1600,6 +1617,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             else
                 movementDir = Vector3.zero;
 #endif
+
+        if (!m_isDied && !m_isWon && !IsAI)
+        {
+            Vector3 weaponDir = weaponJoystick.Direction.normalized;
+            weaponDir.z = weaponDir.y;
+            weaponDir.y = 0f;
+            TurretTransform.rotation = Quaternion.LookRotation(weaponDir, Vector3.up);
+        }
 
         if (m_isDied) return;
 
@@ -1663,6 +1688,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         joystick = _joystick;
     }
 
+    public void SetWeaponJoystick(Joystick _joystick)
+    {
+        weaponJoystick = _joystick;
+    }
+
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.IsWriting)
@@ -1671,6 +1701,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             //stream.SendNext(isFiring);
             stream.SendNext(transform.position);
             stream.SendNext(transform.rotation);
+            stream.SendNext(TurretTransform.rotation);
             stream.SendNext(m_durability);
             stream.SendNext(m_forceField);
             stream.SendNext(m_immuneTime);
@@ -1687,12 +1718,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             networkPos = (Vector3)stream.ReceiveNext();
             networkRot = (Quaternion)stream.ReceiveNext();
 
+            networkWeaponRot = (Quaternion)stream.ReceiveNext();
+
             //Lag compensation
             currentTime = 0.0f;
             lastPacketTime = currentPacketTime;
             currentPacketTime = info.SentServerTime;
             positionAtLastPacket = transform.position;
             rotationAtLastPacket = transform.rotation;
+            weaponRotationAtLastPacket = TurretTransform.rotation;
 
             this.m_durability = (float)stream.ReceiveNext();
             this.m_forceField = (float)stream.ReceiveNext();

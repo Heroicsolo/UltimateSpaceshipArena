@@ -30,6 +30,8 @@ public class PlayerUI : MonoBehaviour
     [SerializeField]
     private Joystick joystick;
     [SerializeField]
+    private Joystick weaponJoystick;
+    [SerializeField]
     private Transform minimapPlayer;
     [SerializeField]
     private GameObject minimapEnemyPrefab;
@@ -403,7 +405,11 @@ public class PlayerUI : MonoBehaviour
         // Cache references for efficiency
         target = _target;
 
-        target.SetJoystick(joystick);
+        target.SetJoystick(Joystick);
+        target.SetWeaponJoystick(WeaponJoystick);
+
+        WeaponJoystick.OnPointerDownCallback += Shoot;
+        WeaponJoystick.OnPointerUpCallback += ShootEnd;
 
         if (ArenaController.instance != null)
         {
@@ -671,6 +677,10 @@ public class PlayerUI : MonoBehaviour
 
     public bool ResultsScreenShown => winScreen.activeSelf || lossScreen.activeSelf || missionCompletedScreen.activeSelf;
 
+    public Joystick Joystick { get => joystick; }
+
+    public Joystick WeaponJoystick { get => weaponJoystick; }
+
     private IEnumerator MissionCompletedScreenAnim(int moneyGained)
     {
         float t = 0f;
@@ -778,7 +788,8 @@ public class PlayerUI : MonoBehaviour
             s.GetComponent<Button>().interactable = false;
         }
 
-        joystick.enabled = false;
+        Joystick.enabled = false;
+        WeaponJoystick.enabled = false;
     }
 
     public void OnSpawn()
@@ -788,7 +799,8 @@ public class PlayerUI : MonoBehaviour
             s.GetComponent<Button>().interactable = true;
         }
 
-        joystick.enabled = true;
+        Joystick.enabled = true;
+        WeaponJoystick.enabled = true;
     }
 
     private void Awake()
