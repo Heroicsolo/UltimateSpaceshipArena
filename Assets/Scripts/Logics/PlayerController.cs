@@ -128,7 +128,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private bool isNitroActive = false;
     private bool missionStarted = false;
 
-    private VirtualJoystick joystick;
+    private Joystick joystick;
 
     private Transform cameraTransform;
     private CharacterController charController;
@@ -1210,7 +1210,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         meshRenderer.material.ToOpaqueMode();
     }
 
-     public void BeginStealth(float length = 5f)
+    public void BeginStealth(float length = 5f)
     {
         length += m_stealthLengthBonus;
         photonView.RPC("BeginStealth_RPC", RpcTarget.All, length);
@@ -1570,28 +1570,33 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         Vector3 newDir = Vector3.zero;
         if (!m_isDied && !m_isWon && !IsAI)
         {
-            if (Input.GetKey(KeyCode.W))
+            movementDir = new Vector3(joystick.Horizontal, 0f, joystick.Vertical);
+
+            if (movementDir.magnitude == 0f)
             {
-                newDir += Vector3.forward;
+                if (Input.GetKey(KeyCode.W))
+                {
+                    newDir += Vector3.forward;
+                }
+                if (Input.GetKey(KeyCode.S))
+                {
+                    newDir += Vector3.back;
+                }
+                if (Input.GetKey(KeyCode.A))
+                {
+                    newDir += Vector3.left;
+                }
+                if (Input.GetKey(KeyCode.D))
+                {
+                    newDir += Vector3.right;
+                }
+                newDir.Normalize();
+                movementDir = Vector3.Lerp(movementDir, newDir, 6f * Time.deltaTime);
             }
-            if (Input.GetKey(KeyCode.S))
-            {
-                newDir += Vector3.back;
-            }
-            if (Input.GetKey(KeyCode.A))
-            {
-                newDir += Vector3.left;
-            }
-            if (Input.GetKey(KeyCode.D))
-            {
-                newDir += Vector3.right;
-            }
-            newDir.Normalize();
-            movementDir = Vector3.Lerp(movementDir, newDir, 6f * Time.deltaTime);
         }
 #else
             if (!m_isDied && !m_isWon && !IsAI)
-                movementDir = new Vector3(joystick.GetAxis("Horizontal"), 0f, joystick.GetAxis("Vertical"));
+                movementDir = new Vector3(joystick.Horizontal, 0f, joystick.Vertical);
             else
                 movementDir = Vector3.zero;
 #endif
@@ -1653,7 +1658,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
-    public void SetJoystick(VirtualJoystick _joystick)
+    public void SetJoystick(Joystick _joystick)
     {
         joystick = _joystick;
     }

@@ -28,7 +28,7 @@ public class PlayerUI : MonoBehaviour
     [SerializeField]
     private Image playerForceFieldBar;
     [SerializeField]
-    private VirtualJoystick joystick;
+    private Joystick joystick;
     [SerializeField]
     private Transform minimapPlayer;
     [SerializeField]
@@ -437,7 +437,7 @@ public class PlayerUI : MonoBehaviour
         }
 
 #if UNITY_STANDALONE || UNITY_EDITOR
-        joystick.gameObject.SetActive(false);
+        //joystick.gameObject.SetActive(false);
 #endif
 
         radar.localScale = Vector3.one * target.RadarRadius / 40f;
@@ -778,7 +778,7 @@ public class PlayerUI : MonoBehaviour
             s.GetComponent<Button>().interactable = false;
         }
 
-        joystick.Disable();
+        joystick.enabled = false;
     }
 
     public void OnSpawn()
@@ -788,7 +788,7 @@ public class PlayerUI : MonoBehaviour
             s.GetComponent<Button>().interactable = true;
         }
 
-        joystick.Enable();
+        joystick.enabled = true;
     }
 
     private void Awake()
