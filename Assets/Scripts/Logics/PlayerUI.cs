@@ -559,11 +559,25 @@ public class PlayerUI : MonoBehaviour
     void OnArenaTutorialDone()
     {
         Launcher.instance.OnArenaTutorialDone();
+        if (!AccountManager.IsControlTutorialDone)
+            TutorialController.instance.ShowCustomTutorialUnit("Use left joystick to move your ship!", joystick.GetComponent<RectTransform>(), OnMovementTutorialDone);
     }
 
     void OnMissionTutorialDone()
     {
         Launcher.instance.OnMissionTutorialDone();
+        if (!AccountManager.IsControlTutorialDone)
+            TutorialController.instance.ShowCustomTutorialUnit("Use left joystick to move your ship!", joystick.GetComponent<RectTransform>(), OnMovementTutorialDone);
+    }
+
+    void OnMovementTutorialDone()
+    {
+        TutorialController.instance.ShowCustomTutorialUnit("Use right joystick to rotate your weapon!", weaponJoystick.GetComponent<RectTransform>(), OnWeaponTutorialDone);
+    }
+
+    void OnWeaponTutorialDone()
+    {
+        AccountManager.OnControlTutorialDone();
     }
 
     public void OnLobbyPlayerAdded(string nickname, Sprite shipIcon, bool isAI)

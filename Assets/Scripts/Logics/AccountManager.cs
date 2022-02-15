@@ -45,6 +45,7 @@ public static class AccountManager
     private static bool m_tutorialDone = false;
     private static bool m_arenaTutorialDone = false;
     private static bool m_missionTutorialDone = false;
+    private static bool m_controlTutorialDone = false;
     private static int m_tutorialStep = 0;
 
     private static string m_userName = "Player";
@@ -65,6 +66,8 @@ public static class AccountManager
     public static int FirstTutorialStep => m_tutorialStep;
     public static bool IsArenaTutorialDone => m_arenaTutorialDone;
     public static bool IsMissionTutorialDone => m_missionTutorialDone;
+
+    public static bool IsControlTutorialDone => m_controlTutorialDone;
 
     public static bool IsFirstTutorialDone => m_tutorialDone;
 
@@ -178,6 +181,7 @@ public static class AccountManager
         m_tutorialDone = notEmptyProfile && snapshot.HasChild("tutorialDone") ? bool.Parse(snapshot.Child("tutorialDone").Value.ToString()) : false;
         m_arenaTutorialDone = notEmptyProfile && snapshot.HasChild("arenaTutorialDone") ? bool.Parse(snapshot.Child("arenaTutorialDone").Value.ToString()) : false;
         m_missionTutorialDone = notEmptyProfile && snapshot.HasChild("missionTutorialDone") ? bool.Parse(snapshot.Child("missionTutorialDone").Value.ToString()) : false;
+        m_controlTutorialDone = notEmptyProfile && snapshot.HasChild("controlTutorialDone") ? bool.Parse(snapshot.Child("controlTutorialDone").Value.ToString()) : false;
         m_tutorialStep = notEmptyProfile && snapshot.HasChild("tutorialStep") ? int.Parse(snapshot.Child("tutorialStep").Value.ToString()) : 0;
 
         string restoredData = "";
@@ -341,6 +345,12 @@ public static class AccountManager
     public static void OnMissionTutorialDone()
     {
         m_missionTutorialDone = true;
+        SaveProfile();
+    }
+
+    public static void OnControlTutorialDone()
+    {
+        m_controlTutorialDone = true;
         SaveProfile();
     }
 
