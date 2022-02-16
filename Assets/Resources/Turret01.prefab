@@ -344,10 +344,10 @@ GameObject:
   - component: {fileID: 3121226319577908300}
   - component: {fileID: 3121226319587470250}
   - component: {fileID: 5348494632549759391}
-  - component: {fileID: 6318409994596562009}
   - component: {fileID: 6547020987323760334}
   - component: {fileID: 8693354538801697167}
   - component: {fileID: 7953470079741275476}
+  - component: {fileID: 6369386945524401993}
   m_Layer: 7
   m_Name: Turret01
   m_TagString: Turret
@@ -416,19 +416,6 @@ MonoBehaviour:
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
---- !u!135 &6318409994596562009
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3121226319578077292}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0.25, z: 0}
 --- !u!54 &6547020987323760334
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -494,6 +481,20 @@ CapsuleCollider:
   m_GameObject: {fileID: 3121226319578077292}
   m_Material: {fileID: 0}
   m_IsTrigger: 1
+  m_Enabled: 1
+  m_Radius: 0.5
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.5, z: 0}
+--- !u!136 &6369386945524401993
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3121226319578077292}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.5
   m_Height: 2
