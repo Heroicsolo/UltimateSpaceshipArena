@@ -440,6 +440,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
     public void OnMainScreenLoaded()
     {
+        m_loadingScreen?.SetActive(false);
         chatManager.ReconnectIfNeeded();
         ratingLabel.text = AccountManager.CurrentRating.ToString();
         RefreshTopButtons();
@@ -722,6 +723,11 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         }
     }
 
+    public void OnRoomLeavingStarted()
+    {
+        m_loadingText.text = "LOADING HANGAR...";
+        m_loadingScreen?.SetActive(true);
+    }
 
     #endregion
 

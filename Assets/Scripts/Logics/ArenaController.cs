@@ -331,6 +331,7 @@ public class ArenaController : MonoBehaviourPunCallbacks, IRoomController
 
     public void LeaveRoom()
     {
+        Launcher.instance.OnRoomLeavingStarted();
         PlayerUI.Instance.OnRoomLeft();
         PhotonNetwork.SendAllOutgoingCommands();
         PhotonNetwork.LeaveRoom();

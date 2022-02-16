@@ -186,8 +186,10 @@ MonoBehaviour:
   - {fileID: 5758942790406504222}
   - {fileID: 7399408029813995702}
   BombLaunchPosition: {fileID: 3705567810215598646}
+  TurretTransform: {fileID: 0}
   ShipIcon: {fileID: 21300000, guid: 32a42bc5fbfe4d8479b76bf314d3b5af, type: 3}
   ShipTitle: Drone
+  cameraOffsetY: 90
   FloatingTextSpawnPosition: {fileID: 606853974519858472}
   ImmortalityOrb: {fileID: 1900988176852242735}
   NameLabel: {fileID: 8186621526043632540}
