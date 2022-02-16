@@ -75,7 +75,7 @@ public class TurretController : MonoBehaviourPunCallbacks, IPunObservable
 
         if (immortal)
         {
-            HPBar.transform.parent.gameObject.SetActive(false);
+            HPBar.transform.parent.parent.gameObject.SetActive(false);
         }
 
         if (ArenaController.instance != null)

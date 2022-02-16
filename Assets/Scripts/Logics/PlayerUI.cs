@@ -416,7 +416,7 @@ public class PlayerUI : MonoBehaviour
             arenaController = ArenaController.instance;
             isMissionMode = false;
             lobbyMissionButtons.SetActive(false);
-            lobbyArenaButtons.SetActive(true);
+            //lobbyArenaButtons.SetActive(true);
 
             mapSizeAmplifier = 5f;
         }
@@ -433,7 +433,7 @@ public class PlayerUI : MonoBehaviour
             else
             {
                 lobbyMissionButtons.SetActive(false);
-                lobbyArenaButtons.SetActive(true);
+                //lobbyArenaButtons.SetActive(true);
             }
 
             mapSizeAmplifier = Mathf.Max(missionController.MapWidth, missionController.MapHeight) * 5f / 1000f;

@@ -88,7 +88,14 @@ public class Projectile : SyncTransform
         foreach (var player in m_roomPlayers)
         {
             if (player.Name != ownerName && player.transform.Distance(transform) < guidingMaxDist && player.DurabilityPercent > 0f && !player.InStealth)
-                selectedPlayers.Add(player);
+            {
+                Vector3 dir = (player.transform.position - transform.position).normalized;
+
+                Vector3 localDir = transform.InverseTransformDirection(dir);
+
+                if (localDir.z > 0f && Mathf.Atan2(localDir.z, localDir.x) < guidingAngle)
+                    selectedPlayers.Add(player);
+            }
         }
 
         if (selectedPlayers.Count > 0)
@@ -103,10 +110,20 @@ public class Projectile : SyncTransform
             targetSelected = true;
         }
 
-        foreach (var turret in m_roomTurrets)
+        if (!isMissionMode)
         {
-            if (turret != null && turret.transform.Distance(transform) < guidingMaxDist && turret.DurabilityPercent > 0f)
-                selectedTurrets.Add(turret);
+            foreach (var turret in m_roomTurrets)
+            {
+                if (turret != null && turret.transform.Distance(transform) < guidingMaxDist && turret.DurabilityPercent > 0f)
+                {
+                    Vector3 dir = (turret.transform.position - transform.position).normalized;
+
+                    Vector3 localDir = transform.InverseTransformDirection(dir);
+
+                    if (localDir.z > 0f && Mathf.Atan2(localDir.z, localDir.x) < guidingAngle)
+                        selectedTurrets.Add(turret);
+                }
+            }
         }
 
         if (selectedTurrets.Count > 0)
