@@ -446,8 +446,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   angularSpeed: 80
   fireRate: 4
-  heatingPerShot: 0.067
-  coolingDelay: 1
+  heatingPerShot: 0.075
+  coolingDelay: 1.2
   coolingPerSecond: 0.2
   attackDistance: 160
   attackStartAngle: 45
@@ -462,9 +462,9 @@ MonoBehaviour:
   headTransform: {fileID: 3121226319577908296}
   heatingIndicator: {fileID: 3121226319580333742}
   immortal: 0
-  durability: 300
-  shield: 120
-  m_shieldRegen: 0.07
+  durability: 250
+  shield: 100
+  m_shieldRegen: 0.05
   shootSound: {fileID: 8300000, guid: 0bd05763df902854a80475577a26666a, type: 3}
   HPBar: {fileID: 6679893498983045963}
   ShieldBar: {fileID: 4004425704208029880}
