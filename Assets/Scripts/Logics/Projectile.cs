@@ -16,9 +16,12 @@ public class Projectile : SyncTransform
     public bool ignoreField = false;
     public bool isGuiding = false;
     public bool isDynamicGuiding = false;
+    public bool isSingleGuiding = false;
     public float dynamicGuidingInterval = 0.5f;
     [Range(0f, 1f)]
     public float guidingForce = 0.4f;
+    [Min(0f)]
+    public float guidingSpeed = 4f;
     [Range(0f, 180f)]
     public float guidingAngle = 30f;
     public float guidingMaxDist = 200f;
@@ -38,6 +41,7 @@ public class Projectile : SyncTransform
     private bool isMissionMode = false;
     private List<PlayerController> m_roomPlayers;
     private List<TurretController> m_roomTurrets;
+    private Quaternion m_targetRot;
 
     [SerializeField] private ParticleSystem explodeEffect;
 
@@ -136,12 +140,15 @@ public class Projectile : SyncTransform
                 Explode();
             }
 
-            if (isGuiding && guidingForce > 0f && (timeToChangeTarget <= 0f || target == null))
+            if (isGuiding && guidingForce > 0f && (!isSingleGuiding || (isSingleGuiding && !targetSelected)))
             {
-                if (isDynamicGuiding)
-                    FindNewGuidingTarget();
-                else if (!isDynamicGuiding && target == null && !targetSelected)
-                    FindNewGuidingTarget();
+                if (timeToChangeTarget <= 0f || target == null)
+                {
+                    if (isDynamicGuiding)
+                        FindNewGuidingTarget();
+                    else if (!isDynamicGuiding && target == null && !targetSelected)
+                        FindNewGuidingTarget();
+                }
             }
 
             if (isGuiding && guidingForce > 0f && target != null && target.Distance(transform) < guidingMaxDist)
@@ -153,7 +160,8 @@ public class Projectile : SyncTransform
                 if (localDir.z > 0f && Mathf.Atan2(localDir.z, localDir.x) < guidingAngle)
                 {
                     Vector3 guidedDir = dir * guidingForce + transform.forward * (1f - guidingForce);
-                    transform.LookAt(transform.position + guidedDir);
+                    m_targetRot = Quaternion.LookRotation(guidedDir, Vector3.up);
+                    transform.rotation = Quaternion.Lerp(transform.rotation, m_targetRot, guidingSpeed * Time.deltaTime);
                 }
                 else
                 {

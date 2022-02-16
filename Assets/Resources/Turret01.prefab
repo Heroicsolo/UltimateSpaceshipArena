@@ -347,6 +347,7 @@ GameObject:
   - component: {fileID: 6318409994596562009}
   - component: {fileID: 6547020987323760334}
   - component: {fileID: 8693354538801697167}
+  - component: {fileID: 7953470079741275476}
   m_Layer: 7
   m_Name: Turret01
   m_TagString: Turret
@@ -411,7 +412,6 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents:
-  - {fileID: 0}
   - {fileID: 8693354538801697167}
   sceneViewId: 0
   InstantiationId: 0
@@ -485,6 +485,20 @@ MonoBehaviour:
   FloatingTextSpawnPosition: {fileID: 2451438485526849462}
   InfoTextPrefab: {fileID: 5291071739982511377, guid: 52862688ba3d3004f9d1c3e90484faef, type: 3}
   DeathEffect: {fileID: 5073354677582627854}
+--- !u!136 &7953470079741275476
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3121226319578077292}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  m_Radius: 0.5
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.5, z: 0}
 --- !u!1 &3121226319578077294
 GameObject:
   m_ObjectHideFlags: 0

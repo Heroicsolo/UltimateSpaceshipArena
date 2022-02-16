@@ -123,6 +123,7 @@ MonoBehaviour:
   ignoreField: 0
   isGuiding: 1
   isDynamicGuiding: 0
+  isSingleGuiding: 1
   dynamicGuidingInterval: 0
   guidingForce: 0.02
   guidingAngle: 10
@@ -165,7 +166,8 @@ MonoBehaviour:
   Synchronization: 3
   OwnershipTransfer: 0
   observableSearch: 2
-  ObservedComponents: []
+  ObservedComponents:
+  - {fileID: 697067822467754854}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0

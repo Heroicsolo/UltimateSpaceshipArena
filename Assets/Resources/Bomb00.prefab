@@ -14816,8 +14816,8 @@ GameObject:
   - component: {fileID: 8869883086731266846}
   - component: {fileID: 2137450260503214902}
   - component: {fileID: 3929202355844421606}
-  - component: {fileID: 5671358633836521799}
   - component: {fileID: 1048053501196303787}
+  - component: {fileID: 1484619449546610378}
   m_Layer: 0
   m_Name: Bomb00
   m_TagString: Bomb
@@ -14918,7 +14918,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 4
+  m_Constraints: 116
   m_CollisionDetection: 0
 --- !u!114 &2137450260503214902
 MonoBehaviour:
@@ -14960,19 +14960,6 @@ MonoBehaviour:
   m_SynchronizeAngularVelocity: 1
   m_TeleportEnabled: 1
   m_TeleportIfDistanceGreaterThan: 3
---- !u!135 &5671358633836521799
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5645800735150061394}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: -0.0000019073486, y: 0, z: 0}
 --- !u!114 &1048053501196303787
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15000,6 +14987,20 @@ MonoBehaviour:
   hazardEffect: {fileID: 6047023229356348045}
   explosionObject: {fileID: 6315783178266861854}
   activationObject: {fileID: 4109485355487952646}
+--- !u!136 &1484619449546610378
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5645800735150061394}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  m_Radius: 0.5
+  m_Height: 3
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &6148384305412985165
 GameObject:
   m_ObjectHideFlags: 0

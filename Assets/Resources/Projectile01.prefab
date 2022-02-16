@@ -123,6 +123,7 @@ MonoBehaviour:
   ignoreField: 1
   isGuiding: 1
   isDynamicGuiding: 0
+  isSingleGuiding: 1
   dynamicGuidingInterval: 0
   guidingForce: 0.05
   guidingAngle: 10
