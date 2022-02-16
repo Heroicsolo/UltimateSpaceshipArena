@@ -471,7 +471,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         StopAllCoroutines();
 
         EndShooting();
-        TurretTransform.gameObject.SetActive(false);
+        if (TurretTransform)
+            TurretTransform.gameObject.SetActive(false);
         meshRenderer.gameObject.SetActive(false);
         GetComponent<Collider>().enabled = false;
         charController.enabled = false;
@@ -532,7 +533,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         transform.position = m_spawnPoint;
 
-        TurretTransform.gameObject.SetActive(true);
+        if (TurretTransform)
+            TurretTransform.gameObject.SetActive(true);
         meshRenderer.gameObject.SetActive(true);
         NameLabel.gameObject.SetActive(true);
 
@@ -1560,13 +1562,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
                 //Update remote player
                 transform.position = Vector3.Lerp(positionAtLastPacket, networkPos, (float)(currentTime / timeToReachGoal));
                 transform.rotation = Quaternion.Lerp(rotationAtLastPacket, networkRot, (float)(currentTime / timeToReachGoal));
-                TurretTransform.rotation = Quaternion.Lerp(weaponRotationAtLastPacket, networkWeaponRot, (float)(currentTime / timeToReachGoal));
+                if (TurretTransform)
+                    TurretTransform.rotation = Quaternion.Lerp(weaponRotationAtLastPacket, networkWeaponRot, (float)(currentTime / timeToReachGoal));
             }
             else
             {
                 transform.position = networkPos;
                 transform.rotation = networkRot;
-                TurretTransform.rotation = networkWeaponRot;
+                if (TurretTransform)
+                    TurretTransform.rotation = networkWeaponRot;
             }
 
             return;
@@ -1721,7 +1725,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             //stream.SendNext(isFiring);
             stream.SendNext(transform.position);
             stream.SendNext(transform.rotation);
-            stream.SendNext(TurretTransform.rotation);
+            if (TurretTransform)
+                stream.SendNext(TurretTransform.rotation);
             stream.SendNext(m_durability);
             stream.SendNext(m_forceField);
             stream.SendNext(m_immuneTime);
@@ -1738,7 +1743,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             networkPos = (Vector3)stream.ReceiveNext();
             networkRot = (Quaternion)stream.ReceiveNext();
 
-            networkWeaponRot = (Quaternion)stream.ReceiveNext();
+            if (TurretTransform)
+                networkWeaponRot = (Quaternion)stream.ReceiveNext();
 
             //Lag compensation
             currentTime = 0.0f;
