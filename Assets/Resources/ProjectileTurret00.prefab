@@ -123,8 +123,10 @@ MonoBehaviour:
   ignoreField: 0
   isGuiding: 1
   isDynamicGuiding: 0
+  isSingleGuiding: 0
   dynamicGuidingInterval: 0
   guidingForce: 0.02
+  guidingSpeed: 4
   guidingAngle: 10
   guidingMaxDist: 200
   ownerID: 

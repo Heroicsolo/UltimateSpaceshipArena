@@ -126,6 +126,7 @@ MonoBehaviour:
   isSingleGuiding: 1
   dynamicGuidingInterval: 0
   guidingForce: 0.02
+  guidingSpeed: 4
   guidingAngle: 10
   guidingMaxDist: 200
   ownerID: 
