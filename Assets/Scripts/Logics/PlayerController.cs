@@ -169,7 +169,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private bool m_isDied = false;
     private bool m_isWon = false;
     private bool m_isLoss = false;
-    private bool m_nexusUsed = false;
     private bool m_initialized = false;
     private Transform m_lastEnemy;
     private string m_lastEnemyName = "";
@@ -472,6 +471,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         StopAllCoroutines();
 
         EndShooting();
+        TurretTransform.gameObject.SetActive(false);
         meshRenderer.gameObject.SetActive(false);
         GetComponent<Collider>().enabled = false;
         charController.enabled = false;
@@ -532,6 +532,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         transform.position = m_spawnPoint;
 
+        TurretTransform.gameObject.SetActive(true);
         meshRenderer.gameObject.SetActive(true);
         NameLabel.gameObject.SetActive(true);
 
@@ -958,8 +959,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             PhotonNetwork.Destroy(gameObject);
         }
 
-        m_nexusUsed = true;
-
         BattleCamera.instance.OnNexusUsed(pos);
 
         if (!isMissionMode)
@@ -1181,6 +1180,18 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     {
         meshRenderer.material = transparentMaterial;
         meshRenderer.material.ToFadeMode();
+        MeshRenderer[] turretRenderers = TurretTransform.GetComponentsInChildren<MeshRenderer>();
+        List<Color> turretColors = new List<Color>();
+        List<Color> turretEndColors = new List<Color>();
+        foreach (var r in turretRenderers)
+        {
+            r.material = transparentMaterial;
+            r.material.ToFadeMode();
+            turretColors.Add(r.material.color);
+            Color endTurretColor = r.material.color;
+            endTurretColor.a = photonView.IsMine ? 0.2f : 0f;
+            turretEndColors.Add(endTurretColor);
+        }
 
         float t = 0f;
 
@@ -1194,6 +1205,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
             meshRenderer.material.color = Color.Lerp(startColor, endColor, t);
 
+            for (int i = 0; i < turretRenderers.Length; i++)
+            {
+                turretRenderers[i].material.color = Color.Lerp(turretColors[i], turretEndColors[i], t);
+            }
+
             yield return null;
         }
         while (t < 1f);
@@ -1202,6 +1218,18 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private IEnumerator StealthEndAnim()
     {
         float t = 0f;
+
+        MeshRenderer[] turretRenderers = TurretTransform.GetComponentsInChildren<MeshRenderer>();
+        List<Color> turretColors = new List<Color>();
+        List<Color> turretEndColors = new List<Color>();
+        foreach (var r in turretRenderers)
+        {
+            turretColors.Add(r.material.color);
+            Color endTurretColor = r.material.color;
+            endTurretColor.a = 1f;
+            turretEndColors.Add(endTurretColor);
+        }
+
 
         Color startColor = meshRenderer.material.color;
         Color endColor = startColor;
@@ -1212,6 +1240,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             t += Time.deltaTime * 2f;
 
             meshRenderer.material.color = Color.Lerp(startColor, endColor, t);
+
+            for (int i = 0; i < turretRenderers.Length; i++)
+            {
+                turretRenderers[i].material.color = Color.Lerp(turretColors[i], turretEndColors[i], t);
+            }
 
             yield return null;
         }
@@ -1224,6 +1257,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         meshRenderer.material = initMaterial;
         meshRenderer.material.ToOpaqueMode();
+
+        foreach (var r in turretRenderers)
+        {
+            r.material = initMaterial;
+            r.material.ToOpaqueMode();
+        }
     }
 
     public void BeginStealth(float length = 5f)
