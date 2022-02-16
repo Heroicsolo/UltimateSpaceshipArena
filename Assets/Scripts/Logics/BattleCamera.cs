@@ -41,7 +41,7 @@ public class BattleCamera : MonoBehaviour
 
     void Update()
     {
-        if (!initialized) return;
+        if (!initialized || target == null) return;
 
         if (!target.IsDied)
         {
