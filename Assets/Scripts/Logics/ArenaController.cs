@@ -84,11 +84,15 @@ public class ArenaController : MonoBehaviourPunCallbacks, IRoomController
     [PunRPC]
     void OnPlayerKilled_RPC(string killerName, string victimName)
     {
-        if (killerName == PlayerController.LocalPlayer.Name && killerName != victimName)
-            PlayerController.LocalPlayer.KillsCount++;
+        PlayerController killer = GetPlayerByName(killerName);
 
-        if (victimName == PlayerController.LocalPlayer.Name)
-            PlayerController.LocalPlayer.DeathsCount++;
+        if (killer != null && killer.photonView.IsMine && killerName != victimName)
+            killer.KillsCount++;
+
+        PlayerController victim = GetPlayerByName(victimName);
+
+        if (victim.photonView.IsMine)
+            victim.DeathsCount++;
 
         PlayerUI.Instance.SortPlayerStatsSlots();
     }

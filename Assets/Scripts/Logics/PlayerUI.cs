@@ -321,6 +321,10 @@ public class PlayerUI : MonoBehaviour
         HideCaptureAnnounce();
         killAnnounceObject.SetActive(false);
         killAnnounceObject.SetActive(true);
+
+        if (killerName.Length < 2)
+            killerName = "Turret";
+
         killAnnounceKillerLabel.text = killerName;
         killAnnounceVictimLabel.text = victimName;
 

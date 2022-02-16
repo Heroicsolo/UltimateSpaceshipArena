@@ -6,7 +6,7 @@ using UnityEngine;
 public class SyncTransform : MonoBehaviourPunCallbacks, IPunObservable
 {
     private Vector3 networkPos;
-    private Quaternion networkRot;
+    private Quaternion networkRot = Quaternion.identity;
     //Lag compensation
     private float currentTime = 0;
     private double currentPacketTime = 0;

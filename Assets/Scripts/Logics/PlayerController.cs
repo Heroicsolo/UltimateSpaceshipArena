@@ -141,8 +141,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private Vector3 movementDir;
     private Vector3 initPos;
     private Vector3 networkPos;
-    private Quaternion networkRot;
-    private Quaternion networkWeaponRot;
+    private Quaternion networkRot = Quaternion.identity;
+    private Quaternion networkWeaponRot = Quaternion.identity;
     //Lag compensation
     private float currentTime = 0;
     private double currentPacketTime = 0;

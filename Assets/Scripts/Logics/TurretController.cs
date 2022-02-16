@@ -42,10 +42,11 @@ public class TurretController : MonoBehaviourPunCallbacks, IPunObservable
     private bool isCooling = false;
     private bool isReadyToShoot = false;
     private bool isMissionMode = false;
+    private string lastEnemyName;
     private AudioSource audioSource;
 
     private RoomObjectPool projectilesPool;
-    private Quaternion networkRot;
+    private Quaternion networkRot = Quaternion.identity;
     //Lag compensation
     private float currentTime = 0;
     private double currentPacketTime = 0;
@@ -53,7 +54,7 @@ public class TurretController : MonoBehaviourPunCallbacks, IPunObservable
     private Quaternion rotationAtLastPacket = Quaternion.identity;
 
     private Vector3 targetPos;
-    private Quaternion targetRot;
+    private Quaternion targetRot = Quaternion.identity;
 
     private List<PlayerController> m_roomPlayers;
 
@@ -282,6 +283,8 @@ public class TurretController : MonoBehaviourPunCallbacks, IPunObservable
             currentDurability -= actualDamage;
 
             SpawnDamageText(actualDamage, isCrit);
+
+            lastEnemyName = owner;
         }
         else
         {
@@ -309,6 +312,8 @@ public class TurretController : MonoBehaviourPunCallbacks, IPunObservable
             DeathEffect.transform.parent = null;
             DeathEffect.SetActive(true);
         }
+
+        PlayerUI.Instance.DoKillAnnounce(lastEnemyName, "Turret");
 
         PhotonNetwork.Destroy(gameObject);
     }
