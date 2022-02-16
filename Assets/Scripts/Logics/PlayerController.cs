@@ -150,7 +150,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private Vector3 positionAtLastPacket = Vector3.zero;
     private Quaternion rotationAtLastPacket = Quaternion.identity;
     private Quaternion weaponRotationAtLastPacket = Quaternion.identity;
-    private Vector3 targetCameraPos;
 
     private Material initMaterial;
 
@@ -203,6 +202,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     #region Public Fields
 
+    public Transform LastEnemyTransform => m_lastEnemy;
+    public MeshRenderer ShipRenderer => meshRenderer;
     public float DurabilityPercent => (float)m_durability / (float)m_scaledMaxDurability;
     public float FieldPercent => (float)m_forceField / (float)m_scaledMaxField;
 
@@ -261,6 +262,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         {
             LocalPlayerInstance = this.gameObject;
             LocalPlayer = this;
+            BattleCamera.instance.SetTarget(this);
         }
 
         if (ArenaController.instance != null)
@@ -956,8 +958,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             PhotonNetwork.Destroy(gameObject);
         }
 
-        targetCameraPos = pos;
         m_nexusUsed = true;
+
+        BattleCamera.instance.OnNexusUsed(pos);
 
         if (!isMissionMode)
         {
@@ -1557,28 +1560,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
                 m_speedBonus = Mathf.Lerp(m_speedBonus, 0f, 6f * Time.deltaTime);
                 isNitroActive = false;
             }
-        }
-
-        if (cameraTransform == null) cameraTransform = Camera.main.transform;
-
-        if (!IsAI)
-        {
-            if (!m_isDied)
-            {
-                if (targetCameraPos != null && m_nexusUsed)
-                {
-                    if (!isMissionMode || (isMissionMode && missionController.IsObjectiveDone))
-                        cameraTransform.position = Vector3.Lerp(cameraTransform.position, targetCameraPos + Vector3.up * cameraOffsetY, Time.deltaTime * 8f);
-                    else
-                        cameraTransform.position = Vector3.Lerp(cameraTransform.position, transform.position + Vector3.up * cameraOffsetY, Time.deltaTime * 8f);
-                }
-                else
-                    cameraTransform.position = Vector3.Lerp(cameraTransform.position, transform.position + Vector3.up * cameraOffsetY, Time.deltaTime * 8f);
-            }
-            else if (m_lastEnemy != null && !meshRenderer.gameObject.activeSelf)
-                cameraTransform.position = Vector3.Lerp(cameraTransform.position, m_lastEnemy.position + Vector3.up * cameraOffsetY, Time.deltaTime * 8f);
-            else if (m_isDied && meshRenderer.gameObject.activeSelf)
-                cameraTransform.position = Vector3.Lerp(cameraTransform.position, transform.position + Vector3.up * cameraOffsetY, Time.deltaTime * 8f);
         }
 
 #if UNITY_STANDALONE || UNITY_EDITOR
