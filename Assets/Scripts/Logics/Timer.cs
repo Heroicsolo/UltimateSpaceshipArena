@@ -32,7 +32,13 @@ public class Timer : IOnEventCallback
 		get { return m_started; }
 	}
 
+	public bool IsFinished
+	{
+		get { return m_finished; }
+	}
+
 	private bool m_started = false;
+	private bool m_finished = false;
 	private float m_currentTime = 0.0f;
 	private string m_key = "";
 	private float m_timeStamp = 0.0f;
@@ -170,6 +176,7 @@ public class Timer : IOnEventCallback
 				Debug.Log("Timer Finished intern");
 
 				OnFinished?.Invoke();
+				m_finished = true;
 
 				Deinitialize();
 

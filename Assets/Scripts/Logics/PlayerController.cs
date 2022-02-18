@@ -129,6 +129,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private bool isFiring = false;
     private bool isNitroActive = false;
     private bool missionStarted = false;
+    private bool isEndingMatch = false;
 
     private Joystick joystick;
     private Joystick weaponJoystick;
@@ -923,6 +924,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     [PunRPC]
     void EndMatch_RPC(bool isVictory = false)
     {
+        isEndingMatch = true;
+
         if (IsAI)
         {
             PhotonNetwork.Destroy(gameObject);
@@ -1503,7 +1506,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             timer.Update(Time.deltaTime);
             matchTimer.Update(Time.deltaTime);
 
-            if (MatchTimer <= 0f && PhotonNetwork.IsMasterClient && matchTimer.IsRunning && !PlayerUI.Instance.IsLobbyState && ((isMissionMode && missionStarted) || !isMissionMode))
+            if (MatchTimer <= 0f && !isEndingMatch && PhotonNetwork.IsMasterClient && matchTimer.IsFinished && !PlayerUI.Instance.IsLobbyState && ((isMissionMode && missionStarted) || !isMissionMode))
             {
                 matchTimer.Stop();
                 EndMatch();
