@@ -65,7 +65,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField]
     private GameObject InfoTextPrefab;
     [SerializeField]
-    private GameObject DeathEffect;
+    private ParticleSystem DeathEffect;
 
     [Header("AI")]
     [SerializeField]
@@ -130,6 +130,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private bool isNitroActive = false;
     private bool missionStarted = false;
     private bool isEndingMatch = false;
+    private bool isDeathEffectLoaded = false;
+
+    private GameObject deathEffectSkin;
 
     private Joystick joystick;
     private Joystick weaponJoystick;
@@ -155,6 +158,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private Material initMaterial;
 
     private Transform barsHolder;
+
+    private string currBombSkin = "";
+    private string currDeathSkin = "";
 
     public Timer timer;
     public Timer matchTimer;
@@ -333,6 +339,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         if (photonView.IsMine && !IsAI)
         {
+            currBombSkin = Launcher.instance.GetCurrentSkin(ID, SkinType.Bomb).name;
+            currDeathSkin = Launcher.instance.GetCurrentSkin(ID, SkinType.DeathEffect).name;
+
+            LoadDeathEffect();
+
             //TODO: Uncomment when cooperative missions will be fixed
             /*if (PhotonNetwork.IsMasterClient)
                 timer.Start(isMissionMode ? 30f : m_balance.lobbyLength);
@@ -506,10 +517,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             OnLoss(1);
         }
 
-        if (DeathEffect)
+        if (deathEffectSkin)
         {
-            DeathEffect.transform.parent = null;
-            DeathEffect.SetActive(true);
+            Instantiate(deathEffectSkin, transform.position, Quaternion.identity);
+        }
+        else if (DeathEffect)
+        {
+            DeathEffect.Play();
         }
 
         if (this == LocalPlayer)
@@ -872,6 +886,20 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         matchTimer.Start(MatchTimer);
     }
 
+    void LoadDeathEffect()
+    {
+        if (isDeathEffectLoaded) return;
+
+        ResourceRequest request = Resources.LoadAsync("Prefabs/" + currDeathSkin);
+
+        isDeathEffectLoaded = true;
+
+        request.completed += delegate(AsyncOperation operation)
+        {
+            deathEffectSkin = request.asset as GameObject;
+        };
+    }
+
     void ExitFromRoom()
     {
         if (PhotonNetwork.NetworkClientState == Photon.Realtime.ClientState.Leaving) return;
@@ -1118,9 +1146,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             audioSource.PlayOneShot(shootSound, 0.6f);
     }
 
-    public void LaunchProjectileCustom(GameObject projectilePrefab)
+    public void LaunchProjectileCustom(string projectilePrefabName)
     {
-        photonView.RPC("LaunchProjectileCustom_RPC", RpcTarget.All, projectilePrefab.name);
+        photonView.RPC("LaunchProjectileCustom_RPC", RpcTarget.All, projectilePrefabName);
     }
 
     [PunRPC]
@@ -1162,7 +1190,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         if (m_isDied) return;
 
         if (skill.projectilePrefab)
-            LaunchProjectileCustom(skill.projectilePrefab);
+        {
+            string prefabName = skill.projectilePrefab.name;
+
+            if (skill.projectilePrefab.name.Contains("Bomb") && currBombSkin != null && currBombSkin.Length > 2)
+            {
+                prefabName = currBombSkin;
+            }
+
+            LaunchProjectileCustom(prefabName);
+        }
 
         if (skill.stealthLength > 0f)
             BeginStealth(skill.stealthLength);
@@ -1747,6 +1784,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             stream.SendNext(m_killsCount);
             stream.SendNext(m_deathsCount);
             stream.SendNext(m_name);
+            stream.SendNext(currBombSkin);
+            stream.SendNext(currDeathSkin);
         }
         else
         {
@@ -1774,6 +1813,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             this.m_killsCount = (int)stream.ReceiveNext();
             this.m_deathsCount = (int)stream.ReceiveNext();
             this.m_name = (string)stream.ReceiveNext();
+            this.currBombSkin = (string)stream.ReceiveNext();
+            this.currDeathSkin = (string)stream.ReceiveNext();
+
+            LoadDeathEffect();
         }
     }
 

@@ -20,6 +20,12 @@ public class UpgradesInfo
     public List<ShipUpgradesInfo> shipUpgradeLevels;
 }
 
+[Serializable]
+public class UnlockedSkinsInfo
+{
+    public List<int> unlockedSkins;
+}
+
 public static class AccountManager
 {
     private static FirebaseAuth auth;
@@ -28,6 +34,7 @@ public static class AccountManager
     private static DatabaseReference mQueueValueRef;
 
     private static UpgradesInfo m_upgradesInfo;
+    private static UnlockedSkinsInfo m_skinsInfo;
 
     private static int m_lastDailyRewardDebugTime;
     private static string m_lastDailyRewardTime;
@@ -194,6 +201,13 @@ public static class AccountManager
         else
             m_upgradesInfo = JsonUtility.FromJson<UpgradesInfo>(restoredData);
 
+        restoredData = snapshot.Child("SkinsInfo").GetRawJsonValue();
+
+        if (restoredData == null || restoredData.Length < 2)
+            m_skinsInfo = new UnlockedSkinsInfo();
+        else
+            m_skinsInfo = JsonUtility.FromJson<UnlockedSkinsInfo>(restoredData);
+
         IsLoaded = true;
     }
 
@@ -242,6 +256,22 @@ public static class AccountManager
     {
         m_queueLength++;
         mQueueValueRef.SetValueAsync(m_queueLength);
+    }
+
+    public static bool IsSkinUnlocked(int skinID)
+    {
+        CheckSkinsInfo();
+
+        return m_skinsInfo.unlockedSkins.Contains(skinID);
+    }
+
+    public static void UnlockSkin(int skinID)
+    {
+        if (IsSkinUnlocked(skinID)) return;
+
+        m_skinsInfo.unlockedSkins.Add(skinID);
+
+        SaveProfile();
     }
 
     public static int GetUpgradeLevel(PlayerController ship, UpgradeData upgrade)
@@ -331,6 +361,14 @@ public static class AccountManager
         }
     }
 
+    public static void CheckSkinsInfo()
+    {
+        if (m_skinsInfo.unlockedSkins == null || m_skinsInfo.unlockedSkins.Count == 0)
+        {
+            m_skinsInfo.unlockedSkins = new List<int>();
+        }
+    }
+
     public static void SaveTutorialStep()
     {
         mDatabaseRef.Child(AuthController.UserID).Child("tutorialStep").SetValueAsync(TutorialController.instance.TutorialStep);
@@ -391,10 +429,15 @@ public static class AccountManager
         userTable.Child("controlTutorialDone").SetValueAsync(m_controlTutorialDone);
 
         CheckUpgradesInfo();
+        CheckSkinsInfo();
 
         string saveData = JsonUtility.ToJson(m_upgradesInfo);
 
         userTable.Child("UpgradesInfo").SetRawJsonValueAsync(saveData);
+
+        saveData = JsonUtility.ToJson(m_skinsInfo);
+
+        userTable.Child("SkinsInfo").SetRawJsonValueAsync(saveData);
     }
 
     public static void SetUserName(string name)

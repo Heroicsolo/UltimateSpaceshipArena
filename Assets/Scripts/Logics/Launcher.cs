@@ -53,6 +53,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     [SerializeField] private GameObject m_shipsSelector;
     [SerializeField] private GameObject m_shipsButton;
     [SerializeField] private GameObject m_arenaButton;
+    [SerializeField] private GameObject m_shopButton;
     [SerializeField] private GameObject m_missionButton;
     [SerializeField] private ChatManager chatManager;
     [SerializeField] private GameObject chatUI;
@@ -61,6 +62,9 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     [SerializeField] private Button changeNameBtn;
     [SerializeField] private Button changeNameBtnPaid;
     [SerializeField] private Text changeNameCostLabel;
+
+    [Header("Skins")]
+    [SerializeField] private List<SkinData> availableSkins;
 
     #endregion
 
@@ -97,6 +101,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     public Action<bool> OnApplicationPaused;
     public Action OnApplicationExit;
     
+    public List<SkinData> AvailableSkins => availableSkins;
+
     public GameObject SelectedShipPrefab { get { return m_selectedShip; } set { m_selectedShip = value; SelectHangarShip(m_selectedShip.name); } }
 
     public bool IsSoundOn { get { return isSoundOn; } set { isSoundOn = value; PlayerPrefs.SetInt("soundOn", isSoundOn ? 1 : 0); } }
@@ -251,6 +257,22 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         m_shipsSelector.SetActive(false);
     }
 
+    public GameObject GetCurrentSkin(int shipID, SkinType type)
+    {
+        foreach (var skin in availableSkins)
+        {
+            if (skin.Type == type && 
+                (skin.SupportedShips == null || 
+                skin.SupportedShips.Count == 0 || 
+                skin.SupportedShips.FindIndex(x => x.ID == shipID) >= 0) && AccountManager.IsSkinUnlocked(skin.ID))
+            {
+                return skin.SkinObject;
+            }
+        }
+
+        return null;
+    }
+
     public void RefreshTopButtons()
     {
         bool anyUpgradeAvailable = false;
@@ -270,7 +292,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
         m_arenaButton.GetComponent<Animator>().enabled = !AccountManager.IsArenaTutorialDone;
         m_missionButton.GetComponent<Animator>().enabled = AccountManager.IsArenaTutorialDone && !AccountManager.IsMissionTutorialDone;
-
+        m_shopButton.GetComponent<Animator>().enabled = false;
         m_shipsButton.GetComponent<Animator>().enabled = anyUpgradeAvailable;
     }
 
