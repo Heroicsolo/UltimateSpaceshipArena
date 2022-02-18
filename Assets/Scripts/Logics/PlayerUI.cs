@@ -342,6 +342,14 @@ public class PlayerUI : MonoBehaviour
         capturerLabel.text = capturerName + "<color=\"white\"> is capturing Nexus!</color>";
     }
 
+    public void DoCapturedAnnounce(string capturerName)
+    {
+        HideKillAnnounce();
+        captureAnnounceObject.SetActive(false);
+        captureAnnounceObject.SetActive(true);
+        capturerLabel.text = capturerName + "<color=\"white\"> has captured Nexus!</color>";
+    }
+
     public void DoRespawnAnnounce(int seconds)
     {
         HideCaptureAnnounce();

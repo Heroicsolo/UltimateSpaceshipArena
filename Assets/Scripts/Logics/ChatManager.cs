@@ -14,10 +14,11 @@ public class ChatMessage
     public string msg;
 }
 
-public class ChatManager : MonoBehaviourPunCallbacks, IChatClientListener
+public class ChatManager : MonoBehaviour, IChatClientListener
 {
     private ChatClient chatClient;
     private bool m_justEntered = false;
+    private bool m_needToConnect = false;
     private List<GameObject> chatMessages = new List<GameObject>();
 
     [SerializeField] private int maxChatMessagesCount = 20;
@@ -40,8 +41,11 @@ public class ChatManager : MonoBehaviourPunCallbacks, IChatClientListener
 
     public void ReconnectIfNeeded()
     {
-        if (chatClient.State == ChatState.Disconnected)
+        if (m_needToConnect)
+        {
+            chatClient.ChatRegion = "EU";
             chatClient.Connect(PhotonNetwork.PhotonServerSettings.AppSettings.AppIdChat, PhotonNetwork.PhotonServerSettings.AppSettings.AppVersion, new Photon.Chat.AuthenticationValues(PhotonNetwork.NickName));
+        }
     }
 
     private void OnApplicationQuit()
@@ -54,11 +58,8 @@ public class ChatManager : MonoBehaviourPunCallbacks, IChatClientListener
 
     private void Update()
     {
-        if (PhotonNetwork.IsConnected)
-        {
-            if (chatClient != null)
-                chatClient.Service();
-        }
+        if (chatClient != null)
+            chatClient.Service();
     }
 
     public void DebugReturn(DebugLevel level, string message)
@@ -114,6 +115,7 @@ public class ChatManager : MonoBehaviourPunCallbacks, IChatClientListener
         if (m_justEntered)
             PostOnlineStatus();
         m_justEntered = false;
+        m_needToConnect = false;
         chatLoadingIndicator.SetActive(false);
         chatMessageField.interactable = true;
     }
@@ -122,6 +124,7 @@ public class ChatManager : MonoBehaviourPunCallbacks, IChatClientListener
     {
         chatLoadingIndicator.SetActive(true);
         chatMessageField.interactable = false;
+        m_needToConnect = true;
     }
 
     public void OnChatStateChange(ChatState state)

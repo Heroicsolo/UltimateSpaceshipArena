@@ -972,6 +972,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
             int place = Mathf.Min(m_balance.maxPlayersPerRoom, sortedPlayers.FindIndex(x => x == this) + 1);
 
+            PlayerUI.Instance.DoCapturedAnnounce(byPlayer);
+
             if (Name == byPlayer)
             {
                 GameAnalytics.NewDesignEvent("nexus_captured_by_player");
@@ -980,9 +982,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             else
                 OnLoss(place + 1);
         }
-        else
+        else if (!missionController.IsNexusCaptured)
         {
+            PlayerUI.Instance.DoCapturedAnnounce(byPlayer);
+
             missionController.IsNexusCaptured = true;
+
+            if (Name == byPlayer)
+            {
+                GameAnalytics.NewDesignEvent("nexus_captured_by_player");
+            }
         }
     }
 
