@@ -54,7 +54,6 @@ public static class BalanceProvider
                             else if (task.IsCompleted)
                             {
                                 RefreshBalance(task.Result);
-                                IsLoaded = true;
                             }
                         });
     }
@@ -72,12 +71,14 @@ public static class BalanceProvider
         {
             MessageBox.instance.Show("Your game client version is old. Please, update it on Google Play.");
             Launcher.instance.CloseGameDelayed();
+            return;
         }
         else if (Balance.techWorks != 0)
         {
             if (Balance.techWorksDelay < 1)
             {
                 MessageBox.instance.Show("The game is currently under maintenance. We are sorry for the inconvenience.");
+                return;
             }
             else
             {
@@ -85,6 +86,8 @@ public static class BalanceProvider
                 Launcher.instance.CloseGameDelayed(Balance.techWorksDelay * 60f);
             }
         }
+
+        IsLoaded = true;
     }
 
     private static void HandleBalanceValueChanged(object sender, ValueChangedEventArgs args)
