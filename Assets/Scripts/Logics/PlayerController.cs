@@ -1576,7 +1576,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             return;
         }
 
-        if (m_durability < m_maxDurability && m_durabilityRegen > 0f && m_durability > 0)
+        if (m_durability < m_maxDurability && m_durabilityRegen > 0f && m_durability > 0 && m_currShieldRegenDelay <= 0f)
         {
             m_durability = Mathf.Min(m_maxDurability, m_durability + m_maxDurability * m_durabilityRegen * Time.deltaTime);
         }
