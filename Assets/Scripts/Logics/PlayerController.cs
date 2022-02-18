@@ -635,8 +635,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     public void ScaleStats(float modifier)
     {
-        m_scaledMaxDurability = Mathf.CeilToInt(m_maxDurability * modifier);
-        m_scaledMaxField = Mathf.CeilToInt(m_maxField * modifier);
+        m_scaledMaxDurability = Mathf.CeilToInt(m_maxDurability * modifier * m_balance.missionBotsDurabilityCoef);
+        m_scaledMaxField = Mathf.CeilToInt(m_maxField * modifier * m_balance.missionBotsShieldCoef);
         m_damageModifier = modifier;
 
         m_durability = m_scaledMaxDurability;

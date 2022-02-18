@@ -30,6 +30,8 @@ public class BalanceInfo
     public int currencyPlaceBonus;
     public int currencyPerMissionMin;
     public float missionTimeRewardModifier;
+    public float missionBotsDurabilityCoef;
+    public float missionBotsShieldCoef;
     public int nameChangeCost;
 }
 
