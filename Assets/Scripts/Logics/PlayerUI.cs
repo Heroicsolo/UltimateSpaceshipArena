@@ -785,8 +785,10 @@ public class PlayerUI : MonoBehaviour
         else
             MissionController.instance.LeaveRoom();
 
-        if (changeRating)
+        if (changeRating && !isMissionMode)
             Launcher.instance.OnFightLoss();
+        else if (isMissionMode)
+            Launcher.instance.OnMissionFailed();
     }
 
     public void Shoot()
