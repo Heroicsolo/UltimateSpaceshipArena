@@ -39,7 +39,7 @@ public static class BalanceProvider
     public static BalanceInfo Balance;
     public static bool IsLoaded = false;
     public static Action OnValueChanged;
-    const int clientVersion = 5;
+    const int clientVersion = 6;
 
     public static void Init()
     {
@@ -67,19 +67,6 @@ public static class BalanceProvider
             Balance = new BalanceInfo();
         else
             Balance = JsonUtility.FromJson<BalanceInfo>(restoredData);
-    }
-
-    private static void HandleBalanceValueChanged(object sender, ValueChangedEventArgs args)
-    {
-        if (args.DatabaseError != null)
-        {
-            Debug.LogError(args.DatabaseError.Message);
-            return;
-        }
-
-        RefreshBalance(args.Snapshot);
-
-        OnValueChanged?.Invoke();
 
         if (Balance.version > clientVersion)
         {
@@ -98,5 +85,18 @@ public static class BalanceProvider
                 Launcher.instance.CloseGameDelayed(Balance.techWorksDelay * 60f);
             }
         }
+    }
+
+    private static void HandleBalanceValueChanged(object sender, ValueChangedEventArgs args)
+    {
+        if (args.DatabaseError != null)
+        {
+            Debug.LogError(args.DatabaseError.Message);
+            return;
+        }
+
+        RefreshBalance(args.Snapshot);
+
+        OnValueChanged?.Invoke();
     }
 }
