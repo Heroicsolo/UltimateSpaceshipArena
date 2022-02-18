@@ -55,6 +55,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     [SerializeField] private GameObject m_arenaButton;
     [SerializeField] private GameObject m_missionButton;
     [SerializeField] private ChatManager chatManager;
+    [SerializeField] private GameObject chatUI;
 
     [Header("Profile Screen")]
     [SerializeField] private Button changeNameBtn;
@@ -342,6 +343,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         changeNameCostLabel.text = BalanceProvider.Balance.nameChangeCost.ToString();
 
         chatManager.gameObject.SetActive(true);
+        chatUI.gameObject.SetActive(true);
 
         RefreshTopButtons();
 

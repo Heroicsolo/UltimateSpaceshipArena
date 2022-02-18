@@ -5477,7 +5477,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 49240106}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -12049,7 +12049,6 @@ GameObject:
   - component: {fileID: 358065028}
   - component: {fileID: 358065027}
   - component: {fileID: 358065026}
-  - component: {fileID: 358065029}
   m_Layer: 5
   m_Name: ChatHolder
   m_TagString: Untagged
@@ -12131,23 +12130,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 358065024}
   m_CullTransparentMesh: 1
---- !u!114 &358065029
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 358065024}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 55490b94cbccc4c41a41dd08c7a00a01, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxChatMessagesCount: 20
-  chatContent: {fileID: 1033555416}
-  chatMessagePrefab: {fileID: 3861081527441703834, guid: 89cc60a5ed249b94abfa1d0bc8417782, type: 3}
-  chatMessageField: {fileID: 1769918732}
-  chatLoadingIndicator: {fileID: 639619058}
 --- !u!1001 &358773947
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14773,7 +14755,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 639619058}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -24030,6 +24012,54 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!1 &1233641709
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1233641711}
+  - component: {fileID: 1233641710}
+  m_Layer: 0
+  m_Name: ChatManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &1233641710
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1233641709}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55490b94cbccc4c41a41dd08c7a00a01, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxChatMessagesCount: 20
+  chatContent: {fileID: 1033555416}
+  chatMessagePrefab: {fileID: 3861081527441703834, guid: 89cc60a5ed249b94abfa1d0bc8417782, type: 3}
+  chatMessageField: {fileID: 1769918732}
+  chatLoadingIndicator: {fileID: 639619058}
+--- !u!4 &1233641711
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1233641709}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1981.6512, y: 824.8243, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 12
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1240014449
 GameObject:
   m_ObjectHideFlags: 0
@@ -30039,7 +30069,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1455606423}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -41694,7 +41724,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1769918730}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -41704,7 +41734,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: -20.9, y: 43.5}
+  m_AnchoredPosition: {x: -20.9, y: 43.50003}
   m_SizeDelta: {x: 340, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1769918732
@@ -41769,7 +41799,7 @@ MonoBehaviour:
   m_OnEndEdit:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 358065029}
+      - m_Target: {fileID: 1233641710}
         m_TargetAssemblyTypeName: ChatManager, Assembly-CSharp
         m_MethodName: SendChatMessage
         m_Mode: 1
@@ -53401,7 +53431,8 @@ MonoBehaviour:
   m_shipsButton: {fileID: 1079351753}
   m_arenaButton: {fileID: 2001592182}
   m_missionButton: {fileID: 368046057}
-  chatManager: {fileID: 358065029}
+  chatManager: {fileID: 1233641710}
+  chatUI: {fileID: 358065024}
   changeNameBtn: {fileID: 2064206104}
   changeNameBtnPaid: {fileID: 117746112}
   changeNameCostLabel: {fileID: 796804576}

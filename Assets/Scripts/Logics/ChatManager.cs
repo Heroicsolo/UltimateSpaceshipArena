@@ -16,6 +16,8 @@ public class ChatMessage
 
 public class ChatManager : MonoBehaviour, IChatClientListener
 {
+    public static ChatManager instance;
+
     private ChatClient chatClient;
     private bool m_justEntered = false;
     private bool m_needToConnect = false;
@@ -26,6 +28,15 @@ public class ChatManager : MonoBehaviour, IChatClientListener
     [SerializeField] private GameObject chatMessagePrefab;
     [SerializeField] private TMP_InputField chatMessageField;
     [SerializeField] private GameObject chatLoadingIndicator;
+
+    void Awake()
+    {
+        if (!instance)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+    }
 
     void Start()
     {
@@ -64,7 +75,7 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 
     public void DebugReturn(DebugLevel level, string message)
     {
-
+        Debug.Log(message);
     }
 
     public void SendChatMessage()
