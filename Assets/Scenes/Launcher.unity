@@ -54835,7 +54835,7 @@ MonoBehaviour:
   m_shipsSelector: {fileID: 1528247112}
   m_shipsButton: {fileID: 1079351753}
   m_arenaButton: {fileID: 2001592182}
-  m_shopButton: {fileID: 0}
+  m_shopButton: {fileID: 283837496}
   m_missionButton: {fileID: 368046057}
   chatManager: {fileID: 1233641710}
   chatUI: {fileID: 358065024}

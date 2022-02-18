@@ -339,8 +339,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         if (photonView.IsMine && !IsAI)
         {
-            currBombSkin = Launcher.instance.GetCurrentSkin(ID, SkinType.Bomb).name;
-            currDeathSkin = Launcher.instance.GetCurrentSkin(ID, SkinType.DeathEffect).name;
+            currBombSkin = Launcher.instance.GetCurrentSkin(ID, SkinType.Bomb);
+            currDeathSkin = Launcher.instance.GetCurrentSkin(ID, SkinType.DeathEffect);
 
             LoadDeathEffect();
 

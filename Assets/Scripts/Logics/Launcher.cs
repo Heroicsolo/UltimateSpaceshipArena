@@ -257,7 +257,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         m_shipsSelector.SetActive(false);
     }
 
-    public GameObject GetCurrentSkin(int shipID, SkinType type)
+    public string GetCurrentSkin(int shipID, SkinType type)
     {
         foreach (var skin in availableSkins)
         {
@@ -266,11 +266,11 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
                 skin.SupportedShips.Count == 0 || 
                 skin.SupportedShips.FindIndex(x => x.ID == shipID) >= 0) && AccountManager.IsSkinUnlocked(skin.ID))
             {
-                return skin.SkinObject;
+                return skin.SkinObject.name;
             }
         }
 
-        return null;
+        return "";
     }
 
     public void RefreshTopButtons()
