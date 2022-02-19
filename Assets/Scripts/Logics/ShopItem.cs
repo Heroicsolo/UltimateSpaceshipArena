@@ -42,7 +42,7 @@ public class ShopItem : MonoBehaviour
 
         AccountManager.UnlockSkin(skinData.ID);
 
-        Refresh();
+        shop.Refresh();
     }
 
     public void Refresh()
@@ -53,7 +53,5 @@ public class ShopItem : MonoBehaviour
         purchaseBlock.SetActive(!isUnlocked);
 
         buyButtonAnimator.enabled = AccountManager.Currency >= skinData.Cost;
-
-        shop.Refresh();
     }
 }
