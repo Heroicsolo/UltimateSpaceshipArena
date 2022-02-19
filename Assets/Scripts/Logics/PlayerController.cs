@@ -890,7 +890,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (isDeathEffectLoaded) return;
 
-        ResourceRequest request = Resources.LoadAsync("Prefabs/" + currDeathSkin);
+        ResourceRequest request = Resources.LoadAsync(currDeathSkin);
 
         isDeathEffectLoaded = true;
 
