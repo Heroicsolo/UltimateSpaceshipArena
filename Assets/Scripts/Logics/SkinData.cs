@@ -16,6 +16,7 @@ public class SkinData : ScriptableObject
 {
     [SerializeField] public int ID;
     [SerializeField] public string Title;
+    [SerializeField] public string Desc;
     [SerializeField] public Sprite Icon;
     [SerializeField] public SkinType Type;
     [SerializeField] public List<PlayerController> SupportedShips;

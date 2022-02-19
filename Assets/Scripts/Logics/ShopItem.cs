@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class ShopItem : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI titleLabel;
+    [SerializeField] private TextMeshProUGUI descLabel;
     [SerializeField] private TextMeshProUGUI costLabel;
     [SerializeField] private Image itemImage;
     [SerializeField] private GameObject unlockedIndicator;
@@ -28,6 +29,7 @@ public class ShopItem : MonoBehaviour
         purchaseBlock.SetActive(!isUnlocked);
 
         titleLabel.text = data.Title;
+        descLabel.text = data.Desc;
         costLabel.text = data.Cost.ToString();
         itemImage.sprite = data.Icon;
 
@@ -36,7 +38,11 @@ public class ShopItem : MonoBehaviour
 
     public void Purchase()
     {
-        if (AccountManager.Currency < skinData.Cost) return;
+        if (AccountManager.Currency < skinData.Cost)
+        {
+            MessageBox.instance.Show("Not enough money!");
+            return;
+        }
 
         AccountManager.Currency -= skinData.Cost;
 
