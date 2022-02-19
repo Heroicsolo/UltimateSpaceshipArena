@@ -5594,7 +5594,7 @@ MonoBehaviour:
   BombLaunchPosition: {fileID: 2180226660458417659}
   TurretTransform: {fileID: 5204624422129714692}
   ShipIcon: {fileID: 21300000, guid: 780d1de04c33b5a4fb7f21c95e9128fc, type: 3}
-  ShipTitle: Rogue
+  ShipTitle: ShipRogue
   cameraOffsetY: 110
   FloatingTextSpawnPosition: {fileID: 6016336048886456366}
   ImmortalityOrb: {fileID: 7482507792824328463}

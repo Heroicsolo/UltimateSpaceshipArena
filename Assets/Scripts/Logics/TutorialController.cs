@@ -61,7 +61,7 @@ public class TutorialController : MonoBehaviour
 
     void ShowTutorialUnit(string message, RectTransform target = null)
     {
-        tutorialMessageLabel.text = message;
+        tutorialMessageLabel.text = LangResolver.instance.GetLocalizedString(message);
         tutorialMessageTransform.gameObject.SetActive(true);
         tutorialMessageTransform.localPosition = new Vector3(tutorialMessageTransform.localPosition.x, -213f, tutorialMessageTransform.localPosition.z);
         fullScreenBtn.gameObject.SetActive(true);

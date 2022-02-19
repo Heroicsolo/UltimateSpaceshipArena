@@ -153,7 +153,7 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 
             if (msgObj.nickname == "/online")
             {
-                chatMsgGO.GetComponent<TextMeshProUGUI>().text = "<color=\"green\">" + senders[i] + "</color> has entered the game";
+                chatMsgGO.GetComponent<TextMeshProUGUI>().text = LangResolver.instance.GetLocalizedString("HasEnteredGame", senders[i], "green");
             }
             else
             {

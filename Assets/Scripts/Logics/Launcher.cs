@@ -321,11 +321,11 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     {
         m_loadingScreen.SetActive(true);
 
-        m_loadingText.text = "CONNECTING TO SERVER...";
+        m_loadingText.text = LangResolver.instance.GetLocalizedString("LoadingScreen_Server");
 
         yield return new WaitUntil(() => AccountManager.IsNicknamesListLoaded && BalanceProvider.IsLoaded);
 
-        m_loadingText.text = "CONNECTING TO GOOGLE PLAY...";
+        m_loadingText.text = LangResolver.instance.GetLocalizedString("LoadingScreen_GP");
 
         AuthController.InitGP();
 
@@ -333,7 +333,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
         if (!skipSignIn)
         {
-            m_loadingText.text = "SIGNING IN...";
+            m_loadingText.text = LangResolver.instance.GetLocalizedString("LoadingScreen_SigningIn");
 
             AuthController.SignIn();
 
@@ -346,7 +346,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
             yield return new WaitUntil(() => AuthController.CredentialsSaved);
         }
 
-        m_loadingText.text = "LOADING PROFILE...";
+        m_loadingText.text = LangResolver.instance.GetLocalizedString("LoadingScreen_LoadingProfile");
 
         AccountManager.LoadProfile(m_newProfile);
 
@@ -357,7 +357,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
             AccountManager.SetOnline();
         }
 
-        m_loadingText.text = "CONNECTING TO MASTER SERVER...";
+        m_loadingText.text = LangResolver.instance.GetLocalizedString("LoadingScreen_Connecting");
 
         Connect();
 
@@ -379,6 +379,10 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         chatUI.gameObject.SetActive(true);
 
         RefreshTopButtons();
+
+        NotificationsManager.Init();
+
+        LangResolver.instance.ResolveTexts();
 
         if (AccountManager.IsFirstTutorialDone)
         {
@@ -651,14 +655,14 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
         if (newName.Length < 2)
         {
-            MessageBox.instance.Show("Your nickname is too short!");
+            MessageBox.instance.Show(LangResolver.instance.GetLocalizedString("WarningNicknameShort"));
             m_inputProfileName.text = AccountManager.UserName;
             return;
         }
 
         if (AccountManager.IsNicknameUsed(newName))
         {
-            MessageBox.instance.Show("This nickname is already taken!");
+            MessageBox.instance.Show(LangResolver.instance.GetLocalizedString("WarningNicknameTaken"));
             m_inputProfileName.text = AccountManager.UserName;
             return;
         }
@@ -681,21 +685,21 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
         if (newName.Length < 2)
         {
-            MessageBox.instance.Show("Your nickname is too short!");
+            MessageBox.instance.Show(LangResolver.instance.GetLocalizedString("WarningNicknameShort"));
             m_inputProfileName.text = AccountManager.UserName;
             return;
         }
 
         if (AccountManager.IsNicknameUsed(newName))
         {
-            MessageBox.instance.Show("This nickname is already taken!");
+            MessageBox.instance.Show(LangResolver.instance.GetLocalizedString("WarningNicknameTaken"));
             m_inputProfileName.text = AccountManager.UserName;
             return;
         }
 
         if (AccountManager.Currency < BalanceProvider.Balance.nameChangeCost)
         {
-            MessageBox.instance.Show("Not enough money!");
+            MessageBox.instance.Show(LangResolver.instance.GetLocalizedString("WarningNotEnoughMoney"));
             m_inputProfileName.text = AccountManager.UserName;
             return;
         }
@@ -729,7 +733,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
             selectedMap = "Arena00";
             GameAnalytics.NewProgressionEvent(GAProgressionStatus.Start, "Arena", selectedMap);
             m_loadingScreen.SetActive(true);
-            m_loadingText.text = "FINDING A GAME...";
+            m_loadingText.text = LangResolver.instance.GetLocalizedString("LoadingScreen_FindingRoom");
             // #Critical we need at this point to attempt joining a Random Room. If it fails, we'll get notified in OnJoinRandomFailed() and we'll create one.
             string sqlLobbyFilter = string.Format("C0 BETWEEN {0} AND {1} AND C1 = '{2}'", Mathf.Max(0, AccountManager.CurrentRating - BalanceProvider.Balance.matchmakingGap), AccountManager.CurrentRating + BalanceProvider.Balance.matchmakingGap, selectedMap);
             PhotonNetwork.JoinRandomRoom(null, 0, MatchmakingMode.FillRoom, sqlLobby, sqlLobbyFilter);
@@ -747,7 +751,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
             selectedMap = "Mission00";
             GameAnalytics.NewProgressionEvent(GAProgressionStatus.Start, "Mission", selectedMap);
             m_loadingScreen.SetActive(true);
-            m_loadingText.text = "STARTING MISSION...";
+            m_loadingText.text = LangResolver.instance.GetLocalizedString("LoadingScreen_StartingMission");
             // #Critical we need at this point to attempt joining a Random Room. If it fails, we'll get notified in OnJoinRandomFailed() and we'll create one.
             //string sqlLobbyFilter = string.Format("C1 = '{0}'", selectedMap);
             //PhotonNetwork.JoinRandomRoom(null, 0, MatchmakingMode.FillRoom, sqlLobby, sqlLobbyFilter);
@@ -761,7 +765,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
     public void OnRoomLeavingStarted()
     {
-        m_loadingText.text = "LOADING HANGAR...";
+        m_loadingText.text = LangResolver.instance.GetLocalizedString("LoadingScreen_LoadingHangar");
         m_loadingScreen?.SetActive(true);
     }
 

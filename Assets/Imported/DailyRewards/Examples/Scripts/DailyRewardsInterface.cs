@@ -193,7 +193,7 @@ namespace NiobiumStudios
             if (isRewardAvailableNow)
             {
                 SnapToReward();
-                textTimeDue.text = "You can claim your reward!";
+                textTimeDue.text = LangResolver.instance.GetLocalizedString("CanClaimReward");
             }
             readyToClaim = isRewardAvailableNow;
         }
@@ -249,7 +249,7 @@ namespace NiobiumStudios
 
                 string formattedTs = dailyRewards.GetFormattedTime(difference);
 
-                textTimeDue.text = string.Format("Come back in {0} for your next reward", formattedTs);
+                textTimeDue.text = LangResolver.instance.GetLocalizedString("DailyRewardsComeBackIn", formattedTs);
             }
         }
 
@@ -264,11 +264,11 @@ namespace NiobiumStudios
             imageReward.sprite = reward.sprite;
             if (rewardQt > 0)
             {
-                textReward.text = string.Format("You got {0} {1}!", reward.reward, unit);
+                textReward.text = LangResolver.instance.GetLocalizedString("YouGotNX", reward.reward, unit);
             }
             else
             {
-                textReward.text = string.Format("You got {0}!", unit);
+                textReward.text = LangResolver.instance.GetLocalizedString("YouGotX", unit);
             }
         }
 

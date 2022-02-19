@@ -339,7 +339,7 @@ public class PlayerUI : MonoBehaviour
         HideKillAnnounce();
         captureAnnounceObject.SetActive(false);
         captureAnnounceObject.SetActive(true);
-        capturerLabel.text = capturerName + "<color=\"white\"> is capturing Nexus!</color>";
+        capturerLabel.text = capturerName + "<color=\"white\"> " + LangResolver.instance.GetLocalizedString("CapturingNexus") + "</color>";
     }
 
     public void DoCapturedAnnounce(string capturerName)
@@ -347,7 +347,7 @@ public class PlayerUI : MonoBehaviour
         HideKillAnnounce();
         captureAnnounceObject.SetActive(false);
         captureAnnounceObject.SetActive(true);
-        capturerLabel.text = capturerName + "<color=\"white\"> has captured Nexus!</color>";
+        capturerLabel.text = capturerName + "<color=\"white\"> " + LangResolver.instance.GetLocalizedString("CapturedNexus") + "</color>";
     }
 
     public void DoRespawnAnnounce(int seconds)
@@ -356,7 +356,7 @@ public class PlayerUI : MonoBehaviour
         HideKillAnnounce();
         respawnAnnounceObject.SetActive(false);
         respawnAnnounceObject.SetActive(true);
-        respawnAnnounceLabel.text = "Respawn in: " + seconds.ToString();
+        respawnAnnounceLabel.text = LangResolver.instance.GetLocalizedString("RespawnIn", seconds.ToString());
     }
 
     public void HideKillAnnounce()
@@ -505,8 +505,8 @@ public class PlayerUI : MonoBehaviour
             Vector3 mapPos = missionController.GetMapPosition(missionController.NexusPosition);
             minimapNexus.transform.localPosition = new Vector3(mapPos.x / mapSizeAmplifier, mapPos.z / mapSizeAmplifier, 0f);
             missionObjectiveHolder.SetActive(true);
-            missionObjectiveLabel.text = string.Format("Drones killed: {0}/{1}", missionController.KilledBotsCount, missionController.InitBotsCount);
-            missionObjectiveLabel2.text = "Nexus captured: 0/1";
+            missionObjectiveLabel.text = LangResolver.instance.GetLocalizedString("DronesKilled", missionController.KilledBotsCount, missionController.InitBotsCount);
+            missionObjectiveLabel2.text = LangResolver.instance.GetLocalizedString("NexusCaptured", 0, 1);
         }
 
         IsInitialized = true;
@@ -544,12 +544,12 @@ public class PlayerUI : MonoBehaviour
             target.OnMissionStarted();
 
             if (!AccountManager.IsMissionTutorialDone)
-                TutorialController.instance.ShowCustomTutorialUnit("Capture the Nexus on the right side of this area and kill all drones on the way!", minimapNexus.GetComponent<RectTransform>(), OnMissionTutorialDone);
+                TutorialController.instance.ShowCustomTutorialUnit(LangResolver.instance.GetLocalizedString("TutorialMission"), minimapNexus.GetComponent<RectTransform>(), OnMissionTutorialDone);
         }
         else
         {
             if (!AccountManager.IsArenaTutorialDone)
-                TutorialController.instance.ShowCustomTutorialUnit("Move to the Nexus on Arena center and try to capture it!", minimapNexus.GetComponent<RectTransform>(), OnArenaTutorialDone);
+                TutorialController.instance.ShowCustomTutorialUnit(LangResolver.instance.GetLocalizedString("TutorialArena"), minimapNexus.GetComponent<RectTransform>(), OnArenaTutorialDone);
         }
 
         if (PhotonNetwork.IsMasterClient && !isMissionMode)
@@ -572,19 +572,19 @@ public class PlayerUI : MonoBehaviour
     {
         Launcher.instance.OnArenaTutorialDone();
         if (!AccountManager.IsControlTutorialDone)
-            TutorialController.instance.ShowCustomTutorialUnit("Use left joystick to move your ship!", joystick.GetComponent<RectTransform>(), OnMovementTutorialDone);
+            TutorialController.instance.ShowCustomTutorialUnit(LangResolver.instance.GetLocalizedString("TutorialLeftJoystick"), joystick.GetComponent<RectTransform>(), OnMovementTutorialDone);
     }
 
     void OnMissionTutorialDone()
     {
         Launcher.instance.OnMissionTutorialDone();
         if (!AccountManager.IsControlTutorialDone)
-            TutorialController.instance.ShowCustomTutorialUnit("Use left joystick to move your ship!", joystick.GetComponent<RectTransform>(), OnMovementTutorialDone);
+            TutorialController.instance.ShowCustomTutorialUnit(LangResolver.instance.GetLocalizedString("TutorialLeftJoystick"), joystick.GetComponent<RectTransform>(), OnMovementTutorialDone);
     }
 
     void OnMovementTutorialDone()
     {
-        TutorialController.instance.ShowCustomTutorialUnit("Use right joystick to rotate your weapon!", weaponJoystick.GetComponent<RectTransform>(), OnWeaponTutorialDone);
+        TutorialController.instance.ShowCustomTutorialUnit(LangResolver.instance.GetLocalizedString("TutorialRightJoystick"), weaponJoystick.GetComponent<RectTransform>(), OnWeaponTutorialDone);
     }
 
     void OnWeaponTutorialDone()
@@ -599,7 +599,7 @@ public class PlayerUI : MonoBehaviour
         LobbyPlayerSlot lps = playerSlot.GetComponent<LobbyPlayerSlot>();
         lps.SetData(nickname, shipIcon, isAI);
         m_lobbyPlayers.Add(lps);
-        lobbyScreenTitle.text = string.Format("Players ready to fight: {0}/{1}", m_lobbyPlayers.Count, PhotonNetwork.CurrentRoom.MaxPlayers);
+        lobbyScreenTitle.text = LangResolver.instance.GetLocalizedString("PlayersReady", m_lobbyPlayers.Count, PhotonNetwork.CurrentRoom.MaxPlayers);
     }
 
     public void OnLobbyPlayerDeleted(string nickname)
@@ -608,7 +608,7 @@ public class PlayerUI : MonoBehaviour
         LobbyPlayerSlot lps = m_lobbyPlayers.Find(x => x.Nickname == nickname);
         m_lobbyPlayers.Remove(lps);
         Destroy(lps.gameObject);
-        lobbyScreenTitle.text = string.Format("Players ready to fight: {0}/{1}", m_lobbyPlayers.Count, PhotonNetwork.CurrentRoom.MaxPlayers);
+        lobbyScreenTitle.text = LangResolver.instance.GetLocalizedString("PlayersReady", m_lobbyPlayers.Count, PhotonNetwork.CurrentRoom.MaxPlayers);
     }
 
     public void OnLoss(int currRating, int ratingChange, int place, int moneyGained)
@@ -616,11 +616,12 @@ public class PlayerUI : MonoBehaviour
         lossScreen.SetActive(true);
 
         loseScreenRatingLabel.text = currRating.ToString();
-        string suffix = "th";
-        if (place == 1) suffix = "st";
-        if (place == 2) suffix = "nd";
-        if (place == 3) suffix = "rd";
-        loseScreenPlaceLabel.text = place.ToString() + suffix + " Place!";
+        place = Mathf.Min(place, 4);
+        string suffix = "SuffixTh";
+        if (place == 1) suffix = "SuffixSt";
+        if (place == 2) suffix = "SuffixNd";
+        if (place == 3) suffix = "SuffixRd";
+        loseScreenPlaceLabel.text = place.ToString() + LangResolver.instance.GetLocalizedString(suffix) + " " + LangResolver.instance.GetLocalizedString("Place");
 
         PlaySound(SoundType.Loss, 5f);
 
@@ -632,11 +633,11 @@ public class PlayerUI : MonoBehaviour
         winScreen.SetActive(true);
         winScreenRatingLabel.text = "+0";
         winScreenCurrencyLabel.text = "+0";
-        string suffix = "th";
-        if (place == 1) suffix = "st";
-        if (place == 2) suffix = "nd";
-        if (place == 3) suffix = "rd";
-        winScreenPlaceLabel.text = place.ToString() + suffix + " Place!";
+        string suffix = "SuffixTh";
+        if (place == 1) suffix = "SuffixSt";
+        if (place == 2) suffix = "SuffixNd";
+        if (place == 3) suffix = "SuffixRd";
+        winScreenPlaceLabel.text = place.ToString() + LangResolver.instance.GetLocalizedString(suffix) + " " + LangResolver.instance.GetLocalizedString("Place");
 
         PlaySound(SoundType.Victory, 5f);
 
@@ -958,8 +959,8 @@ public class PlayerUI : MonoBehaviour
 
         if (isMissionMode)
         {
-            missionObjectiveLabel.text = string.Format("Drones killed: {0}/{1}", missionController.KilledBotsCount, missionController.InitBotsCount);
-            missionObjectiveLabel2.text = string.Format("Nexus captured: {0}/{1}", missionController.IsNexusCaptured ? 1 : 0, 1);
+            missionObjectiveLabel.text = LangResolver.instance.GetLocalizedString("DronesKilled", missionController.KilledBotsCount, missionController.InitBotsCount);
+            missionObjectiveLabel2.text = LangResolver.instance.GetLocalizedString("NexusCaptured", missionController.IsNexusCaptured ? 1 : 0, 1);
 
             if (missionController.IsObjectiveDone && missionController.IsNexusCaptured && PhotonNetwork.IsMasterClient)
             {

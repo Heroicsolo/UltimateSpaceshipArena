@@ -62,12 +62,12 @@ namespace NiobiumStudios
 
         public void Initialize()
         {
-            textDay.text = string.Format("Day {0}", day.ToString());
+            textDay.text = LangResolver.instance.GetLocalizedString("DayN", day.ToString());
             if (reward.reward > 0)
             {
                 if (showRewardName)
                 {
-                    textReward.text = reward.reward + " " + reward.unit;
+                    textReward.text = reward.reward + " " + LangResolver.instance.GetLocalizedString(reward.unit);
                 }
                 else
                 {
@@ -76,7 +76,7 @@ namespace NiobiumStudios
             }
             else
             {
-                textReward.text = reward.unit.ToString();
+                textReward.text = LangResolver.instance.GetLocalizedString(reward.unit);
             }
             imageReward.sprite = reward.sprite;
         }

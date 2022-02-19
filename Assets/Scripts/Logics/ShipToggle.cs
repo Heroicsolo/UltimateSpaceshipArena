@@ -31,7 +31,7 @@ public class ShipToggle : MonoBehaviour
         m_barShield.fillAmount = m_shipData.BaseShield / 200f;
         m_barSpeed.fillAmount = m_shipData.MaxSpeed / 100f;
         m_shipIcon.sprite = m_shipData.ShipIcon;
-        m_shipTitle.text = m_shipData.ShipTitle;
+        m_shipTitle.text = LangResolver.instance.GetLocalizedString(m_shipData.ShipTitle);
 
         m_skillIcon1.sprite = m_shipData.Skills[0].icon;
         m_skillIcon2.sprite = m_shipData.Skills[1].icon;

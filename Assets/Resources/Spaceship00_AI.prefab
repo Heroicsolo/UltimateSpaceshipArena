@@ -942,7 +942,7 @@ MonoBehaviour:
   BombLaunchPosition: {fileID: 2180226660458417659}
   TurretTransform: {fileID: 4221986164814883545}
   ShipIcon: {fileID: 21300000, guid: 32a42bc5fbfe4d8479b76bf314d3b5af, type: 3}
-  ShipTitle: Fighter
+  ShipTitle: ShipFighter
   cameraOffsetY: 110
   FloatingTextSpawnPosition: {fileID: 6016336048886456366}
   ImmortalityOrb: {fileID: 7482507792824328463}
