@@ -37,6 +37,7 @@ namespace NiobiumStudios
         public Image imageReward;           // The Reward Image
         public Color colorClaim;            // The Color of the background when claimed
         private Color colorUnclaimed;       // The Color of the background when not claimed
+        public GameObject checkmark;        // The Checkmark
 
         [Header("Internal")]
         public int day;
@@ -87,12 +88,15 @@ namespace NiobiumStudios
             {
                 case DailyRewardState.UNCLAIMED_AVAILABLE:
                     imageRewardBackground.color = colorClaim;
+                    checkmark.SetActive(false);
                     break;
                 case DailyRewardState.UNCLAIMED_UNAVAILABLE:
                     imageRewardBackground.color = colorUnclaimed;
+                    checkmark.SetActive(false);
                     break;
                 case DailyRewardState.CLAIMED:
                     imageRewardBackground.color = colorClaim;
+                    checkmark.SetActive(true);
                     break;
             }
         }
