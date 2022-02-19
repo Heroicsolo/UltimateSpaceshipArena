@@ -290,9 +290,20 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
             }
         }
 
+        bool anyShopItemAvailable = false;
+
+        foreach (var item in AvailableSkins)
+        {
+            if (item.Cost <= AccountManager.Currency && !AccountManager.IsSkinUnlocked(item.ID))
+            {
+                anyShopItemAvailable = true;
+                break;
+            }
+        }
+
         m_arenaButton.GetComponent<Animator>().enabled = !AccountManager.IsArenaTutorialDone;
         m_missionButton.GetComponent<Animator>().enabled = AccountManager.IsArenaTutorialDone && !AccountManager.IsMissionTutorialDone;
-        m_shopButton.GetComponent<Animator>().enabled = false;
+        m_shopButton.GetComponent<Animator>().enabled = anyShopItemAvailable;
         m_shipsButton.GetComponent<Animator>().enabled = anyUpgradeAvailable;
     }
 
