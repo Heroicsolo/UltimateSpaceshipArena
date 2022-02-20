@@ -621,7 +621,10 @@ public class PlayerUI : MonoBehaviour
         if (place == 1) suffix = "SuffixSt";
         if (place == 2) suffix = "SuffixNd";
         if (place == 3) suffix = "SuffixRd";
-        loseScreenPlaceLabel.text = place.ToString() + LangResolver.instance.GetLocalizedString(suffix) + " " + LangResolver.instance.GetLocalizedString("Place");
+        if (Application.systemLanguage != SystemLanguage.German)
+            loseScreenPlaceLabel.text = place.ToString() + LangResolver.instance.GetLocalizedString(suffix) + " " + LangResolver.instance.GetLocalizedString("Place");
+        else
+            loseScreenPlaceLabel.text = LangResolver.instance.GetLocalizedString("Place") + " " + place.ToString();
 
         PlaySound(SoundType.Loss, 5f);
 
@@ -637,7 +640,10 @@ public class PlayerUI : MonoBehaviour
         if (place == 1) suffix = "SuffixSt";
         if (place == 2) suffix = "SuffixNd";
         if (place == 3) suffix = "SuffixRd";
-        winScreenPlaceLabel.text = place.ToString() + LangResolver.instance.GetLocalizedString(suffix) + " " + LangResolver.instance.GetLocalizedString("Place");
+        if (Application.systemLanguage != SystemLanguage.German)
+            winScreenPlaceLabel.text = place.ToString() + LangResolver.instance.GetLocalizedString(suffix) + " " + LangResolver.instance.GetLocalizedString("Place");
+        else
+            winScreenPlaceLabel.text = LangResolver.instance.GetLocalizedString("Place") + " " + place.ToString();
 
         PlaySound(SoundType.Victory, 5f);
 
