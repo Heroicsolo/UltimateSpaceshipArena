@@ -71,3 +71,4 @@ SkinDesc_IceBombs=Bombs like ice stars!
 SkinDesc_DarkDeath=Die with dark mystery!
 Unlocked=UNLOCKED
 SelectLangTitle=Select language:
+Reward=Reward

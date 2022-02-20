@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using TMPro;
@@ -8,6 +9,8 @@ using UnityEngine.UI;
 public class LangResolver : MonoBehaviour
 {
     public static LangResolver instance;
+
+    public Action OnLanguageSwitched;
 
     private const char Separator = '=';
     private readonly Dictionary<string, string> _lang = new Dictionary<string, string>();
@@ -77,6 +80,8 @@ public class LangResolver : MonoBehaviour
         }
 
         ResolveTexts();
+
+        OnLanguageSwitched?.Invoke();
     }
 
     public string GetLocalizedString(string id)
@@ -111,7 +116,7 @@ public class LangResolver : MonoBehaviour
 
     public void ResolveTexts()
     {
-        var allTexts = Resources.FindObjectsOfTypeAll<LangText>();
+        var allTexts = Resources.FindObjectsOfTypeAll(typeof(LangText)) as LangText[];
         foreach (var langText in allTexts)
         {
             var text = langText.GetComponent<Text>();

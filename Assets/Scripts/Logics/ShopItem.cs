@@ -55,6 +55,13 @@ public class ShopItem : MonoBehaviour
         shop.Refresh();
     }
 
+    private void OnEnable()
+    {
+        if (skinData == null) return;
+        titleLabel.text = LangResolver.instance.GetLocalizedString(skinData.Title);
+        descLabel.text = LangResolver.instance.GetLocalizedString(skinData.Desc);
+    }
+
     public void Refresh()
     {
         bool isUnlocked = AccountManager.IsSkinUnlocked(skinData.ID);

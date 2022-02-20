@@ -71,3 +71,4 @@ SkinDesc_IceBombs=Бомбы как ледяные звезды!
 SkinDesc_DarkDeath=Умирай с мрачной загадкой!
 Unlocked=ПОЛУЧЕНО
 SelectLangTitle=Выбери язык:
+Reward=Награда
