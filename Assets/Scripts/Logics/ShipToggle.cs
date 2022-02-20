@@ -40,6 +40,8 @@ public class ShipToggle : MonoBehaviour
 
     private void Refresh()
     {
+        m_shipTitle.text = LangResolver.instance.GetLocalizedString(m_shipData.ShipTitle);
+
         List<UpgradeData> upgradesList = m_shipData.Upgrades;
 
         Animator buttonAnimator = GetComponentInChildren<Animator>(true);
