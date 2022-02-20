@@ -86,8 +86,8 @@ public class UpgradesScreen : MonoBehaviour
         durabilityLabel.text = modifiedDurability.ToString();
         shieldLabel.text = modifiedShield.ToString();
         speedLabel.text = modifiedSpeed.ToString() + " m/s";
-        critLabel.text = string.Format("Crit chance: {0}%", Mathf.CeilToInt(100f * modifiedCrit));
-        critDamageLabel.text = string.Format("Crit damage: {0}%", Mathf.CeilToInt(100f * modifiedCritDamage));
+        critLabel.text = LangResolver.instance.GetLocalizedString("StatCritChance", Mathf.CeilToInt(100f * modifiedCrit));
+        critDamageLabel.text = LangResolver.instance.GetLocalizedString("StatCritDamage", Mathf.CeilToInt(100f * modifiedCritDamage));
     }
 
     public void Refresh()

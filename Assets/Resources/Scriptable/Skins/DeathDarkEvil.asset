@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: DeathDarkEvil
   m_EditorClassIdentifier: 
   ID: 1
-  Title: Dark Death
-  Desc: Die with dark mystery!
+  Title: SkinTitle_DarkDeath
+  Desc: SkinDesc_DarkDeath
   Icon: {fileID: 21300000, guid: 2146e08ca13dda444afa3ce13054cbb4, type: 3}
+  OverlayColor: {r: 0.7417625, g: 0.22828408, b: 0.8490566, a: 0.7058824}
   Type: 2
   SupportedShips: []
   Cost: 3000

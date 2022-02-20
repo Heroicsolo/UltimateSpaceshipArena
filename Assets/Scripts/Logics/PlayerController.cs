@@ -1408,7 +1408,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     void SpawnInfoText_RPC(string info)
     {
         GameObject txt = Instantiate(InfoTextPrefab, FloatingTextSpawnPosition.position, Quaternion.identity);
-        txt.GetComponent<FloatingText>().SetText(info);
+        txt.GetComponent<FloatingText>().SetText(LangResolver.instance.GetLocalizedString(info));
     }
 
     #endregion

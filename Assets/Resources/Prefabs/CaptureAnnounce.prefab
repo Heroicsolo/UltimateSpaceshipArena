@@ -252,8 +252,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Capturer <color="white">is capturing Nexus!</color>
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: e0a419a013a571645bf68d0a9f4915c3, type: 2}
+  m_sharedMaterial: {fileID: 1181590791713798303, guid: e0a419a013a571645bf68d0a9f4915c3, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

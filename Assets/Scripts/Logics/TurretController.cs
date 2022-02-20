@@ -248,7 +248,7 @@ public class TurretController : MonoBehaviourPunCallbacks, IPunObservable
     void SpawnInfoText_RPC(string info)
     {
         GameObject txt = Instantiate(InfoTextPrefab, FloatingTextSpawnPosition.position, Quaternion.identity);
-        txt.GetComponent<FloatingText>().SetText(info);
+        txt.GetComponent<FloatingText>().SetText(LangResolver.instance.GetLocalizedString(info));
     }
 
     public void GetDamage(int amount, int damageToShield, bool ignoreShield = false, bool isCrit = false, float critModifier = 2f, string owner = "")

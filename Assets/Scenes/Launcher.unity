@@ -15556,6 +15556,7 @@ GameObject:
   - component: {fileID: 633791913}
   - component: {fileID: 633791915}
   - component: {fileID: 633791914}
+  - component: {fileID: 633791916}
   m_Layer: 5
   m_Name: title
   m_TagString: Untagged
@@ -15604,8 +15605,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: SHOP
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 9c39d2c7265172746b0baa69475cc5e8, type: 2}
-  m_sharedMaterial: {fileID: 594424095830867057, guid: 9c39d2c7265172746b0baa69475cc5e8, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: e0a419a013a571645bf68d0a9f4915c3, type: 2}
+  m_sharedMaterial: {fileID: 1181590791713798303, guid: e0a419a013a571645bf68d0a9f4915c3, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -15679,6 +15680,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 633791912}
   m_CullTransparentMesh: 1
+--- !u!114 &633791916
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 633791912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07bda499927707947a03523b0527c930, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Identifier: MenuShop
 --- !u!1 &639619058
 GameObject:
   m_ObjectHideFlags: 0
@@ -20738,8 +20752,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'Crit chance: 99%'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: e0a419a013a571645bf68d0a9f4915c3, type: 2}
+  m_sharedMaterial: {fileID: 1181590791713798303, guid: e0a419a013a571645bf68d0a9f4915c3, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -30681,6 +30695,7 @@ GameObject:
   - component: {fileID: 1355471289}
   - component: {fileID: 1355471291}
   - component: {fileID: 1355471290}
+  - component: {fileID: 1355471292}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -30749,6 +30764,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1355471288}
   m_CullTransparentMesh: 1
+--- !u!114 &1355471292
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1355471288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07bda499927707947a03523b0527c930, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Identifier: BackBig
 --- !u!1 &1388520975
 GameObject:
   m_ObjectHideFlags: 0
@@ -48595,6 +48623,7 @@ GameObject:
   - component: {fileID: 1873419540}
   - component: {fileID: 1873419542}
   - component: {fileID: 1873419541}
+  - component: {fileID: 1873419543}
   m_Layer: 5
   m_Name: title
   m_TagString: Untagged
@@ -48619,7 +48648,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 400, y: 50}
+  m_SizeDelta: {x: 640, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1873419541
 MonoBehaviour:
@@ -48643,8 +48672,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: SPACESHIP UPGRADE
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 9c39d2c7265172746b0baa69475cc5e8, type: 2}
-  m_sharedMaterial: {fileID: 594424095830867057, guid: 9c39d2c7265172746b0baa69475cc5e8, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: e0a419a013a571645bf68d0a9f4915c3, type: 2}
+  m_sharedMaterial: {fileID: 1181590791713798303, guid: e0a419a013a571645bf68d0a9f4915c3, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -48718,6 +48747,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1873419539}
   m_CullTransparentMesh: 1
+--- !u!114 &1873419543
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1873419539}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07bda499927707947a03523b0527c930, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Identifier: UpgradeScreenTitle
 --- !u!1001 &1884301644
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -53832,8 +53874,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'Crit damage: 200%'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: e0a419a013a571645bf68d0a9f4915c3, type: 2}
+  m_sharedMaterial: {fileID: 1181590791713798303, guid: e0a419a013a571645bf68d0a9f4915c3, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -54086,6 +54128,7 @@ GameObject:
   - component: {fileID: 1924581915}
   - component: {fileID: 1924581917}
   - component: {fileID: 1924581916}
+  - component: {fileID: 1924581918}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -54154,6 +54197,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1924581914}
   m_CullTransparentMesh: 1
+--- !u!114 &1924581918
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1924581914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07bda499927707947a03523b0527c930, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Identifier: BackBig
 --- !u!1 &1953647200
 GameObject:
   m_ObjectHideFlags: 0
@@ -56481,7 +56537,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: -131}
-  m_SizeDelta: {x: 300, y: 50}
+  m_SizeDelta: {x: 300, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2132274398
 MonoBehaviour:
@@ -56505,7 +56561,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: MY PROFILE
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 9c39d2c7265172746b0baa69475cc5e8, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: e0a419a013a571645bf68d0a9f4915c3, type: 2}
   m_sharedMaterial: {fileID: 594424095830867057, guid: 9c39d2c7265172746b0baa69475cc5e8, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -56533,7 +56589,7 @@ MonoBehaviour:
   m_fontSize: 48
   m_fontSizeBase: 48
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
@@ -56569,7 +56625,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &2132274399
@@ -77434,10 +77490,10 @@ RectTransform:
   m_Father: {fileID: 6946256476863337472}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 220, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &6946256476863337476
 RectTransform:
@@ -77552,10 +77608,10 @@ RectTransform:
   m_Father: {fileID: 6946256476863337480}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 18}
-  m_SizeDelta: {x: 0, y: -37}
+  m_SizeDelta: {x: 744, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &6946256476863337488
 RectTransform:
@@ -79215,6 +79271,7 @@ GameObject:
   - component: {fileID: 6946256476863555312}
   - component: {fileID: 6946256476890082114}
   - component: {fileID: 6946256476890082112}
+  - component: {fileID: 6946256476883541743}
   m_Layer: 0
   m_Name: Text
   m_TagString: Untagged
@@ -79222,6 +79279,19 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &6946256476883541743
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6946256476883541742}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07bda499927707947a03523b0527c930, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Identifier: DailyRewardsTitle
 --- !u!1 &6946256476883541744
 GameObject:
   m_ObjectHideFlags: 0
@@ -79418,7 +79488,7 @@ MonoBehaviour:
     m_Font: {fileID: 12800000, guid: 094538e84e7478c44873b961511a5fa4, type: 3}
     m_FontSize: 78
     m_FontStyle: 0
-    m_BestFit: 0
+    m_BestFit: 1
     m_MinSize: 10
     m_MaxSize: 78
     m_Alignment: 4
@@ -79697,7 +79767,7 @@ MonoBehaviour:
     m_Font: {fileID: 12800000, guid: 094538e84e7478c44873b961511a5fa4, type: 3}
     m_FontSize: 61
     m_FontStyle: 0
-    m_BestFit: 0
+    m_BestFit: 1
     m_MinSize: 10
     m_MaxSize: 61
     m_Alignment: 4

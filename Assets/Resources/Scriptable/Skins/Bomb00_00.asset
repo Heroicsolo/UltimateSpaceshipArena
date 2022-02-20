@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: Bomb00_00
   m_EditorClassIdentifier: 
   ID: 0
-  Title: Ice Bombs
-  Desc: Bombs like ice stars!
+  Title: SkinTitle_IceBombs
+  Desc: SkinDesc_IceBombs
   Icon: {fileID: 21300000, guid: 56af5d7bd05ebf14aad8569a06467638, type: 3}
+  OverlayColor: {r: 0, g: 0, b: 0, a: 0.84313726}
   Type: 0
   SupportedShips: []
   Cost: 3000
