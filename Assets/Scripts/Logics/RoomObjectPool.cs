@@ -12,7 +12,7 @@ public class RoomObjectPool
     {
         foreach (var p in poolObjects)
         {
-            if (!p.activeSelf)
+            if (p != null && !p.activeSelf)
             {
                 p.transform.position = position;
                 p.transform.rotation = rotation;

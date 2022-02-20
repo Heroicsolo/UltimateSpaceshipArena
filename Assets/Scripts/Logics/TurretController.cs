@@ -353,11 +353,15 @@ public class TurretController : MonoBehaviourPunCallbacks, IPunObservable
     void LaunchTurretProjectile_RPC(int launchPosIdx)
     {
         GameObject proj = projectilesPool.Spawn(shootPositions[launchPosIdx].position, headTransform.rotation);
-        Projectile p = proj.GetComponent<Projectile>();
-        p.SetOwner("", "Turret");
 
-        if (audioSource && shootSound)
-            audioSource.PlayOneShot(shootSound, 0.6f);
+        if (proj != null)
+        {
+            Projectile p = proj.GetComponent<Projectile>();
+            p.SetOwner("", "Turret");
+
+            if (audioSource && shootSound)
+                audioSource.PlayOneShot(shootSound, 0.6f);
+        }
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -373,7 +377,7 @@ public class TurretController : MonoBehaviourPunCallbacks, IPunObservable
         {
             this.isCooling = (bool)stream.ReceiveNext();
             this.currHeating = (float)stream.ReceiveNext();
-            this.currentDurability = (int)stream.ReceiveNext();
+            this.currentDurability = (float)stream.ReceiveNext();
             this.networkRot = (Quaternion)stream.ReceiveNext();
 
             //Lag compensation

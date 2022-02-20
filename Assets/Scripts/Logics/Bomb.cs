@@ -153,9 +153,9 @@ public class Bomb : SyncTransform
 
                 t.GetDamage(Random.Range(damageMin, damageMax + 1), damageToShield, ignoreField, isCrit, critDamageModifier, ownerName);
             }
-        }
 
-        PhotonNetwork.Destroy(gameObject);
+            PhotonNetwork.Destroy(gameObject);
+        }
     }
 
     public void Activate()
