@@ -70,3 +70,4 @@ SkinTitle_DarkDeath=Dunkler Tod
 SkinDesc_IceBombs=Bomben wie Eissterne!
 SkinDesc_DarkDeath=Stirb mit dunklem Geheimnis!
 Unlocked=ENTSPERRT
+SelectLangTitle=Sprache auswählen:

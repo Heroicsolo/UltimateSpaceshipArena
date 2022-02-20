@@ -38,6 +38,47 @@ public class LangResolver : MonoBehaviour
         }
     }
 
+    public void SwitchLanguage(string lang)
+    {
+        switch(lang)
+        {
+            case "UA":
+                SwitchLanguage(SystemLanguage.Ukrainian);
+                break;
+            case "EN":
+                SwitchLanguage(SystemLanguage.English);
+                break;
+            case "RU":
+                SwitchLanguage(SystemLanguage.Russian);
+                break;
+            case "DE":
+                SwitchLanguage(SystemLanguage.German);
+                break;
+            default:
+                SwitchLanguage(SystemLanguage.English);
+                break;
+        }
+    }
+
+    public void SwitchLanguage(SystemLanguage lang)
+    {
+        _language = lang;
+
+        var file = Resources.Load<TextAsset>("Localization/" + _language.ToString());
+        if (file == null)
+        {
+            file = Resources.Load<TextAsset>("Localization/" + SystemLanguage.English.ToString());
+            _language = SystemLanguage.English;
+        }
+        foreach (var line in file.text.Split('\n'))
+        {
+            var prop = line.Split(Separator);
+            _lang[prop[0]] = prop[1];
+        }
+
+        ResolveTexts();
+    }
+
     public string GetLocalizedString(string id)
     {
         return Regex.Unescape(_lang[id]);
