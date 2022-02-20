@@ -21,7 +21,7 @@ public class RoomObjectPool
             }
         }
 
-        GameObject go = PhotonNetwork.InstantiateRoomObject(prefabName, position, rotation);
+        GameObject go = PhotonNetwork.Instantiate(prefabName, position, rotation);
 
         poolObjects.Add(go);
 

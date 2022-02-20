@@ -264,13 +264,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         projectilesPool = new RoomObjectPool();
         projectilesPool.prefabName = ProjectilePrefab.name;
 
-        if (photonView.IsMine && !IsAI)
-        {
-            LocalPlayerInstance = this.gameObject;
-            LocalPlayer = this;
-            BattleCamera.instance.SetTarget(this);
-        }
-
         if (ArenaController.instance != null)
         {
             arenaController = ArenaController.instance;
@@ -294,6 +287,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         m_spawnPoint = transform.position;
 
+        cameraTransform = Camera.main.transform;
+        cameraTransform.localEulerAngles = new Vector3(90f, 0f, 0f);
+
+        if (photonView.IsMine && !IsAI && LocalPlayer == null)
+        {
+            LocalPlayerInstance = this.gameObject;
+            LocalPlayer = this;
+            cameraTransform.GetComponent<BattleCamera>().SetTarget(this);
+        }
+
         DontDestroyOnLoad(this.gameObject);
 
         m_spectacleTime = m_balance.spectacleTime;
@@ -310,8 +313,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         ImmortalityOrb.SetActive(true);
 
-        cameraTransform = Camera.main.transform;
-
         if (photonView.IsMine)
         {
             if (!isMissionMode)
@@ -323,8 +324,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
             SendNameData();
         }
-
-        cameraTransform.localEulerAngles = new Vector3(90f, 0f, 0f);
 
         if (!IsAI && photonView.IsMine)
         {
@@ -894,7 +893,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
         isDeathEffectLoaded = true;
 
-        request.completed += delegate(AsyncOperation operation)
+        request.completed += delegate (AsyncOperation operation)
         {
             deathEffectSkin = request.asset as GameObject;
         };
@@ -1134,12 +1133,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         foreach (var shootPos in ShootPositions)
         {
             GameObject proj = projectilesPool.Spawn(shootPos.position, shootPos.rotation);
-            Projectile p = proj.GetComponent<Projectile>();
-            p.SetOwner(m_name, photonView.Owner.UserId);
-            p.critChance += critBonus;
-            p.critDamageModifier += critDmgBonus;
-            p.damageMin = Mathf.CeilToInt(p.damageMin * m_damageModifier);
-            p.damageMax = Mathf.CeilToInt(p.damageMax * m_damageModifier);
+
+            if (proj != null)
+            {
+                Projectile p = proj.GetComponent<Projectile>();
+                p.SetOwner(m_name, photonView.Owner.UserId);
+                p.critChance += critBonus;
+                p.critDamageModifier += critDmgBonus;
+                p.damageMin = Mathf.CeilToInt(p.damageMin * m_damageModifier);
+                p.damageMax = Mathf.CeilToInt(p.damageMax * m_damageModifier);
+            }
         }
 
         if (audioSource && shootSound)
@@ -1156,7 +1159,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     {
         foreach (var shootPos in ShootPositions)
         {
-            GameObject projObj = PhotonNetwork.InstantiateRoomObject(projectilePrefabName, shootPos.position, transform.rotation);
+            GameObject projObj = PhotonNetwork.Instantiate(projectilePrefabName, shootPos.position, transform.rotation);
             Bomb bomb = projObj.GetComponent<Bomb>();
             Projectile proj = projObj.GetComponent<Projectile>();
             if (bomb)

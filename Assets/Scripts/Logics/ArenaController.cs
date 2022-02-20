@@ -212,7 +212,7 @@ public class ArenaController : MonoBehaviourPunCallbacks, IRoomController
     {
         instance = this;
 
-        photonView.ViewID = 1;
+        //photonView.ViewID = 1;
 
         if (PlayerController.LocalPlayerInstance == null)
         {
