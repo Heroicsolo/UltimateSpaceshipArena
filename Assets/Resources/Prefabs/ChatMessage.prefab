@@ -65,10 +65,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Player: Blablablablablablabla!'
+  m_text: "Player \u0432\u0445\u043E\u0434\u0438\u0442 \u0432 \u0438\u0433\u0440\u0443"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 56ec1cad58067144787d263704237e6b, type: 2}
-  m_sharedMaterial: {fileID: -2848244454441929562, guid: 56ec1cad58067144787d263704237e6b, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: e0a419a013a571645bf68d0a9f4915c3, type: 2}
+  m_sharedMaterial: {fileID: 1181590791713798303, guid: e0a419a013a571645bf68d0a9f4915c3, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
