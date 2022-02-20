@@ -72,3 +72,4 @@ SkinDesc_DarkDeath=Умирай с мрачной загадкой!
 Unlocked=ПОЛУЧЕНО
 SelectLangTitle=Выбери язык:
 Reward=Награда
+Notification_DailyReward=Возвращайся в Ангар, герой! Твоя ежедневная награда ждет тебя!

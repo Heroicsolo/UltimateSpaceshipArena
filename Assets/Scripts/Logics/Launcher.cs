@@ -560,6 +560,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     public void OnDailyRewardsChanged(int lastDailyRewardDebugTime, string lastDailyRewardTime, int lastDailyReward)
     {
         AccountManager.OnDailyRewardsChanged(lastDailyRewardDebugTime, lastDailyRewardTime, lastDailyReward);
+
+        NotificationsManager.SendNotification(LangResolver.instance.GetLocalizedString("Notification_DailyReward"), 1440, 10001);
     }
 
     public void OnTutorialDone()

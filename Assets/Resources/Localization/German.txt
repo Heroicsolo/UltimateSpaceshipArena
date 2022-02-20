@@ -72,3 +72,4 @@ SkinDesc_DarkDeath=Stirb mit dunklem Geheimnis!
 Unlocked=ENTSPERRT
 SelectLangTitle=Sprache auswählen:
 Reward=Preis
+Notification_DailyReward=Komm zurück zum Hangar, Held! Deine tägliche Belohnung wartet auf dich!

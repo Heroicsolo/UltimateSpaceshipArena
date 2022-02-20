@@ -72,3 +72,4 @@ SkinDesc_DarkDeath=Die with dark mystery!
 Unlocked=UNLOCKED
 SelectLangTitle=Select language:
 Reward=Reward
+Notification_DailyReward=Come back to Hangar, hero! Your daily reward is waiting for you!
