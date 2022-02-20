@@ -67,8 +67,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'Player: Blablablablablablabla!'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 9c39d2c7265172746b0baa69475cc5e8, type: 2}
-  m_sharedMaterial: {fileID: 594424095830867057, guid: 9c39d2c7265172746b0baa69475cc5e8, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 56ec1cad58067144787d263704237e6b, type: 2}
+  m_sharedMaterial: {fileID: -2848244454441929562, guid: 56ec1cad58067144787d263704237e6b, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

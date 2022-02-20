@@ -44,7 +44,7 @@ public class UpgradeSlot : MonoBehaviour
         if (isAvailable)
         {
             buttonAnimator.enabled = true;
-            buttonLabel.text = "UPGRADE";
+            buttonLabel.text = LangResolver.instance.GetLocalizedString("UpgradeBig");
             costLabel.gameObject.SetActive(true);
         }
         else
@@ -58,7 +58,7 @@ public class UpgradeSlot : MonoBehaviour
             }
             else
             {
-                buttonLabel.text = "UPGRADE";
+                buttonLabel.text = LangResolver.instance.GetLocalizedString("UpgradeBig");
                 costLabel.gameObject.SetActive(true);
             }
         }

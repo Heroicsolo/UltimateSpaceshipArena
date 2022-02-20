@@ -409,6 +409,7 @@ GameObject:
   - component: {fileID: 8947835458196055410}
   - component: {fileID: 4944559940942351016}
   - component: {fileID: 3927319774284465937}
+  - component: {fileID: 8503872875177404700}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -464,7 +465,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: 094538e84e7478c44873b961511a5fa4, type: 3}
+    m_Font: {fileID: 12800000, guid: 15e1bf25ef113594e92ddd6d1d1c3a83, type: 3}
     m_FontSize: 48
     m_FontStyle: 0
     m_BestFit: 0
@@ -477,6 +478,19 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: BUY
+--- !u!114 &8503872875177404700
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4043903342198257525}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07bda499927707947a03523b0527c930, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Identifier: Buy
 --- !u!1 &5572307394368089886
 GameObject:
   m_ObjectHideFlags: 0
@@ -1040,8 +1054,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Amazing Skin
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 9c39d2c7265172746b0baa69475cc5e8, type: 2}
-  m_sharedMaterial: {fileID: 594424095830867057, guid: 9c39d2c7265172746b0baa69475cc5e8, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 56ec1cad58067144787d263704237e6b, type: 2}
+  m_sharedMaterial: {fileID: -2848244454441929562, guid: 56ec1cad58067144787d263704237e6b, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1065,7 +1079,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 50
+  m_fontSize: 41.65
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
