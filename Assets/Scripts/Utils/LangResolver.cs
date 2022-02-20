@@ -24,8 +24,7 @@ public class LangResolver : MonoBehaviour
 
     private void ReadProperties()
     {
-        //_language = Application.systemLanguage;
-        _language = SystemLanguage.Ukrainian;
+        _language = Application.systemLanguage;
         var file = Resources.Load<TextAsset>("Localization/" + _language.ToString());
         if (file == null)
         {
