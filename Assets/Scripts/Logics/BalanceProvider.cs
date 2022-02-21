@@ -63,12 +63,7 @@ public static class BalanceProvider
 
     private static void RefreshBalance(DataSnapshot snapshot)
     {
-        string restoredData = snapshot.GetRawJsonValue();
-
-        if (restoredData.Length < 2)
-            Balance = new BalanceInfo();
-        else
-            Balance = JsonUtility.FromJson<BalanceInfo>(restoredData);
+        snapshot.GetRawValueFromSnapshot(out Balance);
 
         if (Balance.version > clientVersion)
         {

@@ -157,50 +157,15 @@ public static class AccountManager
         AuthController.SignOut();
     }
 
-    private static void GetValueFromSnapshot(DataSnapshot snapshot, string childName, bool defaultValue, out bool savedValue)
-    {
-        bool notEmptyProfile = snapshot != null && snapshot.ChildrenCount > 1;
-        savedValue = notEmptyProfile && snapshot.HasChild(childName) ? bool.Parse(snapshot.Child(childName).Value.ToString()) : defaultValue;
-    }
-
-    private static void GetValueFromSnapshot(DataSnapshot snapshot, string childName, int defaultValue, out int savedValue)
-    {
-        bool notEmptyProfile = snapshot != null && snapshot.ChildrenCount > 1;
-        savedValue = notEmptyProfile && snapshot.HasChild(childName) ? int.Parse(snapshot.Child(childName).Value.ToString()) : defaultValue;
-    }
-
-    private static void GetValueFromSnapshot(DataSnapshot snapshot, string childName, string defaultValue, out string savedValue)
-    {
-        bool notEmptyProfile = snapshot != null && snapshot.ChildrenCount > 1;
-        savedValue = notEmptyProfile && snapshot.HasChild(childName) ? snapshot.Child(childName).Value.ToString() : defaultValue;
-    }
-
-    private static void GetRawValueFromSnapshot<T>(DataSnapshot snapshot, string childName, out T savedValue) where T : new()
-    {
-        bool notEmptyProfile = snapshot != null && snapshot.ChildrenCount > 1;
-
-        if (notEmptyProfile)
-        {
-            string restoredData = snapshot.Child(childName).GetRawJsonValue();
-
-            if (restoredData == null || restoredData.Length < 2)
-                savedValue = new T();
-            else
-                savedValue = JsonUtility.FromJson<T>(restoredData);
-        }
-        else
-        {
-            savedValue = new T();
-        }
-    }
-
     private static void LoadProfileFromSnapshot(DataSnapshot snapshot)
     {
         bool notEmptyProfile = snapshot != null && snapshot.ChildrenCount > 1;
 
-        bool isOnline = notEmptyProfile ? bool.Parse(snapshot.Child("online").Value.ToString()) : false;
+        bool isOnline = false;
+        string deviceId = AuthController.DeviceID;
 
-        string deviceId = notEmptyProfile && snapshot.HasChild("deviceId") ? snapshot.Child("deviceId").Value.ToString() : AuthController.DeviceID;
+        snapshot.GetValueFromSnapshot("online", false, out isOnline);
+        snapshot.GetValueFromSnapshot("deviceId", AuthController.DeviceID, out deviceId);
 
         if (isOnline && AuthController.DeviceID != deviceId)
         {
@@ -208,25 +173,25 @@ public static class AccountManager
             return;
         }
 
-        GetValueFromSnapshot(snapshot, "username", m_userName, out m_userName);
-        GetValueFromSnapshot(snapshot, "nameChanged", false, out m_nameChanged);
-        GetValueFromSnapshot(snapshot, "arenaRating", BalanceProvider.Balance.initArenaRating, out m_arenaRating);
-        GetValueFromSnapshot(snapshot, "currency", BalanceProvider.Balance.initCurrency, out m_currency);
+        snapshot.GetValueFromSnapshot("username", m_userName, out m_userName);
+        snapshot.GetValueFromSnapshot("nameChanged", false, out m_nameChanged);
+        snapshot.GetValueFromSnapshot("arenaRating", BalanceProvider.Balance.initArenaRating, out m_arenaRating);
+        snapshot.GetValueFromSnapshot("currency", BalanceProvider.Balance.initCurrency, out m_currency);
 
         AuthController.SetEmailIfEmpty(notEmptyProfile ? snapshot.Child("email").Value.ToString() : "");
 
-        GetValueFromSnapshot(snapshot, "lastDailyRewardDebugTime", 0, out m_lastDailyRewardDebugTime);
-        GetValueFromSnapshot(snapshot, "lastDailyRewardTime", "", out m_lastDailyRewardTime);
-        GetValueFromSnapshot(snapshot, "lastDailyReward", 0, out m_lastDailyReward);
+        snapshot.GetValueFromSnapshot("lastDailyRewardDebugTime", 0, out m_lastDailyRewardDebugTime);
+        snapshot.GetValueFromSnapshot("lastDailyRewardTime", "", out m_lastDailyRewardTime);
+        snapshot.GetValueFromSnapshot("lastDailyReward", 0, out m_lastDailyReward);
 
-        GetValueFromSnapshot(snapshot, "tutorialDone", false, out m_tutorialDone);
-        GetValueFromSnapshot(snapshot, "arenaTutorialDone", false, out m_arenaTutorialDone);
-        GetValueFromSnapshot(snapshot, "missionTutorialDone", false, out m_missionTutorialDone);
-        GetValueFromSnapshot(snapshot, "controlTutorialDone", false, out m_controlTutorialDone);
-        GetValueFromSnapshot(snapshot, "tutorialStep", 0, out m_tutorialStep);
+        snapshot.GetValueFromSnapshot("tutorialDone", false, out m_tutorialDone);
+        snapshot.GetValueFromSnapshot("arenaTutorialDone", false, out m_arenaTutorialDone);
+        snapshot.GetValueFromSnapshot("missionTutorialDone", false, out m_missionTutorialDone);
+        snapshot.GetValueFromSnapshot("controlTutorialDone", false, out m_controlTutorialDone);
+        snapshot.GetValueFromSnapshot("tutorialStep", 0, out m_tutorialStep);
 
-        GetRawValueFromSnapshot(snapshot, "UpgradesInfo", out m_upgradesInfo);
-        GetRawValueFromSnapshot(snapshot, "SkinsInfo", out m_skinsInfo);
+        snapshot.GetRawValueFromSnapshot("UpgradesInfo", out m_upgradesInfo);
+        snapshot.GetRawValueFromSnapshot("SkinsInfo", out m_skinsInfo);
 
         IsLoaded = true;
     }
