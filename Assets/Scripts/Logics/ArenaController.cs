@@ -340,4 +340,14 @@ public class ArenaController : MonoBehaviourPunCallbacks, IRoomController
         PhotonNetwork.SendAllOutgoingCommands();
         PhotonNetwork.LeaveRoom();
     }
+
+    public List<PlayerController> GetRoomPlayers()
+    {
+        return m_roomPlayers;
+    }
+
+    public List<TurretController> GetRoomTurrets()
+    {
+        return m_roomTurrets;
+    }
 }

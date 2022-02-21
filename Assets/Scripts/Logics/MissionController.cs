@@ -349,4 +349,14 @@ public class MissionController : MonoBehaviourPunCallbacks, IRoomController
             PlayerUI.Instance.AddMissionBotToMiniMap(b);
         }
     }
+
+    public List<PlayerController> GetRoomPlayers()
+    {
+        return m_roomPlayers;
+    }
+
+    public List<TurretController> GetRoomTurrets()
+    {
+        return m_roomTurrets;
+    }
 }

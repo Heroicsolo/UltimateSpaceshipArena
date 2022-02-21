@@ -24,10 +24,7 @@ public class Bomb : SyncTransform
     private float timeToEnable = 2f;
     private bool isActivated = false;
 
-    private MissionController missionController;
-    private ArenaController arenaController;
-    private bool isMissionMode = false;
-    private List<PlayerController> m_roomPlayers;
+    private IRoomController roomController;
 
     [SerializeField] private ParticleSystem hazardEffect;
     [SerializeField] private GameObject explosionObject;
@@ -44,16 +41,12 @@ public class Bomb : SyncTransform
 
         if (ArenaController.instance != null)
         {
-            arenaController = ArenaController.instance;
-            isMissionMode = false;
+            roomController = ArenaController.instance;
         }
         else if (MissionController.instance != null)
         {
-            missionController = MissionController.instance;
-            isMissionMode = true;
+            roomController = MissionController.instance;
         }
-
-        m_roomPlayers = isMissionMode ? missionController.RoomPlayers : arenaController.RoomPlayers;
     }
 
     // Update is called once per frame

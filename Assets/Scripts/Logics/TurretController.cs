@@ -45,6 +45,7 @@ public class TurretController : MonoBehaviourPunCallbacks, IPunObservable
     private string lastEnemyName;
     private AudioSource audioSource;
 
+    private IRoomController roomController;
     private RoomObjectPool projectilesPool;
     private Quaternion networkRot = Quaternion.identity;
     //Lag compensation
@@ -81,14 +82,16 @@ public class TurretController : MonoBehaviourPunCallbacks, IPunObservable
 
         if (ArenaController.instance != null)
         {
+            roomController = ArenaController.instance;
             isMissionMode = false;
         }
         else if (MissionController.instance != null)
         {
+            roomController = MissionController.instance;
             isMissionMode = true;
         }
 
-        m_roomPlayers = isMissionMode ? MissionController.instance.RoomPlayers : ArenaController.instance.RoomPlayers;
+        m_roomPlayers = roomController.GetRoomPlayers();
 
         StartCoroutine(ShootingCoroutine());
     }

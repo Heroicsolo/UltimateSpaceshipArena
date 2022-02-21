@@ -14,4 +14,7 @@ public interface IRoomController
     void SendPlayersNamesData();
     public void LeaveRoom();
     public void AddRegisteredPlayersToLobbyUI();
+
+    public List<PlayerController> GetRoomPlayers();
+    public List<TurretController> GetRoomTurrets();
 }

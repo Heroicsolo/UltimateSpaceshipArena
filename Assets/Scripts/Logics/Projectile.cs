@@ -36,8 +36,7 @@ public class Projectile : SyncTransform
     private float timeToDeath = 3f;
     private float timeToChangeTarget = 0f;
 
-    private MissionController missionController;
-    private ArenaController arenaController;
+    private IRoomController roomController;
     private bool isMissionMode = false;
     private List<PlayerController> m_roomPlayers;
     private List<TurretController> m_roomTurrets;
@@ -52,17 +51,17 @@ public class Projectile : SyncTransform
 
         if (ArenaController.instance != null)
         {
-            arenaController = ArenaController.instance;
+            roomController = ArenaController.instance;
             isMissionMode = false;
         }
         else if (MissionController.instance != null)
         {
-            missionController = MissionController.instance;
+            roomController = MissionController.instance;
             isMissionMode = true;
         }
 
-        m_roomPlayers = isMissionMode ? missionController.RoomPlayers : arenaController.RoomPlayers;
-        m_roomTurrets = isMissionMode ? missionController.RoomTurrets : arenaController.RoomTurrets;
+        m_roomPlayers = roomController.GetRoomPlayers();
+        m_roomTurrets = roomController.GetRoomTurrets();
     }
 
     public override void OnEnable()

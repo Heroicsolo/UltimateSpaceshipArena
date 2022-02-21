@@ -152,7 +152,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
         // #Critical
         // this makes sure we can use PhotonNetwork.LoadLevel() on the master client and all clients in the same room sync their level automatically
-        //PhotonNetwork.AutomaticallySyncScene = true;
+        PhotonNetwork.AutomaticallySyncScene = true;
 
         isSoundOn = PlayerPrefs.GetInt("soundOn", 1) == 1;
 

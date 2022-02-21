@@ -17,7 +17,7 @@ public class SyncTransform : MonoBehaviourPunCallbacks, IPunObservable
     // Update is called once per frame
     void Update()
     {
-        if (!PhotonNetwork.IsMasterClient)
+        if (!photonView.IsMine)
         {
             //Lag compensation
             double timeToReachGoal = currentPacketTime - lastPacketTime;

@@ -297,7 +297,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             cameraTransform.GetComponent<BattleCamera>().SetTarget(this);
         }
 
-        DontDestroyOnLoad(this.gameObject);
+        //DontDestroyOnLoad(this.gameObject);
 
         m_spectacleTime = m_balance.spectacleTime;
         m_isDied = false;
