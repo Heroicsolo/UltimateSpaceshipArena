@@ -544,12 +544,12 @@ public class PlayerUI : MonoBehaviour
             target.OnMissionStarted();
 
             if (!AccountManager.IsMissionTutorialDone)
-                TutorialController.instance.ShowCustomTutorialUnit(LangResolver.instance.GetLocalizedString("TutorialMission"), minimapNexus.GetComponent<RectTransform>(), OnMissionTutorialDone);
+                TutorialController.instance.ShowCustomTutorialUnit("TutorialMission", minimapNexus.GetComponent<RectTransform>(), OnMissionTutorialDone);
         }
         else
         {
             if (!AccountManager.IsArenaTutorialDone)
-                TutorialController.instance.ShowCustomTutorialUnit(LangResolver.instance.GetLocalizedString("TutorialArena"), minimapNexus.GetComponent<RectTransform>(), OnArenaTutorialDone);
+                TutorialController.instance.ShowCustomTutorialUnit("TutorialArena", minimapNexus.GetComponent<RectTransform>(), OnArenaTutorialDone);
         }
 
         if (PhotonNetwork.IsMasterClient && !isMissionMode)
