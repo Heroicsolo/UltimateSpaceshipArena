@@ -97,29 +97,45 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     #endregion
 
     #region Public Fields
-    
+
     public Action<bool> OnApplicationPaused;
     public Action OnApplicationExit;
-    
+
     public List<SkinData> AvailableSkins => availableSkins;
 
-    public GameObject SelectedShipPrefab { get { return m_selectedShip; } set { m_selectedShip = value; SelectHangarShip(m_selectedShip.name); } }
+    public GameObject SelectedShipPrefab { get { return m_selectedShip; } set { m_selectedShip = value; } }
 
     public bool IsSoundOn { get { return isSoundOn; } set { isSoundOn = value; PlayerPrefs.SetInt("soundOn", isSoundOn ? 1 : 0); } }
 
     public bool CloseGameOnError { get { return m_closeGameOnError; } set { m_closeGameOnError = value; } }
 
     public List<PlayerController> AvailableShips => availableShips;
-    
+
     public const string ELO_PROP_KEY = "C0";
     public const string MAP_PROP_KEY = "C1";
     #endregion
 
-    void SelectHangarShip(string shipName)
+    public void SelectHangarShip(string shipName)
+    {
+        int shipIdx = availableShips.FindIndex(x => x.name == shipName);
+
+        SelectHangarShip(shipIdx, true);
+    }
+
+    public void SelectHangarShip(int shipNumber, bool withSave = false)
     {
         foreach (var ship in hangarShips)
         {
-            ship.SetActive(ship.name == shipName);
+            ship.SetActive(ship.name == availableShips[shipNumber].name);
+        }
+
+        SelectedShipPrefab = availableShips[shipNumber].gameObject;
+
+        if (withSave)
+        {
+            AccountManager.SelectedShip = shipNumber;
+
+            AccountManager.SaveProfile();
         }
     }
 
@@ -223,7 +239,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         BalanceProvider.Init();
 
         AccountManager.OnQueueChanged += OnQueueLengthChanged;
-        
+
         BalanceProvider.OnValueChanged += OnBalanceChanged;
     }
 
@@ -261,9 +277,9 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     {
         foreach (var skin in availableSkins)
         {
-            if (skin.Type == type && 
-                (skin.SupportedShips == null || 
-                skin.SupportedShips.Count == 0 || 
+            if (skin.Type == type &&
+                (skin.SupportedShips == null ||
+                skin.SupportedShips.Count == 0 ||
                 skin.SupportedShips.FindIndex(x => x.ID == shipID) >= 0) && AccountManager.IsSkinUnlocked(skin.ID))
             {
                 return skin.SkinObject.name;
@@ -378,6 +394,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         chatManager.gameObject.SetActive(true);
         chatUI.gameObject.SetActive(true);
 
+        SelectHangarShip(AccountManager.SelectedShip);
+
         RefreshTopButtons();
 
         NotificationsManager.Init();
@@ -489,8 +507,8 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
     public void OnShipSelectorOpened()
     {
-        defaultShipToggle.isOn = true;
-        defaultShipToggle.Select();
+        //defaultShipToggle.isOn = true;
+        //defaultShipToggle.Select();
     }
 
     public void GetProfileData()
@@ -570,7 +588,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         AccountManager.OnFirstTutorialDone();
     }
 
-    
+
 
     #region Auth Handlers
     public void SignUp()
@@ -785,7 +803,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         }
 
         m_loginQueueText.gameObject.SetActive(false);
-        
+
         AccountManager.ReduceLoginQueueLength();
 
         //Some optimization
@@ -805,11 +823,11 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     public override void OnLeftRoom()
     {
         //if (!PhotonNetwork.IsConnectedAndReady)
-            //Connect();
+        //Connect();
         Debug.Log("OnLeftRoom() called by PUN. Now this client is not in a room.");
         isRoomLoading = false;
         m_homeScreen.SetActive(true);
-        SelectHangarShip(SelectedShipPrefab != null ? SelectedShipPrefab.name : "Spaceship00");
+        SelectHangarShip(AccountManager.SelectedShip);
         OnMainScreenLoaded();
     }
 

@@ -30,7 +30,7 @@ MonoBehaviour:
   secretKey:
   - 049edcaf1fe33e16fe4c37f61355e86a54353435
   Build:
-  - 0.1
+  - 0.7.2
   SelectedPlatformOrganization:
   - Heroicsolo
   SelectedPlatformStudio:
@@ -41,8 +41,10 @@ MonoBehaviour:
   SelectedOrganization: 02000000
   SelectedStudio: 01000000
   SelectedGame: 01000000
-  NewVersion: 
-  Changes: 
+  NewVersion: 7.3.20
+  Changes: '7.3.20
+
+    - added event uuid to events sent'
   SignUpOpen: 0
   StudioName: Heroicsolo
   GameName: Ultimate Spaceship Arena

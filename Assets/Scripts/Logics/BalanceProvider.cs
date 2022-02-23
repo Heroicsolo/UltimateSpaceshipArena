@@ -42,7 +42,7 @@ public static class BalanceProvider
     public static BalanceInfo Balance;
     public static bool IsLoaded = false;
     public static Action OnValueChanged;
-    const int clientVersion = 7;
+    const int clientVersion = 8;
 
     public static void Init()
     {

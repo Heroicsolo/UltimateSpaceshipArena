@@ -13,6 +13,7 @@ Claim=Abholen
 DailyRewardsComeBackIn=Komm zurück in {0} für deine nächste Belohnung
 DayN=Tag {0}
 Credits=Kredite
+CreditsGot=Kredite
 CanClaimReward=Sie können Ihre Belohnung einfordern!
 YouGotX=Sie haben {0}!
 YouGotNX=Sie haben {0} {1}!

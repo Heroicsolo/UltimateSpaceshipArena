@@ -13,6 +13,7 @@ Claim=CLAIM
 DailyRewardsComeBackIn=Come back in {0} for your next reward
 DayN=Day {0}
 Credits=Credits
+CreditsGot=credits
 CanClaimReward=You can claim your reward!
 YouGotX=You got {0}!
 YouGotNX=You got {0} {1}!

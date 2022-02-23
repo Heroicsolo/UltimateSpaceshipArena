@@ -21,8 +21,14 @@ public class ShipToggle : MonoBehaviour
     {
         if( selected )
         {
-            Launcher.instance.SelectedShipPrefab = m_shipData.gameObject;
+            Launcher.instance.SelectHangarShip(m_shipData.gameObject.name);
         }
+    }
+
+    public void Select()
+    {
+        GetComponent<Toggle>().isOn = true;
+        GetComponent<Toggle>().Select();
     }
 
     private void Awake()

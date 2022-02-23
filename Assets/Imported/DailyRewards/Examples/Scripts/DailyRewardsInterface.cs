@@ -264,7 +264,7 @@ namespace NiobiumStudios
             imageReward.sprite = reward.sprite;
             if (rewardQt > 0)
             {
-                textReward.text = LangResolver.instance.GetLocalizedString("YouGotNX", reward.reward, unit);
+                textReward.text = string.Format(LangResolver.instance.GetLocalizedString("YouGotNX"), reward.reward, LangResolver.instance.GetLocalizedString(unit + "Got"));
             }
             else
             {

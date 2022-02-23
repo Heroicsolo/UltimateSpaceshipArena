@@ -56,6 +56,7 @@ public static class AccountManager
     private static int m_tutorialStep = 0;
 
     private static string m_userName = "Player";
+    private static int m_selectedShip = 0;
     private static int m_queueLength = 0;
     private static List<string> m_usedNicknamesList = new List<string>();
 
@@ -68,6 +69,7 @@ public static class AccountManager
     public static bool IsNicknamesListLoaded = false;
 
     public static string UserName => m_userName;
+    public static int SelectedShip { get { return m_selectedShip; } set { m_selectedShip = value; } }
     public static int CurrentRating { get { return m_arenaRating; } set { m_arenaRating = value; } }
 
     public static int FirstTutorialStep => m_tutorialStep;
@@ -174,6 +176,7 @@ public static class AccountManager
         }
 
         snapshot.GetValueFromSnapshot("username", m_userName, out m_userName);
+        snapshot.GetValueFromSnapshot("selectedShip", 0, out m_selectedShip);
         snapshot.GetValueFromSnapshot("nameChanged", false, out m_nameChanged);
         snapshot.GetValueFromSnapshot("arenaRating", BalanceProvider.Balance.initArenaRating, out m_arenaRating);
         snapshot.GetValueFromSnapshot("currency", BalanceProvider.Balance.initCurrency, out m_currency);
@@ -399,6 +402,7 @@ public static class AccountManager
         DatabaseReference userTable = mDatabaseRef.Child(AuthController.UserID);
 
         userTable.Child("username").SetValueAsync(m_userName);
+        userTable.Child("selectedShip").SetValueAsync(m_selectedShip);
         userTable.Child("nameChanged").SetValueAsync(m_nameChanged);
         userTable.Child("email").SetValueAsync(AuthController.Email);
         userTable.Child("arenaRating").SetValueAsync(m_arenaRating);

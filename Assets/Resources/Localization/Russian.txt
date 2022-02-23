@@ -13,6 +13,7 @@ Claim=ПОЛУЧИТЬ
 DailyRewardsComeBackIn=Возвращайся через {0} для след. награды
 DayN=День {0}
 Credits=Кредиты
+CreditsGot=кредитов
 CanClaimReward=Ты можешь получить свою награду!
 YouGotX=Получено {0}!
 YouGotNX=Получено {0} {1}!
