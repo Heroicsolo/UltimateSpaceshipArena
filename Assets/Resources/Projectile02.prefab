@@ -315,7 +315,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 198452957579870598, guid: 7b808adc014c9b34c9bf265876094d14, type: 3}
       propertyPath: stopAction
-      value: 1
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 198452957579870598, guid: 7b808adc014c9b34c9bf265876094d14, type: 3}
+      propertyPath: playOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 198590945614838730, guid: 7b808adc014c9b34c9bf265876094d14, type: 3}
+      propertyPath: playOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 198644374036710528, guid: 7b808adc014c9b34c9bf265876094d14, type: 3}
+      propertyPath: playOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 198655070740717358, guid: 7b808adc014c9b34c9bf265876094d14, type: 3}
+      propertyPath: playOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 198675903941686696, guid: 7b808adc014c9b34c9bf265876094d14, type: 3}
+      propertyPath: playOnAwake
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 199096192250665412, guid: 7b808adc014c9b34c9bf265876094d14, type: 3}
       propertyPath: m_Materials.Array.size

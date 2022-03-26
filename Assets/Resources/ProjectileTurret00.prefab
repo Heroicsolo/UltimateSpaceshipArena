@@ -227,13 +227,29 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 198105730096223990, guid: ead29d285f812e245818fd67198af431, type: 3}
+      propertyPath: playOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 198287999113124192, guid: ead29d285f812e245818fd67198af431, type: 3}
+      propertyPath: playOnAwake
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 198604625657555562, guid: ead29d285f812e245818fd67198af431, type: 3}
       propertyPath: stopAction
-      value: 1
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 198604625657555562, guid: ead29d285f812e245818fd67198af431, type: 3}
+      propertyPath: playOnAwake
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 198604625657555562, guid: ead29d285f812e245818fd67198af431, type: 3}
       propertyPath: moveWithTransform
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 198908931197519880, guid: ead29d285f812e245818fd67198af431, type: 3}
+      propertyPath: playOnAwake
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 199065738470465782, guid: ead29d285f812e245818fd67198af431, type: 3}
       propertyPath: m_Materials.Array.size

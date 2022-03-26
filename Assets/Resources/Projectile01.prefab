@@ -228,6 +228,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 198105730096223990, guid: ead29d285f812e245818fd67198af431, type: 3}
+      propertyPath: playOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 198105730096223990, guid: ead29d285f812e245818fd67198af431, type: 3}
       propertyPath: InitialModule.startColor.maxColor.b
       value: 1
       objectReference: {fileID: 0}
@@ -238,6 +242,10 @@ PrefabInstance:
     - target: {fileID: 198105730096223990, guid: ead29d285f812e245818fd67198af431, type: 3}
       propertyPath: InitialModule.startColor.maxColor.r
       value: 0.87865937
+      objectReference: {fileID: 0}
+    - target: {fileID: 198287999113124192, guid: ead29d285f812e245818fd67198af431, type: 3}
+      propertyPath: playOnAwake
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 198287999113124192, guid: ead29d285f812e245818fd67198af431, type: 3}
       propertyPath: InitialModule.startColor.maxColor.b
@@ -265,7 +273,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 198604625657555562, guid: ead29d285f812e245818fd67198af431, type: 3}
       propertyPath: stopAction
-      value: 1
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 198604625657555562, guid: ead29d285f812e245818fd67198af431, type: 3}
+      propertyPath: playOnAwake
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 198604625657555562, guid: ead29d285f812e245818fd67198af431, type: 3}
       propertyPath: moveWithTransform
@@ -278,6 +290,10 @@ PrefabInstance:
     - target: {fileID: 198604625657555562, guid: ead29d285f812e245818fd67198af431, type: 3}
       propertyPath: InitialModule.startColor.maxColor.g
       value: 0.1490196
+      objectReference: {fileID: 0}
+    - target: {fileID: 198908931197519880, guid: ead29d285f812e245818fd67198af431, type: 3}
+      propertyPath: playOnAwake
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 198908931197519880, guid: ead29d285f812e245818fd67198af431, type: 3}
       propertyPath: InitialModule.startColor.maxColor.b
