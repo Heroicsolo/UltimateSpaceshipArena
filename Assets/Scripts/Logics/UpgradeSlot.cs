@@ -30,7 +30,7 @@ public class UpgradeSlot : MonoBehaviour
         data = _data;
         currentLevel = level;
         icon.sprite = data.icon;
-        title.text = data.title;
+        title.text = LangResolver.instance.GetLocalizedString("UpgradeTitle_" + data.id);
         currentCost = data.cost + Mathf.CeilToInt(level * data.cost * 0.5f);
         if (currentCost > AccountManager.Currency) costLabel.color = Color.red;
         Refresh();
@@ -69,7 +69,7 @@ public class UpgradeSlot : MonoBehaviour
 
     public void ShowDesc()
     {
-        MessageBox.instance.Show(data.desc);
+        MessageBox.instance.Show(LangResolver.instance.GetLocalizedString("UpgradeDesc_" + data.id));
     }
 
     public void TryUpgrade()

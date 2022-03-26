@@ -13,8 +13,6 @@ MonoBehaviour:
   m_Name: upgrade_ship02_03
   m_EditorClassIdentifier: 
   id: enhanced_repair
-  title: Enhanced Repair
-  desc: Each time repair will restore 40% more durability
   icon: {fileID: 21300000, guid: c16180dcfa7ce714baf66b19c6244390, type: 3}
   cost: 3000
   tier: 1

@@ -6,8 +6,6 @@ using UnityEngine;
 public class UpgradeData : ScriptableObject
 {
     [SerializeField] public string id;
-    [SerializeField] public string title;
-    [SerializeField] public string desc;
     [SerializeField] public Sprite icon;
     [SerializeField] public int cost = 0;
     [SerializeField] public int tier = 0;

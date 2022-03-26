@@ -522,6 +522,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         }
         else if (DeathEffect)
         {
+            if (isMissionBot)
+            {
+                DeathEffect.transform.parent = null;
+                var main = DeathEffect.main;
+                main.stopAction = ParticleSystemStopAction.Destroy;
+            }
             DeathEffect.Play();
         }
 

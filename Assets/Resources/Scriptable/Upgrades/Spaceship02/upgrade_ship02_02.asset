@@ -13,8 +13,6 @@ MonoBehaviour:
   m_Name: upgrade_ship02_02
   m_EditorClassIdentifier: 
   id: unshakeable_defender
-  title: Unshakeable Defender
-  desc: Your ship will be immortal 2 additional seconds after each respawn
   icon: {fileID: 21300000, guid: 500148077c75c0344b98b5bee94cf187, type: 3}
   cost: 3000
   tier: 1

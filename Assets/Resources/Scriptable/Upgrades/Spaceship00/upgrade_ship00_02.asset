@@ -13,8 +13,6 @@ MonoBehaviour:
   m_Name: upgrade_ship00_02
   m_EditorClassIdentifier: 
   id: precise_shots
-  title: Precise Shots
-  desc: Crit chance increased by 3% per each upgrade level
   icon: {fileID: 21300000, guid: a091c418f8c56f34dbd11906cb879af2, type: 3}
   cost: 2000
   tier: 1

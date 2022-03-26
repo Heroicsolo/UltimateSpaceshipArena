@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.4366756, g: 0.48427194, b: 0.5645252, a: 1}
+  m_IndirectSpecularColor: {r: 0.4366757, g: 0.48427194, b: 0.5645252, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -15523,7 +15523,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: Warning!
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: e0a419a013a571645bf68d0a9f4915c3, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -15587,7 +15587,7 @@ MonoBehaviour:
   m_margin: {x: -174.50455, y: -25.098389, z: -165.37732, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &615718544
@@ -80539,6 +80539,7 @@ GameObject:
   - component: {fileID: 6946256476863555304}
   - component: {fileID: 6946256476890082154}
   - component: {fileID: 6946256476890082156}
+  - component: {fileID: 6946256476883541641}
   m_Layer: 0
   m_Name: Text
   m_TagString: Untagged
@@ -80546,6 +80547,19 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &6946256476883541641
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6946256476883541640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07bda499927707947a03523b0527c930, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Identifier: CloseBig
 --- !u!1 &6946256476883541642
 GameObject:
   m_ObjectHideFlags: 0

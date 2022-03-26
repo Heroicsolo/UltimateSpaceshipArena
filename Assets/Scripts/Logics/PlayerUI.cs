@@ -572,19 +572,19 @@ public class PlayerUI : MonoBehaviour
     {
         Launcher.instance.OnArenaTutorialDone();
         if (!AccountManager.IsControlTutorialDone)
-            TutorialController.instance.ShowCustomTutorialUnit(LangResolver.instance.GetLocalizedString("TutorialLeftJoystick"), joystick.GetComponent<RectTransform>(), OnMovementTutorialDone);
+            TutorialController.instance.ShowCustomTutorialUnit("TutorialLeftJoystick", joystick.GetComponent<RectTransform>(), OnMovementTutorialDone);
     }
 
     void OnMissionTutorialDone()
     {
         Launcher.instance.OnMissionTutorialDone();
         if (!AccountManager.IsControlTutorialDone)
-            TutorialController.instance.ShowCustomTutorialUnit(LangResolver.instance.GetLocalizedString("TutorialLeftJoystick"), joystick.GetComponent<RectTransform>(), OnMovementTutorialDone);
+            TutorialController.instance.ShowCustomTutorialUnit("TutorialLeftJoystick", joystick.GetComponent<RectTransform>(), OnMovementTutorialDone);
     }
 
     void OnMovementTutorialDone()
     {
-        TutorialController.instance.ShowCustomTutorialUnit(LangResolver.instance.GetLocalizedString("TutorialRightJoystick"), weaponJoystick.GetComponent<RectTransform>(), OnWeaponTutorialDone);
+        TutorialController.instance.ShowCustomTutorialUnit("TutorialRightJoystick", weaponJoystick.GetComponent<RectTransform>(), OnWeaponTutorialDone);
     }
 
     void OnWeaponTutorialDone()

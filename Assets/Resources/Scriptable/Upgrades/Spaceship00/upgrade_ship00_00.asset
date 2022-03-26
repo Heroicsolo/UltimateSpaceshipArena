@@ -13,8 +13,6 @@ MonoBehaviour:
   m_Name: upgrade_ship00_00
   m_EditorClassIdentifier: 
   id: improved_bullets
-  title: Improved Bullets
-  desc: Main weapon will do +1 additional damage for each upgrade level
   icon: {fileID: 21300000, guid: 6bd2ed960381a98408f1998a25195b2a, type: 3}
   cost: 1000
   tier: 0

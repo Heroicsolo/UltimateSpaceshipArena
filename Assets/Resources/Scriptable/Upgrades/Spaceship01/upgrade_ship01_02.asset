@@ -13,8 +13,6 @@ MonoBehaviour:
   m_Name: upgrade_ship01_02
   m_EditorClassIdentifier: 
   id: search_vulnerabilities
-  title: Search for Vulnerabilites
-  desc: Critical damage increased by 20% per each upgrade level
   icon: {fileID: 21300000, guid: 9b096b02f98d11f4e8d8a583e4823061, type: 3}
   cost: 2000
   tier: 1

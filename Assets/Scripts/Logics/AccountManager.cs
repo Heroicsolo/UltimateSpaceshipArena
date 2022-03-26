@@ -211,13 +211,17 @@ public static class AccountManager
 
     public static void UnlockAchievement(string id)
     {
+        #if UNITY_ANDROID
         if (Social.localUser.authenticated && !IsAchievementUnlocked(id))
             (Social.Active as PlayGamesPlatform).UnlockAchievement(id, achievementUpdated);
+        #endif
     }
 
     private static void achievementUpdated(bool updated)
     {
+        #if UNITY_ANDROID
         (Social.Active as PlayGamesPlatform).LoadAchievements(InitAchievements);
+        #endif
     }
 
     public static void InitAchievements(IAchievement[] achievements)
@@ -226,7 +230,9 @@ public static class AccountManager
 
         m_achievementsLoaded = true;
 
+        #if UNITY_ANDROID
         (Social.Active as PlayGamesPlatform).LoadAchievementDescriptions(InitAchievementsDesc);
+        #endif
     }
 
     private static void InitAchievementsDesc(IAchievementDescription[] achievementsDesc)

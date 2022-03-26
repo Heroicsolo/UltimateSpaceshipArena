@@ -13,8 +13,6 @@ MonoBehaviour:
   m_Name: upgrade_ship01_00
   m_EditorClassIdentifier: 
   id: hidden_killer
-  title: Hidden Killer
-  desc: During stealth fly speed increased by 10% per each upgrade level
   icon: {fileID: 21300000, guid: 095dfef3dfb4b794fa15a6675ef88ed3, type: 3}
   cost: 1000
   tier: 0
