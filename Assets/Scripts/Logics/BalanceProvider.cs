@@ -42,7 +42,7 @@ public static class BalanceProvider
     public static BalanceInfo Balance;
     public static bool IsLoaded = false;
     public static Action OnValueChanged;
-    const int clientVersion = 8;
+    const int clientVersion = 9;
 
     public static void Init()
     {
@@ -59,6 +59,8 @@ public static class BalanceProvider
                                 RefreshBalance(task.Result);
                             }
                         });
+
+        mBalanceDatabaseRef.ValueChanged += HandleBalanceValueChanged;
     }
 
     private static void RefreshBalance(DataSnapshot snapshot)
