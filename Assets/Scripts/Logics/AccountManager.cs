@@ -233,17 +233,20 @@ public static class AccountManager
         int neededExp = GetNeededExpForCurrLevel();
 
         int expTotal = m_experience;
-        int actualLevel = m_level;
+        bool lvlChanged = false;
 
         while( expTotal >= neededExp )
         {
-            actualLevel++;
+            m_level++;
+            lvlChanged = true;
             expTotal -= neededExp;
             neededExp = GetNeededExpForCurrLevel();
         }
 
-        Level = actualLevel;
         m_experience = expTotal;
+
+        if (lvlChanged)
+            Launcher.instance.OnLevelChanged();
     }
 
     private static void achievementUpdated(bool updated)
