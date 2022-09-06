@@ -580,7 +580,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         int moneyGained = BalanceProvider.Balance.currencyPerFightMin + BalanceProvider.Balance.currencyPerWin + BalanceProvider.Balance.currencyPlaceBonus * (BalanceProvider.Balance.winnersCount - place);
         moneyGained = Mathf.CeilToInt(moneyGained * (1f + BalanceProvider.Balance.currencyPerRatingBonus * (float)AccountManager.CurrentRating / 1000f));
         AccountManager.Currency += moneyGained;
-        AccountManager.Exp += BalanceProvider.Balance.expPerFightMin + Mathf.CeilToInt(score * BalanceProvider.Balance.expPerScoreModifier);
+        AccountManager.Exp += BalanceProvider.Balance.expPerFightMin + Mathf.CeilToInt((1 + score) * BalanceProvider.Balance.expPerScoreModifier);
         GameAnalytics.NewResourceEvent(GAResourceFlowType.Source, "credits", moneyGained, "ArenaRewards", "FightWon");
         AccountManager.CurrentRating = Mathf.Max(0, AccountManager.CurrentRating + Mathf.CeilToInt((bonusForPlace + 200) * BalanceProvider.Balance.victoryRatingMod * 2000f / Mathf.Max(1000f, AccountManager.CurrentRating)));
         AccountManager.SaveProfile();
