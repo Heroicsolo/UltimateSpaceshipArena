@@ -60,6 +60,8 @@ public static class AccountManager
     private static int m_queueLength = 0;
     private static List<string> m_usedNicknamesList = new List<string>();
 
+    private static int m_experience = 0;
+    private static int m_level = 1;
     private static int m_currency = 1000;
     private static int m_arenaRating = 0;
     private static bool m_nameChanged = false;
@@ -83,6 +85,8 @@ public static class AccountManager
     public static bool IsNameChanged => m_nameChanged;
 
     public static int Currency { get { return m_currency; } set { m_currency = value; Launcher.instance.OnCurrencyChanged(); } }
+    public static int Level { get { return m_level; } set { m_level = value; Launcher.instance.OnLevelChanged(); } }
+    public static int Exp { get { return m_experience; } set { m_experience = value; CheckExp(); Launcher.instance.OnExpChanged(); } }
 
     public static int LoginQueueLength => m_queueLength;
 
@@ -180,6 +184,8 @@ public static class AccountManager
         snapshot.GetValueFromSnapshot("nameChanged", false, out m_nameChanged);
         snapshot.GetValueFromSnapshot("arenaRating", BalanceProvider.Balance.initArenaRating, out m_arenaRating);
         snapshot.GetValueFromSnapshot("currency", BalanceProvider.Balance.initCurrency, out m_currency);
+        snapshot.GetValueFromSnapshot("experience", 0, out m_experience);
+        snapshot.GetValueFromSnapshot("level", 1, out m_level);
 
         AuthController.SetEmailIfEmpty(notEmptyProfile ? snapshot.Child("email").Value.ToString() : "");
 
@@ -215,6 +221,29 @@ public static class AccountManager
         if (Social.localUser.authenticated && !IsAchievementUnlocked(id))
             (Social.Active as PlayGamesPlatform).UnlockAchievement(id, achievementUpdated);
         #endif
+    }
+
+    public static int GetNeededExpForCurrLevel()
+    {
+        return Mathf.FloorToInt(BalanceProvider.Balance.expForLevelBase * Mathf.Pow(BalanceProvider.Balance.expProgressionModifier, (m_level - 1) * BalanceProvider.Balance.expProgressionPowModifier));
+    }
+
+    private static void CheckExp()
+    {
+        int neededExp = GetNeededExpForCurrLevel();
+
+        int expTotal = m_experience;
+        int actualLevel = m_level;
+
+        while( expTotal >= neededExp )
+        {
+            actualLevel++;
+            expTotal -= neededExp;
+            neededExp = GetNeededExpForCurrLevel();
+        }
+
+        Level = actualLevel;
+        m_experience = expTotal;
     }
 
     private static void achievementUpdated(bool updated)
@@ -413,6 +442,8 @@ public static class AccountManager
         userTable.Child("email").SetValueAsync(AuthController.Email);
         userTable.Child("arenaRating").SetValueAsync(m_arenaRating);
         userTable.Child("currency").SetValueAsync(m_currency);
+        userTable.Child("experience").SetValueAsync(m_experience);
+        userTable.Child("level").SetValueAsync(m_level);
 
         userTable.Child("lastDailyRewardDebugTime").SetValueAsync(m_lastDailyRewardDebugTime);
         userTable.Child("lastDailyRewardTime").SetValueAsync(m_lastDailyRewardTime);

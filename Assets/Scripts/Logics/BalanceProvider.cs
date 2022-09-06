@@ -29,11 +29,17 @@ public class BalanceInfo
     public int currencyPerWin;
     public int currencyPlaceBonus;
     public int currencyPerMissionMin;
+    public int expPerMissionMin;
+    public int expPerFightMin;
+    public float expPerScoreModifier;
     public float missionTimeRewardModifier;
     public float missionBotsDurabilityCoef;
     public float missionBotsShieldCoef;
     public float currencyPerRatingBonus;
     public int nameChangeCost;
+    public int expForLevelBase;
+    public float expProgressionModifier;
+    public float expProgressionPowModifier;
 }
 
 public static class BalanceProvider
@@ -42,7 +48,7 @@ public static class BalanceProvider
     public static BalanceInfo Balance;
     public static bool IsLoaded = false;
     public static Action OnValueChanged;
-    const int clientVersion = 9;
+    const int clientVersion = 10;
 
     public static void Init()
     {

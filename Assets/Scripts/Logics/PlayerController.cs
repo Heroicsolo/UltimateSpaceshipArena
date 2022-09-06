@@ -100,6 +100,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     private int m_maxField = 100;
     [SerializeField]
     private float m_maxSpeed = 50f;
+    [SerializeField]
+    private int m_unlockLevel = 1;
 
     [Header("Audio")]
     [SerializeField] private AudioClip shootSound;
@@ -222,6 +224,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     public int BaseShield => m_maxField;
 
     public float MaxSpeed => m_maxSpeed;
+    public int UnlockLevel => m_unlockLevel;
 
     public Projectile MainProjectile => ProjectilePrefab.GetComponent<Projectile>();
 
@@ -1058,7 +1061,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         if (!isMissionMode)
         {
             int oldRating = AccountManager.CurrentRating;
-            int moneyGained = Launcher.instance.OnFightWon(place);
+            int moneyGained = Launcher.instance.OnFightWon(place, Score);
             int newRating = AccountManager.CurrentRating;
 
             PlayerUI.Instance.OnWin(oldRating, newRating - oldRating, place, moneyGained);

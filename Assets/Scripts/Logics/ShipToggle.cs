@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,8 +15,13 @@ public class ShipToggle : MonoBehaviour
     [SerializeField] Image m_skillIcon3;
     [SerializeField] Image m_shipIcon;
     [SerializeField] Text m_shipTitle;
+    [SerializeField] GameObject m_lockObj;
+    [SerializeField] TextMeshProUGUI m_unlockLabel;
+    [SerializeField] GameObject m_upgradeBtn;
 
     public PlayerController ShipData => m_shipData;
+
+    private Toggle toggle;
 
     public void OnShipSelected(bool selected)
     {
@@ -33,6 +39,8 @@ public class ShipToggle : MonoBehaviour
 
     private void Awake()
     {
+        toggle = GetComponent<Toggle>();
+
         m_barDurability.fillAmount = m_shipData.BaseDurability / 200f;
         m_barShield.fillAmount = m_shipData.BaseShield / 200f;
         m_barSpeed.fillAmount = m_shipData.MaxSpeed / 100f;
@@ -46,6 +54,11 @@ public class ShipToggle : MonoBehaviour
 
     private void Refresh()
     {
+        m_lockObj.SetActive(m_shipData.UnlockLevel > AccountManager.Level);
+        m_unlockLabel.text = "LVL " + m_shipData.UnlockLevel;
+        toggle.interactable = !m_lockObj.activeSelf;
+        m_upgradeBtn.SetActive(!m_lockObj.activeSelf);
+
         m_shipTitle.text = LangResolver.instance.GetLocalizedString(m_shipData.ShipTitle);
 
         List<UpgradeData> upgradesList = m_shipData.Upgrades;

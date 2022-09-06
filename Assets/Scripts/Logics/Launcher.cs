@@ -57,6 +57,9 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     [SerializeField] private GameObject m_missionButton;
     [SerializeField] private ChatManager chatManager;
     [SerializeField] private GameObject chatUI;
+    [SerializeField] private TextMeshProUGUI userLevelLabel;
+    [SerializeField] private TextMeshProUGUI userExpLabel;
+    [SerializeField] private Image userExpBar;
 
     [Header("Profile Screen")]
     [SerializeField] private Button changeNameBtn;
@@ -263,6 +266,18 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         currencyLabel.text = AccountManager.Currency.ToString();
     }
 
+    public void OnLevelChanged()
+    {
+        userLevelLabel.text = AccountManager.Level.ToString();
+    }
+
+    public void OnExpChanged()
+    {
+        int neededExp = AccountManager.GetNeededExpForCurrLevel();
+        userExpLabel.text = AccountManager.Exp + "/" + neededExp;
+        userExpBar.fillAmount = (float)AccountManager.Exp/(float)neededExp;
+    }
+
     public void ShowShipsSelector()
     {
         m_shipsSelector.SetActive(true);
@@ -398,6 +413,9 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
         RefreshTopButtons();
 
+        OnExpChanged();
+        OnLevelChanged();
+
         NotificationsManager.Init();
 
         LangResolver.instance.ResolveTexts();
@@ -524,6 +542,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         GameAnalytics.NewProgressionEvent(GAProgressionStatus.Complete, "Mission", PlayerController.LocalPlayer.Score);
         int moneyGained = BalanceProvider.Balance.currencyPerMissionMin + Mathf.CeilToInt((180f / (10f + completionTime)) * BalanceProvider.Balance.missionTimeRewardModifier * 100);
         AccountManager.Currency += moneyGained;
+        AccountManager.Exp += BalanceProvider.Balance.expPerMissionMin + Mathf.CeilToInt((180f / (10f + completionTime)) * BalanceProvider.Balance.missionTimeRewardModifier * 100);
         GameAnalytics.NewResourceEvent(GAResourceFlowType.Source, "credits", moneyGained, "MissionRewards", "MissionReward");
         AccountManager.SaveProfile();
         AccountManager.UnlockAchievement(GPGSIds.achievement_mission_is_possible);
@@ -542,6 +561,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         isFightCompleted = true;
         GameAnalytics.NewProgressionEvent(GAProgressionStatus.Fail, "Arena", PlayerController.LocalPlayer.Score);
         AccountManager.Currency += BalanceProvider.Balance.currencyPerFightMin;
+        AccountManager.Exp += BalanceProvider.Balance.expPerFightMin;
         GameAnalytics.NewResourceEvent(GAResourceFlowType.Source, "credits", BalanceProvider.Balance.currencyPerFightMin, "ArenaRewards", "FightLoss");
         AccountManager.CurrentRating = Mathf.Max(0, AccountManager.CurrentRating - Mathf.FloorToInt(0.1f * BalanceProvider.Balance.lossRatingMod * AccountManager.CurrentRating));
         AccountManager.SaveProfile();
@@ -552,7 +572,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         return BalanceProvider.Balance.currencyPerFightMin;
     }
 
-    public int OnFightWon(int place = 1)
+    public int OnFightWon(int place = 1, int score = 0)
     {
         isFightCompleted = true;
         GameAnalytics.NewProgressionEvent(GAProgressionStatus.Complete, "Arena", PlayerController.LocalPlayer.Score);
@@ -560,6 +580,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         int moneyGained = BalanceProvider.Balance.currencyPerFightMin + BalanceProvider.Balance.currencyPerWin + BalanceProvider.Balance.currencyPlaceBonus * (BalanceProvider.Balance.winnersCount - place);
         moneyGained = Mathf.CeilToInt(moneyGained * (1f + BalanceProvider.Balance.currencyPerRatingBonus * (float)AccountManager.CurrentRating / 1000f));
         AccountManager.Currency += moneyGained;
+        AccountManager.Exp += BalanceProvider.Balance.expPerFightMin + Mathf.CeilToInt(score * BalanceProvider.Balance.expPerScoreModifier);
         GameAnalytics.NewResourceEvent(GAResourceFlowType.Source, "credits", moneyGained, "ArenaRewards", "FightWon");
         AccountManager.CurrentRating = Mathf.Max(0, AccountManager.CurrentRating + Mathf.CeilToInt((bonusForPlace + 200) * BalanceProvider.Balance.victoryRatingMod * 2000f / Mathf.Max(1000f, AccountManager.CurrentRating)));
         AccountManager.SaveProfile();
