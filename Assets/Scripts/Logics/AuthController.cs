@@ -8,6 +8,7 @@ using GooglePlayGames.BasicApi;
 using GooglePlayGames;
 using UnityEngine.SocialPlatforms;
 using UnityEngine;
+using AppsFlyerSDK;
 
 public static class AuthController
 {
@@ -136,6 +137,10 @@ public static class AuthController
             m_signingIn = false;
             m_playGamesSignInSuccess = true;
             m_playGamesSignInEnded = true;
+
+            Dictionary<string, string> eventValues = new Dictionary<string, string>();
+            eventValues.Add(AFInAppEvents.REGSITRATION_METHOD, "PlayGames");
+            AppsFlyer.sendEvent(AFInAppEvents.COMPLETE_REGISTRATION, eventValues);
         });
     }
 
@@ -184,6 +189,10 @@ public static class AuthController
             m_signInFailed = false;
             m_signedIn = true;
             m_signingIn = false;
+
+            Dictionary<string, string> eventValues = new Dictionary<string, string>();
+            eventValues.Add(AFInAppEvents.REGSITRATION_METHOD, "email");
+            AppsFlyer.sendEvent(AFInAppEvents.COMPLETE_REGISTRATION, eventValues);
 
             PlayerPrefs.SetString("googleId", idToken);
         });

@@ -15,7 +15,7 @@ using GooglePlayGames;
 using UnityEngine.SocialPlatforms;
 using NiobiumStudios;
 using GameAnalyticsSDK;
-using Facebook.Unity;
+using AppsFlyerSDK;
 
 public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 {
@@ -123,6 +123,10 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         int shipIdx = availableShips.FindIndex(x => x.name == shipName);
 
         SelectHangarShip(shipIdx, true);
+
+        Dictionary<string, string> eventValues = new Dictionary<string, string>();
+        eventValues.Add("ship_name", shipName);
+        AppsFlyer.sendEvent("ship_selected", eventValues);
     }
 
     public void SelectHangarShip(int shipNumber, bool withSave = false)
@@ -167,7 +171,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         Input.multiTouchEnabled = true;
 
         GameAnalytics.Initialize();
-        FB.Init();
+        AppsFlyer.startSDK();
 
         // #Critical
         // this makes sure we can use PhotonNetwork.LoadLevel() on the master client and all clients in the same room sync their level automatically
@@ -213,6 +217,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
 
     private void OnApplicationQuit()
     {
+        AppsFlyer.stopSDK(true);
         OnApplicationExit?.Invoke();
     }
 
@@ -386,6 +391,7 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         if (AuthController.IsAuthorized)
         {
             AccountManager.SetOnline();
+            AppsFlyer.sendEvent(AFInAppEvents.LOGIN, null);
         }
 
         m_loadingText.text = LangResolver.instance.GetLocalizedString("LoadingScreen_Connecting");
@@ -445,6 +451,12 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
         {
             AccountManager.Currency += myReward.reward;
             GameAnalytics.NewResourceEvent(GAResourceFlowType.Source, "credits", myReward.reward, "DailyRewards", "DailyReward_" + day.ToString());
+
+            Dictionary<string, string> eventValues = new Dictionary<string, string>();
+            eventValues.Add("reward_type", "Credits");
+            eventValues.Add("reward_amount", myReward.reward.ToString());
+            eventValues.Add("day_number", day.ToString());
+            AppsFlyer.sendEvent("daily_reward", eventValues);
         }
 
         currencyLabel.text = AccountManager.Currency.ToString();
@@ -488,11 +500,21 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     public void OnArenaTutorialDone()
     {
         AccountManager.OnArenaTutorialDone();
+        Dictionary<string, string> eventValues = new Dictionary<string, string>();
+        eventValues.Add(AFInAppEvents.SUCCESS, "true");
+        eventValues.Add("af_tutorial_id", "1");
+        eventValues.Add("af_content", "Arena tutorial");
+        AppsFlyer.sendEvent(AFInAppEvents.TUTORIAL_COMPLETION, eventValues);
     }
 
     public void OnMissionTutorialDone()
     {
         AccountManager.OnMissionTutorialDone();
+        Dictionary<string, string> eventValues = new Dictionary<string, string>();
+        eventValues.Add(AFInAppEvents.SUCCESS, "true");
+        eventValues.Add("af_tutorial_id", "2");
+        eventValues.Add("af_content", "Mission tutorial");
+        AppsFlyer.sendEvent(AFInAppEvents.TUTORIAL_COMPLETION, eventValues);
     }
 
     public void OpenAppStorePage()
@@ -540,6 +562,12 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     {
         isFightCompleted = true;
         GameAnalytics.NewProgressionEvent(GAProgressionStatus.Complete, "Mission", PlayerController.LocalPlayer.Score);
+
+        Dictionary<string, string> eventValues = new Dictionary<string, string>();
+        eventValues.Add(AFInAppEvents.LEVEL, "Mission");
+        eventValues.Add(AFInAppEvents.SCORE, PlayerController.LocalPlayer.Score.ToString());
+        AppsFlyer.sendEvent(AFInAppEvents.LEVEL_ACHIEVED, eventValues);
+
         int moneyGained = BalanceProvider.Balance.currencyPerMissionMin + Mathf.CeilToInt((180f / (10f + completionTime)) * BalanceProvider.Balance.missionTimeRewardModifier * 100);
         AccountManager.Currency += moneyGained;
         AccountManager.Exp += BalanceProvider.Balance.expPerMissionMin + Mathf.CeilToInt((180f / (10f + completionTime)) * BalanceProvider.Balance.missionTimeRewardModifier * 100);
@@ -576,6 +604,12 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     {
         isFightCompleted = true;
         GameAnalytics.NewProgressionEvent(GAProgressionStatus.Complete, "Arena", PlayerController.LocalPlayer.Score);
+
+        Dictionary<string, string> eventValues = new Dictionary<string, string>();
+        eventValues.Add(AFInAppEvents.LEVEL, "Arena");
+        eventValues.Add(AFInAppEvents.SCORE, PlayerController.LocalPlayer.Score.ToString());
+        AppsFlyer.sendEvent(AFInAppEvents.LEVEL_ACHIEVED, eventValues);
+
         int bonusForPlace = (BalanceProvider.Balance.winnersCount - place) * 100;
         int moneyGained = BalanceProvider.Balance.currencyPerFightMin + BalanceProvider.Balance.currencyPerWin + BalanceProvider.Balance.currencyPlaceBonus * (BalanceProvider.Balance.winnersCount - place);
         moneyGained = Mathf.CeilToInt(moneyGained * (1f + BalanceProvider.Balance.currencyPerRatingBonus * (float)AccountManager.CurrentRating / 1000f));
@@ -606,6 +640,11 @@ public class Launcher : MonoBehaviourPunCallbacks, IMatchmakingCallbacks
     public void OnTutorialDone()
     {
         GameAnalytics.NewDesignEvent("tutorial_complete");
+        Dictionary<string, string> eventValues = new Dictionary<string, string>();
+        eventValues.Add(AFInAppEvents.SUCCESS, "true");
+        eventValues.Add("af_tutorial_id", "0");
+        eventValues.Add("af_content", "First tutorial");
+        AppsFlyer.sendEvent(AFInAppEvents.TUTORIAL_COMPLETION, eventValues);
         AccountManager.OnFirstTutorialDone();
     }
 
