@@ -5,7 +5,8 @@
 [Bb]uilds/
 [Ll]ogs/
 [Mm]emoryCaptures/
-[Rr]ecordings
+[Rr]ecordings/
+[Uu]serSettings/
 USA_WinBuild/
 
 # Asset meta data should only be ignored when the corresponding asset is also ignored
@@ -56,5 +57,6 @@ XcodeProject
 
 # Builds
 *.apk
+*.aab
 *.unitypackage
 Assets/Firebase/Plugins/x86_64/FirebaseCppApp-10_7_0.bundle
